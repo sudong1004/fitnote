@@ -6,6 +6,7 @@ import {
   MembershipStatus,
 } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
+import { cache } from "react";
 
 export class TrainerError extends Error {
   constructor(
@@ -24,7 +25,8 @@ export class TrainerError extends Error {
  * 트레이너도 회원을 받고 알림장을 쓴다. 프로필이 없으면 아예 들어오면 안 되는
  * 화면이라 여기서 던진다.
  */
-export async function requireTrainerProfile(userId: string) {
+// 한 화면을 그리는 동안 여러 함수가 같은 확인을 부른다. 요청 안에서는 한 번만 묻는다.
+export const requireTrainerProfile = cache(async (userId: string) => {
   const profile = await prisma.trainerProfile.findUnique({
     where: { userId },
     select: {
@@ -44,7 +46,7 @@ export async function requireTrainerProfile(userId: string) {
     userId: profile.userId,
     name: profile.displayName ?? profile.user.name,
   };
-}
+});
 
 /**
  * 현재 로그인한 트레이너가 실제로 소속되어 있는 활성 센터 목록.
@@ -89,10 +91,10 @@ export async function getActiveMemberships(userId: string) {
  * 언제부터 봐 주기 시작했는지가 담겨 있고, 남의 기록을 읽을 때 그 시점이
  * 기준이 되기 때문이다. userId 를 주소에 쓰면 그 기준을 매번 다시 찾아야 한다.
  */
-export async function requireMyMember(
+export const requireMyMember = cache(async (
   trainerProfileId: string,
   connectionId: string,
-) {
+) => {
   const connection = await prisma.trainerMemberConnection.findFirst({
     where: {
       id: connectionId,
@@ -112,7 +114,7 @@ export async function requireMyMember(
   }
 
   return connection;
-}
+});
 
 /**
  * 회원의 userId 로 연결을 찾는다.
