@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Bell, ChevronRight, LogOut } from "lucide-react";
+import { Bell, ChevronRight, LogOut, Pencil } from "lucide-react";
 
 import { logout } from "@/app/actions/auth";
 import { requireUser } from "@/app/lib/dal";
@@ -69,6 +69,13 @@ export default async function TrainerProfilePage() {
           <h1 className="truncate text-xl font-extrabold">{name}</h1>
           <p className="truncate text-xs text-muted-foreground">{user.email}</p>
         </span>
+        <Link
+          href="/trainer/profile/edit"
+          className="flex h-9 shrink-0 items-center gap-1 rounded-full border border-border px-3.5 text-[0.8125rem] font-bold text-ink hover:bg-surface"
+        >
+          <Pencil className="size-3.5" aria-hidden />
+          수정
+        </Link>
       </header>
 
       <section className="rounded-[1.375rem] bg-primary px-4.5 py-4 text-white">
@@ -113,7 +120,18 @@ export default async function TrainerProfilePage() {
             </p>
           ) : null}
         </section>
-      ) : null}
+      ) : (
+        <Link
+          href="/trainer/profile/edit"
+          className="flex items-center gap-3 rounded-[1.25rem] border border-dashed border-brand px-4 py-3.5"
+        >
+          <span className="min-w-0 flex-1">
+            <b className="block text-sm">회원에게 보일 소개 쓰기</b>
+            <span className="block truncate text-xs text-muted-foreground">전문 분야 · 경력 · 한 줄 소개</span>
+          </span>
+          <ChevronRight className="size-4 shrink-0 text-faint" aria-hidden />
+        </Link>
+      )}
 
       <InvitePanel invitations={invitations} />
 
