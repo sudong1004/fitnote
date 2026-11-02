@@ -11,6 +11,7 @@ import {
   getSessionSummary,
   openManualSession,
   startSession,
+  updateSet,
 } from "@/server/workouts/workout.service";
 
 import { uniq } from "./helpers";
@@ -94,6 +95,22 @@ describe("운동 기록 한 바퀴", () => {
 
     const summary = await getSessionSummary(userId, sessionId);
     expect(summary).not.toBeNull();
+  });
+
+  it("화면이 정한 id 로 세트를 만들고, 그 id 로 바로 값을 고칠 수 있다", async () => {
+    const { userId, exerciseId } = await setup();
+    const started = await startSession(userId, { mode: "new" });
+    const sessionId = started.session!.id;
+    const record = await addRecord(userId, sessionId, { exerciseId });
+    const recordId = record!.record.id;
+
+    const id = crypto.randomUUID();
+    await addSet(userId, recordId, { weight: null, reps: null }, { id });
+    await updateSet(userId, id, { weight: 80, reps: 6, completed: true });
+
+    const set = await prisma.workoutSet.findUniqueOrThrow({ where: { id } });
+    expect({ setNumber: set.setNumber, weight: Number(set.weight), reps: set.reps }).toEqual({ setNumber: 1, weight: 80, reps: 6 });
+    expect((await getSessionById(userId, sessionId))?.totalVolume).toBe(480);
   });
 
   it("세트를 지우면 볼륨이 다시 계산된다", async () => {

@@ -41,6 +41,7 @@ import {
 } from "../actions";
 import { ptErrorMessage } from "../messages";
 import { SubmitButton } from "../submit-button";
+import { SESSION_DURATION } from "@/lib/session-duration";
 
 export const metadata = { title: "PT 계약 | FitNote" };
 
@@ -258,10 +259,10 @@ export default async function ContractPage({
               <input
                 name="durationMinutes"
                 type="number"
-                min={10}
-                max={240}
-                step={5}
-                defaultValue={60}
+                min={SESSION_DURATION.min}
+                max={SESSION_DURATION.max}
+                step={SESSION_DURATION.step}
+                defaultValue={SESSION_DURATION.default}
                 className="h-11 rounded-[0.875rem] border border-border bg-background px-3 text-sm tabular-nums"
               />
             </label>

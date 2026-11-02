@@ -21,6 +21,7 @@ import {
 import { TrainerError } from "@/server/trainers/trainer.service";
 
 import { type PTFail } from "./messages";
+import { parseSessionDuration } from "@/lib/session-duration";
 
 function toFail(error: unknown): PTFail {
   if (error instanceof PTError) {
@@ -138,7 +139,7 @@ export async function scheduleSessionAction(formData: FormData) {
     await scheduleSession(user.id, {
       contractId,
       scheduledAt,
-      durationMinutes: Number(formData.get("durationMinutes")) || 60,
+      durationMinutes: parseSessionDuration(formData.get("durationMinutes")),
       memo: text(formData, "memo"),
     });
   } catch (error) {

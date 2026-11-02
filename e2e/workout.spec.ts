@@ -42,6 +42,23 @@ test.describe("운동 기록", () => {
     // 60x10 + 70x5 = 950kg. 서버가 계산한 값이 화면에 나온다.
     await expect(page.getByText("950kg").first()).toBeVisible();
 
+    // 세트를 지우면 바로 사라지고, 서버가 다시 계산한 볼륨으로 돌아간다.
+    await page.getByRole("button", { name: "2세트 삭제" }).click();
+    await expect(page.getByLabel("2세트 중량(kg)")).toHaveCount(0);
+    await expect(page.getByText("600kg").first()).toBeVisible();
+
+    // 완료를 끄고 켜도 같은 세트에 그대로 저장된다.
+    await page.getByRole("button", { name: "1세트 완료 취소" }).click();
+    await expect(page.getByRole("button", { name: "1세트 완료", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "1세트 완료", exact: true }).click();
+    await expect(page.getByRole("button", { name: "1세트 완료 취소" })).toBeVisible();
+
+    await page.getByRole("button", { name: "세트 추가" }).click();
+    await page.getByLabel("2세트 중량(kg)").fill("70");
+    await page.getByLabel("2세트 횟수").fill("5");
+    await page.getByLabel("2세트 횟수").blur();
+    await expect(page.getByText("950kg").first()).toBeVisible();
+
     await page.getByRole("button", { name: "운동 종료" }).click();
     await page.waitForURL(/\/summary$/);
     await expect(page.getByRole("heading", { name: "운동을 마쳤어요" })).toBeVisible();

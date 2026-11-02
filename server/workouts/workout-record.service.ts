@@ -383,6 +383,11 @@ export async function addSet(
   userId: string,
   recordId: string,
   input: SetInput,
+  /**
+   * 화면이 미리 정한 세트 id. 응답을 기다리지 않고 새 세트를 바로 그리는데,
+   * 저장된 세트가 같은 id 를 가져야 그 사이에 적은 값이 지워지지 않는다.
+   */
+  options: { id?: string } = {},
 ) {
   const owner = await resolveOwnerByRecord(userId, recordId);
 
@@ -402,6 +407,7 @@ export async function addSet(
 
     await tx.workoutSet.create({
       data: {
+        ...(options.id ? { id: options.id } : {}),
         recordId,
         setNumber: (last?.setNumber ?? 0) + 1,
         weight: input.weight == null ? null : new Prisma.Decimal(input.weight),
