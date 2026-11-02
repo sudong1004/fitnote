@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ChevronRight, LogOut, ShieldCheck, TrendingUp } from "lucide-react";
+import { ChevronRight, LogOut, Pencil, ShieldCheck, TrendingUp } from "lucide-react";
 
 import { logout } from "@/app/actions/auth";
 import { requireUser } from "@/app/lib/dal";
@@ -47,6 +47,13 @@ export default async function ProfilePage() {
           <h1 className="truncate text-xl font-extrabold">{user.name}</h1>
           <p className="truncate text-xs text-muted-foreground">{user.email}</p>
         </span>
+        <Link
+          href="/profile/edit"
+          className="flex h-9 shrink-0 items-center gap-1 rounded-full border border-border px-3.5 text-[0.8125rem] font-bold text-ink hover:bg-surface"
+        >
+          <Pencil className="size-3.5" aria-hidden />
+          수정
+        </Link>
       </header>
 
       <div className="flex flex-col gap-3 px-4 pt-1.5">
