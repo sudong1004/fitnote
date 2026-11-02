@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, ChevronRight, History, Loader2, Plus, X } from "lucide-react";
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 
 import {
   BODY_PART_MUSCLES,
@@ -77,39 +77,64 @@ function formatShortDate(iso: string) {
 
 const SET_GRID = "grid grid-cols-[2.125rem_minmax(0,1fr)_minmax(0,1fr)_2.5rem_1.75rem] items-center gap-1.5";
 
+type SetPatch = { weight: number | null; reps: number | null; completed: boolean };
+
+type SetChange =
+  | { type: "add"; set: SetDto }
+  | { type: "update"; id: string; patch: SetPatch }
+  | { type: "remove"; id: string };
+
+/** 서버 응답을 기다리지 않고 화면에 먼저 그릴 세트 목록. 실패하면 React 가 원래 목록으로 돌린다. */
+function applySetChange(sets: SetDto[], change: SetChange): SetDto[] {
+  switch (change.type) {
+    case "add":
+      return [...sets, change.set];
+    case "update":
+      return sets.map((set) => (set.id === change.id ? { ...set, ...change.patch } : set));
+    case "remove":
+      // 서버도 지운 뒤 번호를 1부터 다시 매긴다. 화면도 같은 번호로 보여 준다.
+      return sets
+        .filter((set) => set.id !== change.id)
+        .map((set, index) => ({ ...set, setNumber: index + 1 }));
+  }
+}
+
 function SetRow({
-  sessionId,
   set,
-  onError,
+  onSave,
+  onRemove,
   showCompleteToggle,
 }: {
-  sessionId: string;
   set: SetDto;
-  onError: (message: string | null) => void;
+  onSave: (patch: SetPatch) => void;
+  onRemove: () => void;
   showCompleteToggle: boolean;
 }) {
   const [weight, setWeight] = useState(set.weight?.toString() ?? "");
   const [reps, setReps] = useState(set.reps?.toString() ?? "");
-  const [pending, startTransition] = useTransition();
+
+  /*
+    저장이 실패해 값이 되돌아가면 칸도 따라 되돌린다.
+    값이 같을 때는 건드리지 않아서, 다른 세트가 저장되며 화면이 새로 그려져도
+    지금 적고 있는 칸은 그대로 남는다.
+  */
+  const [shown, setShown] = useState({ weight: set.weight, reps: set.reps });
+  if (shown.weight !== set.weight || shown.reps !== set.reps) {
+    setShown({ weight: set.weight, reps: set.reps });
+    setWeight(set.weight?.toString() ?? "");
+    setReps(set.reps?.toString() ?? "");
+  }
 
   function save(next: { completed?: boolean }) {
-    const nextCompleted = next.completed ?? set.completed;
-    const unchanged =
-      toNumberOrNull(weight) === set.weight &&
-      toNumberOrNull(reps) === set.reps &&
-      nextCompleted === set.completed;
-
-    if (unchanged) return;
-
-    onError(null);
-    startTransition(async () => {
-      const result = await updateSetValues(sessionId, set.id, {
-        weight: toNumberOrNull(weight),
-        reps: toNumberOrNull(reps),
-        completed: nextCompleted,
-      });
-      if (result.error) onError(result.error);
-    });
+    const patch = {
+      weight: toNumberOrNull(weight),
+      reps: toNumberOrNull(reps),
+      completed: next.completed ?? set.completed,
+    };
+    if (patch.weight === set.weight && patch.reps === set.reps && patch.completed === set.completed) {
+      return;
+    }
+    onSave(patch);
   }
 
   // 완료한 세트는 민트, 아직인 세트는 흰 칸에 테두리. 지금 적을 차례인 칸이 눈에 띈다.
@@ -155,18 +180,13 @@ function SetRow({
           type="button"
           aria-label={set.completed ? `${set.setNumber}세트 완료 취소` : `${set.setNumber}세트 완료`}
           aria-pressed={set.completed}
-          disabled={pending}
           onClick={() => save({ completed: !set.completed })}
           className={cn(
-            "mx-auto flex size-9.5 items-center justify-center rounded-full",
+            "mx-auto flex size-9.5 items-center justify-center rounded-full transition-colors",
             set.completed ? "bg-primary text-white" : "bg-surface text-[#8a938e]",
           )}
         >
-          {pending ? (
-            <Loader2 className="size-4 animate-spin" />
-          ) : (
-            <Check className="size-4" strokeWidth={2.8} />
-          )}
+          <Check className="size-4" strokeWidth={2.8} />
         </button>
       ) : (
         <span />
@@ -175,14 +195,7 @@ function SetRow({
       <button
         type="button"
         aria-label={`${set.setNumber}세트 삭제`}
-        disabled={pending}
-        onClick={() => {
-          onError(null);
-          startTransition(async () => {
-            const result = await removeSet(sessionId, set.id);
-            if (result.error) onError(result.error);
-          });
-        }}
+        onClick={onRemove}
         className="flex size-7 items-center justify-center rounded-full text-[#8a938e] hover:bg-surface hover:text-foreground"
       >
         <X className="size-3.5" aria-hidden />
@@ -257,9 +270,39 @@ export function RecordCard({
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  /*
+    세트 추가·완료·값 수정·삭제는 누르는 즉시 화면에 반영한다.
+    체육관처럼 신호가 약한 곳에서 버튼마다 0.5초씩 멈추면 기록을 미루게 된다.
+    서버 액션은 한 줄로 차례차례 실행되므로, 추가 직후 바로 적은 값도 그 세트에 저장된다.
+  */
+  const [sets, applyChange] = useOptimistic(record.sets, applySetChange);
+  const [, startSetTransition] = useTransition();
+
+  function changeSet(change: SetChange, send: () => Promise<{ error: string | null }>) {
+    setError(null);
+    startSetTransition(async () => {
+      applyChange(change);
+      const result = await send();
+      // 실패하면 React 가 화면을 서버 값으로 되돌린다. 무엇이 안 됐는지만 알려 준다.
+      if (result.error) setError(result.error);
+    });
+  }
+
+  function addSet() {
+    const id = crypto.randomUUID();
+    const defaults = nextSetDefaults();
+    changeSet(
+      {
+        type: "add",
+        // 서버도 값만 받은 새 세트를 완료로 저장한다.
+        set: { id, setNumber: sets.length + 1, weight: defaults.weight, reps: defaults.reps, completed: true },
+      },
+      () => addSetToRecord(sessionId, record.id, defaults, id),
+    );
+  }
 
   function nextSetDefaults() {
-    const lastSet = record.sets.at(-1);
+    const lastSet = sets.at(-1);
     if (lastSet) return { weight: lastSet.weight, reps: lastSet.reps };
     const previous = previousRecord?.sets[0];
     return { weight: previous?.weight ?? null, reps: previous?.reps ?? null };
@@ -337,7 +380,7 @@ export function RecordCard({
       ) : null}
 
       {/* 세트 */}
-      {record.sets.length > 0 ? (
+      {sets.length > 0 ? (
         editable ? (
           <>
             <div
@@ -353,20 +396,26 @@ export function RecordCard({
               <span />
             </div>
             <ul className="flex flex-col gap-1.5">
-              {record.sets.map((set) => (
+              {sets.map((set) => (
                 <SetRow
                   key={set.id}
-                  sessionId={sessionId}
                   set={set}
-                  onError={setError}
                   showCompleteToggle={showCompleteToggle}
+                  onSave={(patch) =>
+                    changeSet({ type: "update", id: set.id, patch }, () =>
+                      updateSetValues(sessionId, set.id, patch),
+                    )
+                  }
+                  onRemove={() =>
+                    changeSet({ type: "remove", id: set.id }, () => removeSet(sessionId, set.id))
+                  }
                 />
               ))}
             </ul>
           </>
         ) : (
           <ul className="mt-3 flex flex-col divide-y divide-line">
-            {record.sets.map((set) => (
+            {sets.map((set) => (
               <li key={set.id} className="flex items-center gap-3 py-2 text-sm">
                 <span className="w-6 text-center text-xs font-bold text-muted-foreground tabular-nums">
                   {set.setNumber}
@@ -390,7 +439,7 @@ export function RecordCard({
       ) : null}
 
       {/* 지난 기록 그대로 담기 */}
-      {editable && record.sets.length === 0 && hasPreviousSets ? (
+      {editable && sets.length === 0 && hasPreviousSets ? (
         <button
           type="button"
           className="mt-3 flex h-11 w-full items-center justify-center gap-1.5 rounded-full border border-border text-sm font-bold"
@@ -414,15 +463,9 @@ export function RecordCard({
             type="button"
             className="flex h-10 min-w-0 flex-1 items-center justify-center gap-1 rounded-full border border-dashed border-[#c4ccc7] text-[0.8125rem] font-bold text-primary"
             disabled={pending}
-            onClick={() => {
-              setError(null);
-              startTransition(async () => {
-                const result = await addSetToRecord(sessionId, record.id, nextDefaults);
-                if (result.error) setError(result.error);
-              });
-            }}
+            onClick={addSet}
           >
-            {pending ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
+            <Plus className="size-4" />
             세트 추가
             {nextPreview ? (
               <span className="font-semibold text-muted-foreground tabular-nums">· {nextPreview}</span>

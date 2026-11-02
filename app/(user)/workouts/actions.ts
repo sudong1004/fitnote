@@ -203,15 +203,19 @@ function parseSet(input: SetInput) {
       };
 }
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function addSetToRecord(
   sessionId: string,
   recordId: string,
   input: SetInput,
+  setId?: string,
 ): Promise<ActionResult> {
   const { data, error } = parseSet(input);
   if (!data) return { error };
+  if (setId !== undefined && !UUID.test(setId)) return { error: "잘못된 요청입니다." };
 
-  return run(sessionId, (userId) => addSet(userId, recordId, data));
+  return run(sessionId, (userId) => addSet(userId, recordId, data, { id: setId }));
 }
 
 /**
