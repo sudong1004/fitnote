@@ -138,3 +138,27 @@ describe("수업 잡기", () => {
     expect(numbers).toEqual([1, 2, 3, 4, 5]);
   });
 });
+
+describe("수업 시간", () => {
+  it("10~240분 사이 정수만 받고, 비우면 60분으로 잡는다", async () => {
+    const { trainer, contractId } = await makeContract(5, createContract);
+    const at = (h: number, durationMinutes?: number) =>
+      scheduleSession(trainer.userId, { contractId, scheduledAt: when(h), durationMinutes });
+
+    for (const bad of [1.5, 0, -30, 241, 99999, Number.NaN]) {
+      await expect(at(1, bad)).rejects.toThrow("수업 시간은 10~240분 사이로 입력해주세요.");
+    }
+
+    const ok = await at(2, 45);
+    const fallback = await at(3);
+    const rows = await prisma.pTSession.findMany({
+      where: { id: { in: [ok.id, fallback.id] } },
+      select: { id: true, durationMinutes: true },
+    });
+    expect(rows.find((r) => r.id === ok.id)?.durationMinutes).toBe(45);
+    expect(rows.find((r) => r.id === fallback.id)?.durationMinutes).toBe(60);
+
+    // 거절된 요청은 회차를 차지하지 않는다.
+    expect(await prisma.pTSession.count({ where: { contractId } })).toBe(2);
+  });
+});

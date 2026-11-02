@@ -8,6 +8,7 @@ import { CalendarPlus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { scheduleFromCalendarAction } from "./actions";
+import { SESSION_DURATION } from "@/lib/session-duration";
 
 export interface SchedulableContract {
   id: string;
@@ -117,10 +118,10 @@ export function NewSessionPanel({
                 name="durationMinutes"
                 type="number"
                 inputMode="numeric"
-                min={10}
-                max={240}
-                step={5}
-                defaultValue={60}
+                min={SESSION_DURATION.min}
+                max={SESSION_DURATION.max}
+                step={SESSION_DURATION.step}
+                defaultValue={SESSION_DURATION.default}
                 required
                 aria-label="수업 시간(분)"
                 className={cn(fieldClass, "mt-0 pr-10")}

@@ -17,6 +17,7 @@ import {
   requireMySession,
   requireOpenSession,
 } from "./pt-shared";
+import { SESSION_DURATION, isValidSessionDuration } from "@/lib/session-duration";
 
 /**
  * 수업을 잡는다.
@@ -42,6 +43,12 @@ export async function scheduleSession(
   }
   if (Number.isNaN(input.scheduledAt.getTime())) {
     throw new PTError("INVALID", "수업 시각을 확인해주세요.");
+  }
+  if (input.durationMinutes !== undefined && !isValidSessionDuration(input.durationMinutes)) {
+    throw new PTError(
+      "INVALID",
+      `수업 시간은 ${SESSION_DURATION.min}~${SESSION_DURATION.max}분 사이로 입력해주세요.`,
+    );
   }
 
   return prisma.$transaction(async (tx) => {
@@ -94,7 +101,7 @@ export async function scheduleSession(
         trainerProfileId: trainer.id,
         sessionNumber: (last?.sessionNumber ?? 0) + 1,
         scheduledAt: input.scheduledAt,
-        durationMinutes: input.durationMinutes ?? 60,
+        durationMinutes: input.durationMinutes ?? SESSION_DURATION.default,
         memo: input.memo?.trim() || null,
       },
       select: { id: true, sessionNumber: true, scheduledAt: true },

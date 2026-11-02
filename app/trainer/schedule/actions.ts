@@ -6,6 +6,7 @@ import { requireUser } from "@/app/lib/dal";
 import { kstDateTimeToUtc, toKstDateKey } from "@/lib/date";
 import { PTError, scheduleSession } from "@/server/pt/pt.service";
 import { TrainerError } from "@/server/trainers/trainer.service";
+import { parseSessionDuration } from "@/lib/session-duration";
 
 /**
  * 일정 화면에서 바로 수업을 잡는다.
@@ -39,7 +40,7 @@ export async function scheduleFromCalendarAction(formData: FormData) {
     await scheduleSession(user.id, {
       contractId,
       scheduledAt,
-      durationMinutes: Number(formData.get("durationMinutes")) || 60,
+      durationMinutes: parseSessionDuration(formData.get("durationMinutes")),
     });
   } catch (error) {
     if (error instanceof PTError || error instanceof TrainerError) {
