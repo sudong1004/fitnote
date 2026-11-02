@@ -52,7 +52,7 @@ export default async function TrainerLayout({
       <div
         className="mx-auto w-full max-w-md flex-1"
         style={{
-          paddingBottom: "calc(5.5rem + env(safe-area-inset-bottom))",
+          paddingBottom: "calc(6.5rem + env(safe-area-inset-bottom))",
         }}
       >
         {children}
