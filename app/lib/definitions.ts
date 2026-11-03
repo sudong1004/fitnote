@@ -55,6 +55,7 @@ export type AuthFormState =
         name?: string[];
         email?: string[];
         password?: string[];
+        consent?: string[];
       };
       message?: string;
     }
@@ -128,3 +129,16 @@ export type AccountFormState =
       ok?: boolean;
     }
   | undefined;
+
+export const ForgotPasswordSchema = z.object({ email: EmailSchema });
+
+export const ResetPasswordSchema = z
+  .object({
+    token: z.string().min(20, { error: "링크가 올바르지 않아요." }),
+    newPassword: PasswordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((value) => value.newPassword === value.confirmPassword, {
+    error: "새 비밀번호가 서로 달라요.",
+    path: ["confirmPassword"],
+  });

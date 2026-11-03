@@ -32,6 +32,9 @@ export type UserMinAggregateOutputType = {
   phone: string | null
   profileImageUrl: string | null
   status: $Enums.UserStatus | null
+  termsVersion: string | null
+  termsAgreedAt: Date | null
+  deletedAt: Date | null
   lastLoginAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -45,6 +48,9 @@ export type UserMaxAggregateOutputType = {
   phone: string | null
   profileImageUrl: string | null
   status: $Enums.UserStatus | null
+  termsVersion: string | null
+  termsAgreedAt: Date | null
+  deletedAt: Date | null
   lastLoginAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -58,6 +64,9 @@ export type UserCountAggregateOutputType = {
   phone: number
   profileImageUrl: number
   status: number
+  termsVersion: number
+  termsAgreedAt: number
+  deletedAt: number
   lastLoginAt: number
   createdAt: number
   updatedAt: number
@@ -73,6 +82,9 @@ export type UserMinAggregateInputType = {
   phone?: true
   profileImageUrl?: true
   status?: true
+  termsVersion?: true
+  termsAgreedAt?: true
+  deletedAt?: true
   lastLoginAt?: true
   createdAt?: true
   updatedAt?: true
@@ -86,6 +98,9 @@ export type UserMaxAggregateInputType = {
   phone?: true
   profileImageUrl?: true
   status?: true
+  termsVersion?: true
+  termsAgreedAt?: true
+  deletedAt?: true
   lastLoginAt?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +114,9 @@ export type UserCountAggregateInputType = {
   phone?: true
   profileImageUrl?: true
   status?: true
+  termsVersion?: true
+  termsAgreedAt?: true
+  deletedAt?: true
   lastLoginAt?: true
   createdAt?: true
   updatedAt?: true
@@ -185,6 +203,9 @@ export type UserGroupByOutputType = {
   phone: string | null
   profileImageUrl: string | null
   status: $Enums.UserStatus
+  termsVersion: string | null
+  termsAgreedAt: Date | null
+  deletedAt: Date | null
   lastLoginAt: Date | null
   createdAt: Date
   updatedAt: Date
@@ -219,11 +240,15 @@ export type UserWhereInput = {
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   profileImageUrl?: Prisma.StringNullableFilter<"User"> | string | null
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
+  termsVersion?: Prisma.StringNullableFilter<"User"> | string | null
+  termsAgreedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   aiAnalyses?: Prisma.AiAnalysisListRelationFilter
   authSessions?: Prisma.AuthSessionListRelationFilter
+  passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
   bodyRecords?: Prisma.BodyRecordListRelationFilter
   centerMemberships?: Prisma.CenterMembershipListRelationFilter
   deviceTokens?: Prisma.DeviceTokenListRelationFilter
@@ -255,11 +280,15 @@ export type UserOrderByWithRelationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  termsVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  termsAgreedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   aiAnalyses?: Prisma.AiAnalysisOrderByRelationAggregateInput
   authSessions?: Prisma.AuthSessionOrderByRelationAggregateInput
+  passwordResetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput
   bodyRecords?: Prisma.BodyRecordOrderByRelationAggregateInput
   centerMemberships?: Prisma.CenterMembershipOrderByRelationAggregateInput
   deviceTokens?: Prisma.DeviceTokenOrderByRelationAggregateInput
@@ -294,11 +323,15 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   profileImageUrl?: Prisma.StringNullableFilter<"User"> | string | null
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
+  termsVersion?: Prisma.StringNullableFilter<"User"> | string | null
+  termsAgreedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   aiAnalyses?: Prisma.AiAnalysisListRelationFilter
   authSessions?: Prisma.AuthSessionListRelationFilter
+  passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
   bodyRecords?: Prisma.BodyRecordListRelationFilter
   centerMemberships?: Prisma.CenterMembershipListRelationFilter
   deviceTokens?: Prisma.DeviceTokenListRelationFilter
@@ -330,6 +363,9 @@ export type UserOrderByWithAggregationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
+  termsVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  termsAgreedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -349,6 +385,9 @@ export type UserScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   profileImageUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   status?: Prisma.EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
+  termsVersion?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  termsAgreedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -362,11 +401,15 @@ export type UserCreateInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -398,11 +441,15 @@ export type UserUncheckedCreateInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -434,11 +481,15 @@ export type UserUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -470,11 +521,15 @@ export type UserUncheckedUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -506,6 +561,9 @@ export type UserCreateManyInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -519,6 +577,9 @@ export type UserUpdateManyMutationInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -532,6 +593,9 @@ export type UserUncheckedUpdateManyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -545,6 +609,9 @@ export type UserCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  termsVersion?: Prisma.SortOrder
+  termsAgreedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -558,6 +625,9 @@ export type UserMaxOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  termsVersion?: Prisma.SortOrder
+  termsAgreedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -571,6 +641,9 @@ export type UserMinOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  termsVersion?: Prisma.SortOrder
+  termsAgreedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -930,6 +1003,20 @@ export type UserUpdateOneRequiredWithoutSharingSettingNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSharingSettingInput, Prisma.UserUpdateWithoutSharingSettingInput>, Prisma.UserUncheckedUpdateWithoutSharingSettingInput>
 }
 
+export type UserCreateNestedOneWithoutPasswordResetTokensInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPasswordResetTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetTokensInput
+  upsert?: Prisma.UserUpsertWithoutPasswordResetTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPasswordResetTokensInput, Prisma.UserUpdateWithoutPasswordResetTokensInput>, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+}
+
 export type UserCreateWithoutAuthSessionsInput = {
   id?: string
   email?: string | null
@@ -938,10 +1025,14 @@ export type UserCreateWithoutAuthSessionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -973,10 +1064,14 @@ export type UserUncheckedCreateWithoutAuthSessionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1024,10 +1119,14 @@ export type UserUpdateWithoutAuthSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -1059,10 +1158,14 @@ export type UserUncheckedUpdateWithoutAuthSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1094,11 +1197,15 @@ export type UserCreateWithoutDeviceTokensInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   dietRecords?: Prisma.DietRecordCreateNestedManyWithoutUserInput
@@ -1129,11 +1236,15 @@ export type UserUncheckedCreateWithoutDeviceTokensInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   dietRecords?: Prisma.DietRecordUncheckedCreateNestedManyWithoutUserInput
@@ -1180,11 +1291,15 @@ export type UserUpdateWithoutDeviceTokensInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   dietRecords?: Prisma.DietRecordUpdateManyWithoutUserNestedInput
@@ -1215,11 +1330,15 @@ export type UserUncheckedUpdateWithoutDeviceTokensInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   dietRecords?: Prisma.DietRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -1250,11 +1369,15 @@ export type UserCreateWithoutCenterMembershipsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   dietRecords?: Prisma.DietRecordCreateNestedManyWithoutUserInput
@@ -1285,11 +1408,15 @@ export type UserUncheckedCreateWithoutCenterMembershipsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   dietRecords?: Prisma.DietRecordUncheckedCreateNestedManyWithoutUserInput
@@ -1336,11 +1463,15 @@ export type UserUpdateWithoutCenterMembershipsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   dietRecords?: Prisma.DietRecordUpdateManyWithoutUserNestedInput
@@ -1371,11 +1502,15 @@ export type UserUncheckedUpdateWithoutCenterMembershipsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   dietRecords?: Prisma.DietRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -1406,11 +1541,15 @@ export type UserCreateWithoutMemberProfileInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -1441,11 +1580,15 @@ export type UserUncheckedCreateWithoutMemberProfileInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1492,11 +1635,15 @@ export type UserUpdateWithoutMemberProfileInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -1527,11 +1674,15 @@ export type UserUncheckedUpdateWithoutMemberProfileInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1562,11 +1713,15 @@ export type UserCreateWithoutTrainerProfileInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -1597,11 +1752,15 @@ export type UserUncheckedCreateWithoutTrainerProfileInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1648,11 +1807,15 @@ export type UserUpdateWithoutTrainerProfileInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -1683,11 +1846,15 @@ export type UserUncheckedUpdateWithoutTrainerProfileInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1718,11 +1885,15 @@ export type UserCreateWithoutTrainerConnectionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -1753,11 +1924,15 @@ export type UserUncheckedCreateWithoutTrainerConnectionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1804,11 +1979,15 @@ export type UserUpdateWithoutTrainerConnectionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -1839,11 +2018,15 @@ export type UserUncheckedUpdateWithoutTrainerConnectionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -1874,11 +2057,15 @@ export type UserCreateWithoutClaimCodesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -1909,11 +2096,15 @@ export type UserUncheckedCreateWithoutClaimCodesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -1960,11 +2151,15 @@ export type UserUpdateWithoutClaimCodesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -1995,11 +2190,15 @@ export type UserUncheckedUpdateWithoutClaimCodesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2030,11 +2229,15 @@ export type UserCreateWithoutRoutinesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -2065,11 +2268,15 @@ export type UserUncheckedCreateWithoutRoutinesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2116,11 +2323,15 @@ export type UserUpdateWithoutRoutinesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -2151,11 +2362,15 @@ export type UserUncheckedUpdateWithoutRoutinesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2186,11 +2401,15 @@ export type UserCreateWithoutRecordedWorkoutSessionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -2221,11 +2440,15 @@ export type UserUncheckedCreateWithoutRecordedWorkoutSessionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2261,11 +2484,15 @@ export type UserCreateWithoutWorkoutSessionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -2296,11 +2523,15 @@ export type UserUncheckedCreateWithoutWorkoutSessionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2347,11 +2578,15 @@ export type UserUpdateWithoutRecordedWorkoutSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -2382,11 +2617,15 @@ export type UserUncheckedUpdateWithoutRecordedWorkoutSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2428,11 +2667,15 @@ export type UserUpdateWithoutWorkoutSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -2463,11 +2706,15 @@ export type UserUncheckedUpdateWithoutWorkoutSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2498,11 +2745,15 @@ export type UserCreateWithoutWorkoutRecordsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -2533,11 +2784,15 @@ export type UserUncheckedCreateWithoutWorkoutRecordsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2584,11 +2839,15 @@ export type UserUpdateWithoutWorkoutRecordsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -2619,11 +2878,15 @@ export type UserUncheckedUpdateWithoutWorkoutRecordsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2654,11 +2917,15 @@ export type UserCreateWithoutWorkoutFavoritesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -2689,11 +2956,15 @@ export type UserUncheckedCreateWithoutWorkoutFavoritesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2740,11 +3011,15 @@ export type UserUpdateWithoutWorkoutFavoritesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -2775,11 +3050,15 @@ export type UserUncheckedUpdateWithoutWorkoutFavoritesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2810,11 +3089,15 @@ export type UserCreateWithoutPtContractsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -2845,11 +3128,15 @@ export type UserUncheckedCreateWithoutPtContractsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -2896,11 +3183,15 @@ export type UserUpdateWithoutPtContractsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -2931,11 +3222,15 @@ export type UserUncheckedUpdateWithoutPtContractsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -2966,11 +3261,15 @@ export type UserCreateWithoutPtSessionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -3001,11 +3300,15 @@ export type UserUncheckedCreateWithoutPtSessionsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -3052,11 +3355,15 @@ export type UserUpdateWithoutPtSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -3087,11 +3394,15 @@ export type UserUncheckedUpdateWithoutPtSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -3122,11 +3433,15 @@ export type UserCreateWithoutDietRecordsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -3157,11 +3472,15 @@ export type UserUncheckedCreateWithoutDietRecordsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -3208,11 +3527,15 @@ export type UserUpdateWithoutDietRecordsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -3243,11 +3566,15 @@ export type UserUncheckedUpdateWithoutDietRecordsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -3278,11 +3605,15 @@ export type UserCreateWithoutBodyRecordsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   dietRecords?: Prisma.DietRecordCreateNestedManyWithoutUserInput
@@ -3313,11 +3644,15 @@ export type UserUncheckedCreateWithoutBodyRecordsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   dietRecords?: Prisma.DietRecordUncheckedCreateNestedManyWithoutUserInput
@@ -3364,11 +3699,15 @@ export type UserUpdateWithoutBodyRecordsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   dietRecords?: Prisma.DietRecordUpdateManyWithoutUserNestedInput
@@ -3399,11 +3738,15 @@ export type UserUncheckedUpdateWithoutBodyRecordsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   dietRecords?: Prisma.DietRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -3434,11 +3777,15 @@ export type UserCreateWithoutGoalsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -3469,11 +3816,15 @@ export type UserUncheckedCreateWithoutGoalsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -3520,11 +3871,15 @@ export type UserUpdateWithoutGoalsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -3555,11 +3910,15 @@ export type UserUncheckedUpdateWithoutGoalsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -3590,11 +3949,15 @@ export type UserCreateWithoutJournalsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -3625,11 +3988,15 @@ export type UserUncheckedCreateWithoutJournalsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -3676,11 +4043,15 @@ export type UserUpdateWithoutJournalsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -3711,11 +4082,15 @@ export type UserUncheckedUpdateWithoutJournalsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -3746,11 +4121,15 @@ export type UserCreateWithoutJournalCommentsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -3781,11 +4160,15 @@ export type UserUncheckedCreateWithoutJournalCommentsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -3832,11 +4215,15 @@ export type UserUpdateWithoutJournalCommentsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -3867,11 +4254,15 @@ export type UserUncheckedUpdateWithoutJournalCommentsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -3902,11 +4293,15 @@ export type UserCreateWithoutNotificationsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -3937,11 +4332,15 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -3988,11 +4387,15 @@ export type UserUpdateWithoutNotificationsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -4023,11 +4426,15 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -4058,11 +4465,15 @@ export type UserCreateWithoutNotificationPreferencesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -4093,11 +4504,15 @@ export type UserUncheckedCreateWithoutNotificationPreferencesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -4144,11 +4559,15 @@ export type UserUpdateWithoutNotificationPreferencesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -4179,11 +4598,15 @@ export type UserUncheckedUpdateWithoutNotificationPreferencesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -4214,10 +4637,14 @@ export type UserCreateWithoutAiAnalysesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -4249,10 +4676,14 @@ export type UserUncheckedCreateWithoutAiAnalysesInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -4300,10 +4731,14 @@ export type UserUpdateWithoutAiAnalysesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -4335,10 +4770,14 @@ export type UserUncheckedUpdateWithoutAiAnalysesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -4370,11 +4809,15 @@ export type UserCreateWithoutSharingSettingInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
@@ -4405,11 +4848,15 @@ export type UserUncheckedCreateWithoutSharingSettingInput = {
   phone?: string | null
   profileImageUrl?: string | null
   status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
   lastLoginAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
   authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
   centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
@@ -4456,11 +4903,15 @@ export type UserUpdateWithoutSharingSettingInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
@@ -4491,11 +4942,15 @@ export type UserUncheckedUpdateWithoutSharingSettingInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
   authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
   centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
@@ -4518,6 +4973,178 @@ export type UserUncheckedUpdateWithoutSharingSettingInput = {
   workoutSessions?: Prisma.WorkoutSessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
+export type UserCreateWithoutPasswordResetTokensInput = {
+  id?: string
+  email?: string | null
+  passwordHash?: string | null
+  name: string
+  phone?: string | null
+  profileImageUrl?: string | null
+  status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  aiAnalyses?: Prisma.AiAnalysisCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  bodyRecords?: Prisma.BodyRecordCreateNestedManyWithoutUserInput
+  centerMemberships?: Prisma.CenterMembershipCreateNestedManyWithoutUserInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  dietRecords?: Prisma.DietRecordCreateNestedManyWithoutUserInput
+  goals?: Prisma.GoalCreateNestedManyWithoutUserInput
+  journals?: Prisma.JournalCreateNestedManyWithoutMemberUserInput
+  journalComments?: Prisma.JournalCommentCreateNestedManyWithoutAuthorInput
+  claimCodes?: Prisma.MemberClaimCodeCreateNestedManyWithoutMemberUserInput
+  memberProfile?: Prisma.MemberProfileCreateNestedOneWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreferences?: Prisma.NotificationPreferenceCreateNestedManyWithoutUserInput
+  ptContracts?: Prisma.PTContractCreateNestedManyWithoutMemberUserInput
+  ptSessions?: Prisma.PTSessionCreateNestedManyWithoutMemberUserInput
+  routines?: Prisma.RoutineCreateNestedManyWithoutUserInput
+  trainerConnections?: Prisma.TrainerMemberConnectionCreateNestedManyWithoutMemberUserInput
+  trainerProfile?: Prisma.TrainerProfileCreateNestedOneWithoutUserInput
+  sharingSetting?: Prisma.TrainerSharingSettingCreateNestedOneWithoutUserInput
+  workoutFavorites?: Prisma.WorkoutFavoriteCreateNestedManyWithoutUserInput
+  workoutRecords?: Prisma.WorkoutRecordCreateNestedManyWithoutUserInput
+  recordedWorkoutSessions?: Prisma.WorkoutSessionCreateNestedManyWithoutRecordedByInput
+  workoutSessions?: Prisma.WorkoutSessionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
+  id?: string
+  email?: string | null
+  passwordHash?: string | null
+  name: string
+  phone?: string | null
+  profileImageUrl?: string | null
+  status?: $Enums.UserStatus
+  termsVersion?: string | null
+  termsAgreedAt?: Date | string | null
+  deletedAt?: Date | string | null
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  aiAnalyses?: Prisma.AiAnalysisUncheckedCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  bodyRecords?: Prisma.BodyRecordUncheckedCreateNestedManyWithoutUserInput
+  centerMemberships?: Prisma.CenterMembershipUncheckedCreateNestedManyWithoutUserInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  dietRecords?: Prisma.DietRecordUncheckedCreateNestedManyWithoutUserInput
+  goals?: Prisma.GoalUncheckedCreateNestedManyWithoutUserInput
+  journals?: Prisma.JournalUncheckedCreateNestedManyWithoutMemberUserInput
+  journalComments?: Prisma.JournalCommentUncheckedCreateNestedManyWithoutAuthorInput
+  claimCodes?: Prisma.MemberClaimCodeUncheckedCreateNestedManyWithoutMemberUserInput
+  memberProfile?: Prisma.MemberProfileUncheckedCreateNestedOneWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreferences?: Prisma.NotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+  ptContracts?: Prisma.PTContractUncheckedCreateNestedManyWithoutMemberUserInput
+  ptSessions?: Prisma.PTSessionUncheckedCreateNestedManyWithoutMemberUserInput
+  routines?: Prisma.RoutineUncheckedCreateNestedManyWithoutUserInput
+  trainerConnections?: Prisma.TrainerMemberConnectionUncheckedCreateNestedManyWithoutMemberUserInput
+  trainerProfile?: Prisma.TrainerProfileUncheckedCreateNestedOneWithoutUserInput
+  sharingSetting?: Prisma.TrainerSharingSettingUncheckedCreateNestedOneWithoutUserInput
+  workoutFavorites?: Prisma.WorkoutFavoriteUncheckedCreateNestedManyWithoutUserInput
+  workoutRecords?: Prisma.WorkoutRecordUncheckedCreateNestedManyWithoutUserInput
+  recordedWorkoutSessions?: Prisma.WorkoutSessionUncheckedCreateNestedManyWithoutRecordedByInput
+  workoutSessions?: Prisma.WorkoutSessionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+}
+
+export type UserUpsertWithoutPasswordResetTokensInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetTokensInput, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPasswordResetTokensInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetTokensInput, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+}
+
+export type UserUpdateWithoutPasswordResetTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  aiAnalyses?: Prisma.AiAnalysisUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  bodyRecords?: Prisma.BodyRecordUpdateManyWithoutUserNestedInput
+  centerMemberships?: Prisma.CenterMembershipUpdateManyWithoutUserNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  dietRecords?: Prisma.DietRecordUpdateManyWithoutUserNestedInput
+  goals?: Prisma.GoalUpdateManyWithoutUserNestedInput
+  journals?: Prisma.JournalUpdateManyWithoutMemberUserNestedInput
+  journalComments?: Prisma.JournalCommentUpdateManyWithoutAuthorNestedInput
+  claimCodes?: Prisma.MemberClaimCodeUpdateManyWithoutMemberUserNestedInput
+  memberProfile?: Prisma.MemberProfileUpdateOneWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreferences?: Prisma.NotificationPreferenceUpdateManyWithoutUserNestedInput
+  ptContracts?: Prisma.PTContractUpdateManyWithoutMemberUserNestedInput
+  ptSessions?: Prisma.PTSessionUpdateManyWithoutMemberUserNestedInput
+  routines?: Prisma.RoutineUpdateManyWithoutUserNestedInput
+  trainerConnections?: Prisma.TrainerMemberConnectionUpdateManyWithoutMemberUserNestedInput
+  trainerProfile?: Prisma.TrainerProfileUpdateOneWithoutUserNestedInput
+  sharingSetting?: Prisma.TrainerSharingSettingUpdateOneWithoutUserNestedInput
+  workoutFavorites?: Prisma.WorkoutFavoriteUpdateManyWithoutUserNestedInput
+  workoutRecords?: Prisma.WorkoutRecordUpdateManyWithoutUserNestedInput
+  recordedWorkoutSessions?: Prisma.WorkoutSessionUpdateManyWithoutRecordedByNestedInput
+  workoutSessions?: Prisma.WorkoutSessionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  termsVersion?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  termsAgreedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  aiAnalyses?: Prisma.AiAnalysisUncheckedUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  bodyRecords?: Prisma.BodyRecordUncheckedUpdateManyWithoutUserNestedInput
+  centerMemberships?: Prisma.CenterMembershipUncheckedUpdateManyWithoutUserNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  dietRecords?: Prisma.DietRecordUncheckedUpdateManyWithoutUserNestedInput
+  goals?: Prisma.GoalUncheckedUpdateManyWithoutUserNestedInput
+  journals?: Prisma.JournalUncheckedUpdateManyWithoutMemberUserNestedInput
+  journalComments?: Prisma.JournalCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  claimCodes?: Prisma.MemberClaimCodeUncheckedUpdateManyWithoutMemberUserNestedInput
+  memberProfile?: Prisma.MemberProfileUncheckedUpdateOneWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreferences?: Prisma.NotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  ptContracts?: Prisma.PTContractUncheckedUpdateManyWithoutMemberUserNestedInput
+  ptSessions?: Prisma.PTSessionUncheckedUpdateManyWithoutMemberUserNestedInput
+  routines?: Prisma.RoutineUncheckedUpdateManyWithoutUserNestedInput
+  trainerConnections?: Prisma.TrainerMemberConnectionUncheckedUpdateManyWithoutMemberUserNestedInput
+  trainerProfile?: Prisma.TrainerProfileUncheckedUpdateOneWithoutUserNestedInput
+  sharingSetting?: Prisma.TrainerSharingSettingUncheckedUpdateOneWithoutUserNestedInput
+  workoutFavorites?: Prisma.WorkoutFavoriteUncheckedUpdateManyWithoutUserNestedInput
+  workoutRecords?: Prisma.WorkoutRecordUncheckedUpdateManyWithoutUserNestedInput
+  recordedWorkoutSessions?: Prisma.WorkoutSessionUncheckedUpdateManyWithoutRecordedByNestedInput
+  workoutSessions?: Prisma.WorkoutSessionUncheckedUpdateManyWithoutUserNestedInput
+}
+
 
 /**
  * Count Type UserCountOutputType
@@ -4526,6 +5153,7 @@ export type UserUncheckedUpdateWithoutSharingSettingInput = {
 export type UserCountOutputType = {
   aiAnalyses: number
   authSessions: number
+  passwordResetTokens: number
   bodyRecords: number
   centerMemberships: number
   deviceTokens: number
@@ -4549,6 +5177,7 @@ export type UserCountOutputType = {
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   aiAnalyses?: boolean | UserCountOutputTypeCountAiAnalysesArgs
   authSessions?: boolean | UserCountOutputTypeCountAuthSessionsArgs
+  passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
   bodyRecords?: boolean | UserCountOutputTypeCountBodyRecordsArgs
   centerMemberships?: boolean | UserCountOutputTypeCountCenterMembershipsArgs
   deviceTokens?: boolean | UserCountOutputTypeCountDeviceTokensArgs
@@ -4591,6 +5220,13 @@ export type UserCountOutputTypeCountAiAnalysesArgs<ExtArgs extends runtime.Types
  */
 export type UserCountOutputTypeCountAuthSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AuthSessionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPasswordResetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PasswordResetTokenWhereInput
 }
 
 /**
@@ -4728,11 +5364,15 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   phone?: boolean
   profileImageUrl?: boolean
   status?: boolean
+  termsVersion?: boolean
+  termsAgreedAt?: boolean
+  deletedAt?: boolean
   lastLoginAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   aiAnalyses?: boolean | Prisma.User$aiAnalysesArgs<ExtArgs>
   authSessions?: boolean | Prisma.User$authSessionsArgs<ExtArgs>
+  passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
   bodyRecords?: boolean | Prisma.User$bodyRecordsArgs<ExtArgs>
   centerMemberships?: boolean | Prisma.User$centerMembershipsArgs<ExtArgs>
   deviceTokens?: boolean | Prisma.User$deviceTokensArgs<ExtArgs>
@@ -4765,6 +5405,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phone?: boolean
   profileImageUrl?: boolean
   status?: boolean
+  termsVersion?: boolean
+  termsAgreedAt?: boolean
+  deletedAt?: boolean
   lastLoginAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -4778,6 +5421,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phone?: boolean
   profileImageUrl?: boolean
   status?: boolean
+  termsVersion?: boolean
+  termsAgreedAt?: boolean
+  deletedAt?: boolean
   lastLoginAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -4791,15 +5437,19 @@ export type UserSelectScalar = {
   phone?: boolean
   profileImageUrl?: boolean
   status?: boolean
+  termsVersion?: boolean
+  termsAgreedAt?: boolean
+  deletedAt?: boolean
   lastLoginAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "phone" | "profileImageUrl" | "status" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "name" | "phone" | "profileImageUrl" | "status" | "termsVersion" | "termsAgreedAt" | "deletedAt" | "lastLoginAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   aiAnalyses?: boolean | Prisma.User$aiAnalysesArgs<ExtArgs>
   authSessions?: boolean | Prisma.User$authSessionsArgs<ExtArgs>
+  passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
   bodyRecords?: boolean | Prisma.User$bodyRecordsArgs<ExtArgs>
   centerMemberships?: boolean | Prisma.User$centerMembershipsArgs<ExtArgs>
   deviceTokens?: boolean | Prisma.User$deviceTokensArgs<ExtArgs>
@@ -4831,6 +5481,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     aiAnalyses: Prisma.$AiAnalysisPayload<ExtArgs>[]
     authSessions: Prisma.$AuthSessionPayload<ExtArgs>[]
+    passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
     bodyRecords: Prisma.$BodyRecordPayload<ExtArgs>[]
     centerMemberships: Prisma.$CenterMembershipPayload<ExtArgs>[]
     deviceTokens: Prisma.$DeviceTokenPayload<ExtArgs>[]
@@ -4867,6 +5518,19 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     phone: string | null
     profileImageUrl: string | null
     status: $Enums.UserStatus
+    /**
+     * *
+     * * 가입할 때 동의한 약관·개인정보처리방침 판(날짜 문자열)과 그 시각.
+     * * 문서를 고치면 판이 바뀌고, 누가 어느 판에 동의했는지 남는다.
+     */
+    termsVersion: string | null
+    termsAgreedAt: Date | null
+    /**
+     * *
+     * * 탈퇴한 시각. 탈퇴하면 이름·연락처를 지우고 상태를 DELETED 로 둔다.
+     * * 행 자체는 남긴다: 트레이너의 계약·수업·알림장 기록이 이 행을 가리킨다.
+     */
+    deletedAt: Date | null
     lastLoginAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -5266,6 +5930,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   aiAnalyses<T extends Prisma.User$aiAnalysesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$aiAnalysesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AiAnalysisPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   authSessions<T extends Prisma.User$authSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  passwordResetTokens<T extends Prisma.User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bodyRecords<T extends Prisma.User$bodyRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$bodyRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BodyRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   centerMemberships<T extends Prisma.User$centerMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$centerMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CenterMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deviceTokens<T extends Prisma.User$deviceTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deviceTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5323,6 +5988,9 @@ export interface UserFieldRefs {
   readonly phone: Prisma.FieldRef<"User", 'String'>
   readonly profileImageUrl: Prisma.FieldRef<"User", 'String'>
   readonly status: Prisma.FieldRef<"User", 'UserStatus'>
+  readonly termsVersion: Prisma.FieldRef<"User", 'String'>
+  readonly termsAgreedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
@@ -5764,6 +6432,30 @@ export type User$authSessionsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.AuthSessionScalarFieldEnum | Prisma.AuthSessionScalarFieldEnum[]
+}
+
+/**
+ * User.passwordResetTokens
+ */
+export type User$passwordResetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PasswordResetToken
+   */
+  select?: Prisma.PasswordResetTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PasswordResetToken
+   */
+  omit?: Prisma.PasswordResetTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PasswordResetTokenInclude<ExtArgs> | null
+  where?: Prisma.PasswordResetTokenWhereInput
+  orderBy?: Prisma.PasswordResetTokenOrderByWithRelationInput | Prisma.PasswordResetTokenOrderByWithRelationInput[]
+  cursor?: Prisma.PasswordResetTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PasswordResetTokenScalarFieldEnum | Prisma.PasswordResetTokenScalarFieldEnum[]
 }
 
 /**

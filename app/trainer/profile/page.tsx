@@ -160,6 +160,12 @@ export default async function TrainerProfilePage() {
           로그아웃
         </button>
       </form>
+
+      <p className="text-center">
+        <Link href="/trainer/profile/delete" className="text-xs font-semibold text-faint underline underline-offset-4 hover:text-muted-foreground">
+          회원 탈퇴
+        </Link>
+      </p>
     </main>
   );
 }

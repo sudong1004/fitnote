@@ -15,6 +15,7 @@ import {
   claimMemberAccount,
 } from "@/server/trainers/connection.service";
 
+import { TERMS_VERSION, hasAllConsents } from "@/lib/legal";
 import { prisma } from "@/lib/prisma";
 import {
   AUTH_LIMITS,
@@ -54,6 +55,10 @@ export async function signup(
 
   const { name, email, password } = validated.data;
 
+  if (!hasAllConsents(formData)) {
+    return { errors: { consent: ["필수 항목에 모두 동의해 주세요."] } };
+  }
+
   // 역할은 가입할 때 정하고 하나만 가진다. 값이 이상하면 회원으로 본다.
   const isTrainer = formData.get("role") === "TRAINER";
 
@@ -84,6 +89,8 @@ export async function signup(
       email,
       name,
       passwordHash,
+      termsVersion: TERMS_VERSION,
+      termsAgreedAt: new Date(),
       ...(isTrainer
         ? { trainerProfile: { create: {} } }
         : { memberProfile: { create: {} } }),
@@ -123,6 +130,10 @@ export async function claimAccount(
 
   const { email, password } = validated.data;
 
+  if (!hasAllConsents(formData)) {
+    return { errors: { consent: ["필수 항목에 모두 동의해 주세요."] } };
+  }
+
   const claimKey = attemptKey("claim", await getClientIp());
 
   if (await isRateLimited(claimKey, AUTH_LIMITS.claimIp)) {
@@ -135,6 +146,11 @@ export async function claimAccount(
     const user = await claimMemberAccount(code, {
       email,
       passwordHash,
+    });
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { termsVersion: TERMS_VERSION, termsAgreedAt: new Date() },
     });
 
     await createSession(user.id);

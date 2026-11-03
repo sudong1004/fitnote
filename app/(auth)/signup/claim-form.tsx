@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 
 import { claimAccount } from "@/app/actions/auth";
+import { ConsentFields } from "@/components/legal/consent-fields";
 
 /**
  * 트레이너가 만들어 둔 계정을 이어받는 화면.
@@ -81,6 +82,8 @@ export function ClaimForm({
         {state?.message && (
           <p className="text-sm text-destructive">{state.message}</p>
         )}
+
+        <ConsentFields error={state?.errors?.consent?.[0]} />
 
         <button
           type="submit"

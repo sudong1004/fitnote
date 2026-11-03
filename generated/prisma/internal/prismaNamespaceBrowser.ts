@@ -93,7 +93,8 @@ export const ModelName = {
   Notification: 'Notification',
   NotificationPreference: 'NotificationPreference',
   AiAnalysis: 'AiAnalysis',
-  TrainerSharingSetting: 'TrainerSharingSetting'
+  TrainerSharingSetting: 'TrainerSharingSetting',
+  PasswordResetToken: 'PasswordResetToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -120,6 +121,9 @@ export const UserScalarFieldEnum = {
   phone: 'phone',
   profileImageUrl: 'profileImageUrl',
   status: 'status',
+  termsVersion: 'termsVersion',
+  termsAgreedAt: 'termsAgreedAt',
+  deletedAt: 'deletedAt',
   lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -754,6 +758,18 @@ export const TrainerSharingSettingScalarFieldEnum = {
 } as const
 
 export type TrainerSharingSettingScalarFieldEnum = (typeof TrainerSharingSettingScalarFieldEnum)[keyof typeof TrainerSharingSettingScalarFieldEnum]
+
+
+export const PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
 
 
 export const SortOrder = {

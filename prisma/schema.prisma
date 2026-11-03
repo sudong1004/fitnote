@@ -19,11 +19,21 @@ model User {
   phone                   String?
   profileImageUrl         String?
   status                  UserStatus                @default(ACTIVE)
+  /// *
+  ///    * 가입할 때 동의한 약관·개인정보처리방침 판(날짜 문자열)과 그 시각.
+  ///    * 문서를 고치면 판이 바뀌고, 누가 어느 판에 동의했는지 남는다.
+  termsVersion            String?
+  termsAgreedAt           DateTime?
+  /// *
+  ///    * 탈퇴한 시각. 탈퇴하면 이름·연락처를 지우고 상태를 DELETED 로 둔다.
+  ///    * 행 자체는 남긴다: 트레이너의 계약·수업·알림장 기록이 이 행을 가리킨다.
+  deletedAt               DateTime?
   lastLoginAt             DateTime?
   createdAt               DateTime                  @default(now())
   updatedAt               DateTime                  @updatedAt
   aiAnalyses              AiAnalysis[]
   authSessions            AuthSession[]
+  passwordResetTokens     PasswordResetToken[]
   bodyRecords             BodyRecord[]
   centerMemberships       CenterMembership[]
   deviceTokens            DeviceToken[]
@@ -1134,4 +1144,20 @@ enum AiAnalysisStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+/// *
+///  * 비밀번호 재설정 링크.
+///  * 토큰 원문은 메일로만 보내고 DB 에는 해시만 둔다. DB 가 새어도 링크를 만들 수 없다.
+///  * 한 번 쓰면 usedAt 이 찍히고, 30분 뒤에는 쓸 수 없다.
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

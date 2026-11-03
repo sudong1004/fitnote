@@ -23,6 +23,9 @@ export const AUTH_LIMITS = {
   loginIp: { limit: 20, windowMs: 15 * 60 * 1000 },
   signupIp: { limit: 10, windowMs: 60 * 60 * 1000 },
   claimIp: { limit: 10, windowMs: 15 * 60 * 1000 },
+  /** 비밀번호 재설정 메일: 남의 메일함을 메일로 채우는 걸 막는다 */
+  resetIp: { limit: 10, windowMs: 60 * 60 * 1000 },
+  resetAccount: { limit: 3, windowMs: 60 * 60 * 1000 },
 } as const;
 
 export const RATE_LIMIT_MESSAGE =

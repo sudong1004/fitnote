@@ -6,6 +6,7 @@ import {
   login,
   newPage,
   randomIpHeaders,
+  agreeAll,
   signup,
   uniqueEmail,
 } from "./helpers";
@@ -77,6 +78,7 @@ test.describe("가입과 로그인", () => {
     await second.page.fill("#name", "두번째");
     await second.page.fill("#email", email);
     await second.page.fill("#password", PASSWORD);
+    await agreeAll(second.page);
     await second.page.getByRole("button", { name: "가입하기" }).click();
 
     await expect(second.page.getByText("이미 가입된 이메일이에요.")).toBeVisible();
