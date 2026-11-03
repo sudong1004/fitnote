@@ -11,10 +11,10 @@ export const TERMS_EFFECTIVE_LABEL = "2026년 11월 3일";
 
 export const OPERATOR = {
   /** 개인이면 이름, 사업자면 상호 */
-  name: "[운영자 이름 또는 상호]",
+  name: "김수정",
   /** 개인정보 보호책임자 */
-  privacyOfficer: "[개인정보 보호책임자 이름]",
-  email: "[문의 이메일]",
+  privacyOfficer: "김수정",
+  email: "sujung@chilloen.com",
 };
 
 /** 가입 폼의 필수 동의 칸 이름. 서버는 이 칸이 모두 "on" 이어야 가입시킨다. */
