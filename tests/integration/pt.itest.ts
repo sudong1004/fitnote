@@ -8,6 +8,7 @@ import {
   reopenSession,
   scheduleSession,
 } from "@/server/pt/pt.service";
+import { getNextSessionPlan } from "@/server/pt/next-session.service";
 
 import { makeContract } from "./helpers";
 
@@ -160,5 +161,35 @@ describe("수업 시간", () => {
 
     // 거절된 요청은 회차를 차지하지 않는다.
     expect(await prisma.pTSession.count({ where: { contractId } })).toBe(2);
+  });
+});
+
+describe("다음 수업 잡기", () => {
+  it("2주 날짜와 그날 내 수업 수를 주고, 남은 횟수가 있고 잡힌 수업이 없을 때만 잡게 한다", async () => {
+    const { trainer, contractId } = await makeContract(3, createContract);
+    const first = await book(trainer.userId, contractId, 1);
+    await completeSession(trainer.userId, first.id);
+
+    const plan = await getNextSessionPlan(trainer.userId, first.id);
+    expect(plan.days).toHaveLength(14);
+    expect(plan.canSchedule).toBe(true);
+    expect(plan.upcomingAt).toBeNull();
+    expect(plan.defaultDuration).toBe(60);
+
+    // 사흘 뒤에 하나 잡으면 그날 수가 1이 되고, 잡힌 수업이 생긴다.
+    const next = await scheduleSession(trainer.userId, { contractId, scheduledAt: when(72) });
+    const after = await getNextSessionPlan(trainer.userId, first.id);
+    const key = new Date(next.scheduledAt.getTime() + 9 * 3_600_000).toISOString().slice(0, 10);
+    expect(after.days.find((d) => d.dateKey === key)?.count).toBe(1);
+    expect(after.upcomingAt?.getTime()).toBe(next.scheduledAt.getTime());
+  });
+
+  it("남은 횟수를 다 잡았으면 잡을 수 없다고 알려 준다", async () => {
+    const { trainer, contractId } = await makeContract(1, createContract);
+    const only = await book(trainer.userId, contractId, 1);
+    await completeSession(trainer.userId, only.id);
+
+    const plan = await getNextSessionPlan(trainer.userId, only.id);
+    expect(plan.canSchedule).toBe(false);
   });
 });

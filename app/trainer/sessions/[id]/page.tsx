@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 import { requireUser } from "@/app/lib/dal";
-import { formatKstDateLabel, toKstTimeValue } from "@/lib/date";
+import { formatKstDateLabel, formatKstTimeLabel, toKstTimeValue } from "@/lib/date";
 import { getBodyPartCounts } from "@/server/exercises/exercise.service";
 import { PTError, SESSION_STATUS_LABEL } from "@/server/pt/pt.service";
 import {
@@ -18,6 +18,7 @@ import {
   getSessionRecord,
   getSessionWorkout,
 } from "@/server/pt/session-record.service";
+import { getNextSessionPlan } from "@/server/pt/next-session.service";
 import { getSharingForTrainer } from "@/server/sharing/sharing.service";
 import { TrainerError } from "@/server/trainers/trainer.service";
 import { getFavoriteExerciseIds } from "@/server/workouts/favorite.service";
@@ -32,6 +33,7 @@ import {
   FinishSessionPanel,
   ReopenSessionButton,
 } from "./finish-session-drawer";
+import { NextSessionSheet } from "./next-session-sheet";
 import { OpenWorkoutButton } from "./open-workout-button";
 import { writeJournalAction } from "./actions";
 
@@ -121,6 +123,17 @@ export default async function SessionRecordPage({
   ]);
 
   const remaining = Math.max(session.totalSessions - session.usedSessions, 0);
+
+  /*
+   * 방금 완료로 마쳤거나(다음 수업 시트) 방금 다음 수업을 잡았을 때(확인 문구)만
+   * 다음 수업 정보를 읽는다. 평소에 이 화면을 열 때는 필요 없다.
+   */
+  const justFinished = done && (query.done === "complete" || typeof query.nextError === "string");
+  const nextPlan =
+    justFinished || typeof query.next === "string"
+      ? await getNextSessionPlan(user.id, id)
+      : null;
+  const showNextSheet = Boolean(justFinished && nextPlan?.canSchedule && !nextPlan.upcomingAt);
 
   const recordCount = workout?.records.length ?? 0;
 
@@ -280,6 +293,13 @@ export default async function SessionRecordPage({
               : query.done === "cancel"
                 ? "취소로 저장했어요."
                 : "예정으로 되돌렸어요."}
+        </p>
+      ) : null}
+
+      {typeof query.next === "string" && nextPlan?.upcomingAt ? (
+        <p className="mt-3 flex items-center gap-1.5 rounded-[0.875rem] bg-brand-muted px-3.5 py-2.5 text-sm font-bold text-primary">
+          <Check className="size-4 shrink-0" aria-hidden />
+          다음 수업을 {formatKstDateLabel(nextPlan.upcomingAt)} {formatKstTimeLabel(nextPlan.upcomingAt)}에 잡았어요.
         </p>
       ) : null}
 
@@ -502,6 +522,21 @@ export default async function SessionRecordPage({
             }
           />
         </div>
+      ) : null}
+
+      {showNextSheet && nextPlan ? (
+        <NextSessionSheet
+          ptSessionId={session.id}
+          contractId={nextPlan.contractId}
+          memberName={session.memberName}
+          usedLabel={`${session.sessionNumber}회차`}
+          remainingLabel={`남은 PT ${remaining}회`}
+          days={nextPlan.days}
+          firstDateKey={nextPlan.firstDateKey}
+          defaultTime={nextPlan.defaultTime}
+          defaultDuration={nextPlan.defaultDuration}
+          error={typeof query.nextError === "string" ? query.nextError : undefined}
+        />
       ) : null}
     </main>
   );
