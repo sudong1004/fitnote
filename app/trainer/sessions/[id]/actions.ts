@@ -12,7 +12,10 @@ import {
   markNoShow,
   PTError,
   reopenSession,
+  scheduleSession,
 } from "@/server/pt/pt.service";
+import { kstDateTimeToUtc } from "@/lib/date";
+import { parseSessionDuration } from "@/lib/session-duration";
 import {
   deleteSessionWorkout,
   copyPreviousExercises,
@@ -205,3 +208,45 @@ export async function finishSessionAction(formData: FormData) {
 }
 
 
+
+/**
+ * 수업을 마친 화면에서 바로 다음 수업을 잡는다.
+ *
+ * 잡고 나면 같은 화면으로 돌아와 "언제로 잡았는지" 를 보여 준다. 계약 화면이나
+ * 일정 화면으로 보내지 않는 건, 트레이너가 이어서 알림장을 쓰러 가기 때문이다.
+ */
+export async function scheduleNextSessionAction(formData: FormData) {
+  const user = await requireUser();
+
+  const ptSessionId = String(formData.get("ptSessionId") ?? "");
+  const contractId = String(formData.get("contractId") ?? "");
+  const date = String(formData.get("date") ?? "");
+  const time = String(formData.get("time") ?? "");
+  const back = `/trainer/sessions/${ptSessionId}`;
+  const scheduledAt = kstDateTimeToUtc(date, time);
+
+  if (!scheduledAt) {
+    redirect(`${back}?done=complete&nextError=${encodeURIComponent("날짜와 시각을 확인해주세요.")}`);
+  }
+  if (scheduledAt.getTime() <= Date.now()) {
+    redirect(`${back}?done=complete&nextError=${encodeURIComponent("지난 시각에는 잡을 수 없어요.")}`);
+  }
+
+  let nextId: string;
+  try {
+    const next = await scheduleSession(user.id, {
+      contractId,
+      scheduledAt,
+      durationMinutes: parseSessionDuration(formData.get("durationMinutes")),
+    });
+    nextId = next.id;
+  } catch (error) {
+    redirect(`${back}?done=complete&nextError=${encodeURIComponent(messageOf(error))}`);
+  }
+
+  revalidatePath("/trainer");
+  revalidatePath("/trainer/schedule");
+  revalidatePath("/home");
+
+  redirect(`${back}?next=${nextId}`);
+}
