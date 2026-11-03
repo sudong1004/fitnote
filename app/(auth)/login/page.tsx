@@ -1,11 +1,30 @@
 "use client";
 
 import { BrandMark } from "@/components/layout/brand-mark";
-import { useActionState } from "react";
+import { Suspense, useActionState } from "react";
 
 import Link from "next/link";
 
+import { useSearchParams } from "next/navigation";
+
 import { login } from "@/app/actions/auth";
+
+/** 비밀번호를 바꾸거나 탈퇴한 뒤 돌아왔을 때 한 줄 안내. 주소의 쿼리를 읽으므로 Suspense 안에 둔다. */
+function LoginNotice() {
+  const params = useSearchParams();
+  const notice =
+    params.get("reset") === "1"
+      ? "비밀번호를 바꿨어요. 새 비밀번호로 로그인해 주세요."
+      : params.get("deleted") === "1"
+        ? "탈퇴했어요. 그동안 FitNote를 써 주셔서 고마워요."
+        : null;
+  if (!notice) return null;
+  return (
+    <p role="status" className="mb-4 rounded-2xl bg-brand-muted px-4 py-3 text-sm font-bold text-primary">
+      {notice}
+    </p>
+  );
+}
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, undefined);
@@ -14,6 +33,10 @@ export default function LoginPage() {
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-6">
       <BrandMark />
       <h1 className="mb-6 text-2xl font-extrabold tracking-tight">로그인</h1>
+
+      <Suspense fallback={null}>
+        <LoginNotice />
+      </Suspense>
 
       <form action={formAction} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
@@ -60,7 +83,13 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <p className="mt-4 text-center text-sm">
+        <Link href="/forgot-password" className="font-semibold text-muted-foreground underline underline-offset-4">
+          비밀번호를 잊으셨나요?
+        </Link>
+      </p>
+
+      <p className="mt-3 text-center text-sm text-muted-foreground">
         아직 계정이 없으신가요?{" "}
         <Link href="/signup" className="font-bold text-primary underline underline-offset-4">
           회원가입

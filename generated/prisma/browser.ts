@@ -285,3 +285,11 @@ export type AiAnalysis = Prisma.AiAnalysisModel
  * * 가릴 대상이 아니다. 회원이 스스로 남긴 것만 고를 수 있게 한다.
  */
 export type TrainerSharingSetting = Prisma.TrainerSharingSettingModel
+/**
+ * Model PasswordResetToken
+ * *
+ * * 비밀번호 재설정 링크.
+ * * 토큰 원문은 메일로만 보내고 DB 에는 해시만 둔다. DB 가 새어도 링크를 만들 수 없다.
+ * * 한 번 쓰면 usedAt 이 찍히고, 30분 뒤에는 쓸 수 없다.
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel

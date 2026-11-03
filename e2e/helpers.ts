@@ -30,6 +30,7 @@ export async function signup(
   await page.fill("#name", name);
   await page.fill("#email", email);
   await page.fill("#password", PASSWORD);
+  await agreeAll(page);
   await page.getByRole("button", { name: "가입하기" }).click();
   await page.waitForURL(role === "TRAINER" ? "**/trainer" : "**/home");
 }
@@ -134,4 +135,9 @@ export function solidPng(size = 64, rgb: [number, number, number] = [220, 90, 60
     chunk("IDAT", deflateSync(raw)),
     chunk("IEND", Buffer.alloc(0)),
   ]);
+}
+
+/** 가입·계정 연결 화면의 필수 동의를 한 번에 체크한다. */
+export async function agreeAll(page: import("@playwright/test").Page) {
+  await page.getByLabel("전체 동의").check({ force: true });
 }

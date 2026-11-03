@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { newPage, signup, uniqueEmail } from "./helpers";
+import { agreeAll, newPage, signup, uniqueEmail } from "./helpers";
 
 /**
  * 트레이너와 회원이 만나는 한 바퀴.
@@ -126,6 +126,7 @@ test.describe("트레이너와 회원의 한 바퀴", () => {
 
     await member.page.fill("#email", uniqueEmail("claimed"));
     await member.page.fill("#password", "Passw0rd123");
+    await agreeAll(member.page);
     await member.page.getByRole("button", { name: "시작하기" }).click();
     await member.page.waitForURL("**/home");
 

@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import Link from "next/link";
 
 import { signup } from "@/app/actions/auth";
+import { ConsentFields } from "@/components/legal/consent-fields";
 
 export function SignupForm() {
   const [state, formAction, pending] = useActionState(signup, undefined);
@@ -95,6 +96,8 @@ export function SignupForm() {
         {state?.message && (
           <p className="text-sm text-destructive">{state.message}</p>
         )}
+
+        <ConsentFields error={state?.errors?.consent?.[0]} />
 
         <button
           type="submit"

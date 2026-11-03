@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { SESSION_COOKIE_NAME, decrypt } from "@/app/lib/jwt";
 
 /** 로그인 없이 접근 가능한 경로 */
-const publicRoutes = ["/", "/login", "/signup"];
+const publicRoutes = ["/", "/login", "/signup", "/terms", "/privacy", "/forgot-password", "/reset-password"];
 
 export default async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
