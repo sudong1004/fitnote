@@ -68,4 +68,16 @@ test.describe("출시 필수 기능", () => {
     await expect(page).toHaveURL(/\/login/);
     await context.close();
   });
+
+  test("로그인한 채로도 약관·방침이 열리고 머물러 있는다", async ({ browser }) => {
+    const { context, page } = await newPage(browser);
+    await signup(page, "MEMBER", "약관보는회원", uniqueEmail("legal"));
+    for (const path of ["/terms", "/privacy"]) {
+      await page.goto(path);
+      await page.waitForLoadState("networkidle");
+      await expect(page).toHaveURL(new RegExp(`${path}$`));
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    }
+    await context.close();
+  });
 });

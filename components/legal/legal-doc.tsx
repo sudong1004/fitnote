@@ -15,7 +15,7 @@ export function LegalDoc({
   return (
     <main className="mx-auto w-full max-w-2xl px-5 pt-4 pb-16">
       <Link
-        href="/login"
+        href="/"
         className="inline-flex h-10 items-center gap-1 rounded-full border border-border pr-4 pl-2.5 text-sm font-semibold"
       >
         <ChevronLeft className="size-4" aria-hidden />
