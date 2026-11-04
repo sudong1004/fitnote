@@ -17,6 +17,7 @@ import {
   recordAttempt,
 } from "@/app/lib/rate-limit";
 import { sendMail } from "@/lib/mail";
+import { renderMail } from "@/lib/mail-template";
 import {
   createPasswordResetToken,
   resetPasswordWithToken,
@@ -63,9 +64,18 @@ export async function requestPasswordReset(
     const link = `${await appOrigin()}/reset-password?token=${issued.token}`;
     const sent = await sendMail({
       to: email,
-      subject: "[FitNote] 비밀번호 재설정 링크",
-      text: `${issued.name}님, 아래 링크에서 새 비밀번호를 정해 주세요. 링크는 30분 동안 한 번만 쓸 수 있어요.\n\n${link}\n\n요청하지 않았다면 이 메일은 무시하셔도 돼요. 비밀번호는 바뀌지 않아요.`,
-      html: `<p>${issued.name}님, 아래 버튼을 눌러 새 비밀번호를 정해 주세요. 링크는 30분 동안 한 번만 쓸 수 있어요.</p><p><a href="${link}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#2f6b53;color:#fff;text-decoration:none;font-weight:700">새 비밀번호 정하기</a></p><p style="color:#5f6a64;font-size:13px">요청하지 않았다면 이 메일은 무시하셔도 돼요. 비밀번호는 바뀌지 않아요.</p>`,
+      subject: "FitNote 비밀번호 재설정 안내",
+      text: `${issued.name}님, 안녕하세요.\n\n비밀번호를 다시 정하려면 아래 주소를 열어 주세요. 링크는 30분 동안, 한 번만 쓸 수 있어요.\n\n${link}\n\n비밀번호 재설정을 요청하지 않았다면 이 메일은 무시하셔도 돼요. 비밀번호는 바뀌지 않아요.\n\n- FitNote`,
+      html: renderMail({
+        preheader: "30분 안에 새 비밀번호를 정해 주세요.",
+        title: "새 비밀번호를 정해 주세요",
+        paragraphs: [
+          `${issued.name}님, 안녕하세요.`,
+          "아래 버튼을 눌러 새 비밀번호를 정할 수 있어요. 링크는 30분 동안, 한 번만 쓸 수 있어요.",
+        ],
+        button: { label: "새 비밀번호 정하기", url: link },
+        note: "비밀번호 재설정을 요청하지 않았다면 이 메일은 무시하셔도 돼요. 비밀번호는 바뀌지 않아요.",
+      }),
     });
     // 가입 여부는 숨기되, 실제로 보내지 못한 서버 문제는 알려 준다.
     if (!sent) return { message: FAILED_MESSAGE };
