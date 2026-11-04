@@ -22,6 +22,9 @@ import {
   resetPasswordWithToken,
 } from "@/server/account/password-reset.service";
 
+const FAILED_MESSAGE =
+  "지금 메일을 보내지 못했어요. 잠시 후 다시 시도해 주세요. 계속 안 되면 문의 이메일로 알려 주세요.";
+
 const SENT_MESSAGE =
   "가입된 이메일이면 비밀번호 재설정 링크를 보냈어요. 메일함(스팸함 포함)을 확인해 주세요. 링크는 30분 동안 쓸 수 있어요.";
 
@@ -58,12 +61,14 @@ export async function requestPasswordReset(
   const issued = await createPasswordResetToken(email);
   if (issued) {
     const link = `${await appOrigin()}/reset-password?token=${issued.token}`;
-    await sendMail({
+    const sent = await sendMail({
       to: email,
       subject: "[FitNote] 비밀번호 재설정 링크",
       text: `${issued.name}님, 아래 링크에서 새 비밀번호를 정해 주세요. 링크는 30분 동안 한 번만 쓸 수 있어요.\n\n${link}\n\n요청하지 않았다면 이 메일은 무시하셔도 돼요. 비밀번호는 바뀌지 않아요.`,
       html: `<p>${issued.name}님, 아래 버튼을 눌러 새 비밀번호를 정해 주세요. 링크는 30분 동안 한 번만 쓸 수 있어요.</p><p><a href="${link}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#2f6b53;color:#fff;text-decoration:none;font-weight:700">새 비밀번호 정하기</a></p><p style="color:#5f6a64;font-size:13px">요청하지 않았다면 이 메일은 무시하셔도 돼요. 비밀번호는 바뀌지 않아요.</p>`,
     });
+    // 가입 여부는 숨기되, 실제로 보내지 못한 서버 문제는 알려 준다.
+    if (!sent) return { message: FAILED_MESSAGE };
   }
 
   return { ok: true, message: SENT_MESSAGE };
