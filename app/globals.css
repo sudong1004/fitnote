@@ -192,6 +192,20 @@
     overflow-wrap: break-word;
   }
 
+  /* 긴 글이 한 줄 반으로 끊겨 끝에 두세 글자만 남지 않게 한다. 가운데 정렬 글(빈 화면 안내 등)과
+     제목은 두 줄의 길이를 비슷하게 맞춘다. */
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  h1,
+  h2,
+  h3,
+  .text-center {
+    text-wrap: balance;
+  }
+
   button,
   a {
     -webkit-tap-highlight-color: transparent;
