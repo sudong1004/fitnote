@@ -1,29 +1,30 @@
 "use client";
 
-import { BrandMark } from "@/components/layout/brand-mark";
+import Link from "next/link";
 import { useActionState } from "react";
 
-import Link from "next/link";
+import { Dumbbell, Lock, Mail, User, UserRound } from "lucide-react";
 
 import { signup } from "@/app/actions/auth";
+import { AuthField } from "@/components/auth/auth-field";
+import { SubmitButton } from "@/components/auth/submit-button";
 import { ConsentFields } from "@/components/legal/consent-fields";
+
+const ROLES = [
+  { value: "MEMBER", label: "회원", hint: "운동을 기록해요", icon: Dumbbell },
+  { value: "TRAINER", label: "트레이너", hint: "회원을 관리해요", icon: UserRound },
+] as const;
 
 export function SignupForm() {
   const [state, formAction, pending] = useActionState(signup, undefined);
 
   return (
     <>
-      <BrandMark />
-      <h1 className="mb-6 text-2xl font-extrabold tracking-tight">회원가입</h1>
-
       <form action={formAction} className="flex flex-col gap-4">
-        <fieldset className="flex flex-col gap-1">
-          <legend className="mx-1 mb-1 text-[0.8125rem] font-bold">가입 유형</legend>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { value: "MEMBER", label: "회원", hint: "운동을 기록해요" },
-              { value: "TRAINER", label: "트레이너", hint: "회원을 관리해요" },
-            ].map((option) => (
+        <fieldset className="flex flex-col gap-1.5">
+          <legend className="mx-1 mb-1.5 text-[0.8125rem] font-bold">가입 유형</legend>
+          <div className="grid grid-cols-2 gap-2.5">
+            {ROLES.map((option) => (
               <label key={option.value} className="cursor-pointer">
                 <input
                   type="radio"
@@ -32,88 +33,59 @@ export function SignupForm() {
                   defaultChecked={option.value === "MEMBER"}
                   className="peer sr-only"
                 />
-                <span className="flex h-16 flex-col items-center justify-center rounded-2xl border-[1.5px] border-border bg-card text-sm font-bold transition-colors peer-checked:border-primary peer-checked:bg-[#f3faf6] peer-checked:text-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
+                <span className="flex h-20 flex-col items-center justify-center gap-0.5 rounded-2xl border-[1.5px] border-border bg-surface/60 text-sm font-bold text-muted-foreground transition-colors peer-checked:border-primary peer-checked:bg-brand-muted peer-checked:text-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
+                  <option.icon className="size-5" aria-hidden />
                   {option.label}
-                  <span className="mt-0.5 text-xs font-normal text-muted-foreground">
-                    {option.hint}
-                  </span>
+                  <span className="text-xs font-normal opacity-80">{option.hint}</span>
                 </span>
               </label>
             ))}
           </div>
         </fieldset>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="name" className="mx-1 text-[0.8125rem] font-bold">
-            이름
-          </label>
-          <input
-            id="name"
-            name="name"
-            placeholder="홍길동"
-            className="h-12 rounded-2xl border border-border bg-card px-4 outline-none focus:border-[1.5px] focus:border-primary"
-          />
-          {state?.errors?.name && (
-            <p className="text-sm text-destructive">{state.errors.name[0]}</p>
-          )}
-        </div>
+        <AuthField
+          id="name"
+          name="name"
+          label="이름"
+          icon={User}
+          autoComplete="name"
+          placeholder="홍길동"
+          errors={state?.errors?.name}
+        />
+        <AuthField
+          id="email"
+          name="email"
+          label="이메일"
+          type="email"
+          icon={Mail}
+          autoComplete="email"
+          placeholder="fitnote@example.com"
+          errors={state?.errors?.email}
+        />
+        <AuthField
+          id="password"
+          name="password"
+          label="비밀번호"
+          hint="영문·숫자 포함 8자 이상"
+          type="password"
+          icon={Lock}
+          autoComplete="new-password"
+          errors={state?.errors?.password}
+        />
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="mx-1 text-[0.8125rem] font-bold">
-            이메일
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="fitnote@example.com"
-            className="h-12 rounded-2xl border border-border bg-card px-4 outline-none focus:border-[1.5px] focus:border-primary"
-          />
-          {state?.errors?.email && (
-            <p className="text-sm text-destructive">{state.errors.email[0]}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="password" className="mx-1 text-[0.8125rem] font-bold">
-            비밀번호
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            className="h-12 rounded-2xl border border-border bg-card px-4 outline-none focus:border-[1.5px] focus:border-primary"
-          />
-          {state?.errors?.password && (
-            <ul className="text-sm text-destructive">
-              {state.errors.password.map((error) => (
-                <li key={error}>{error}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        {state?.message && (
-          <p className="text-sm text-destructive">{state.message}</p>
-        )}
+        {state?.message && <p className="mx-1 text-sm text-destructive">{state.message}</p>}
 
         <ConsentFields error={state?.errors?.consent?.[0]} />
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="mt-2 h-13 rounded-full bg-primary text-[0.9375rem] font-extrabold text-primary-foreground disabled:opacity-50"
-        >
-          {pending ? "가입 중..." : "가입하기"}
-        </button>
+        <SubmitButton pending={pending} idle="가입하기" busy="가입 중..." />
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <div className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
         이미 계정이 있으신가요?{" "}
         <Link href="/login" className="font-bold text-primary underline underline-offset-4">
           로그인
         </Link>
-      </p>
+      </div>
     </>
   );
 }
