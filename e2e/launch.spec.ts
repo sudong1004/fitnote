@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { PASSWORD, agreeAll, newPage, signup, uniqueEmail } from "./helpers";
+import { PASSWORD, agreeAll, connectPair, newPage, signup, uniqueEmail } from "./helpers";
 
 test.describe("출시 필수 기능", () => {
   test("필수 동의 없이는 가입되지 않고, 약관·방침 화면은 로그인 없이 열린다", async ({ browser }) => {
@@ -79,5 +79,23 @@ test.describe("출시 필수 기능", () => {
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     }
     await context.close();
+  });
+  test("처음 쓰는 트레이너 홈에 시작하기 카드가 보이고, 단계가 끝나면 체크된다", async ({ browser }) => {
+    const { context, page } = await newPage(browser);
+    await signup(page, "TRAINER", "새트레이너", uniqueEmail("guide"));
+    const card = page.getByRole("region", { name: "시작하기" });
+    await expect(card).toBeVisible();
+    await expect(card.getByText("0/4 완료")).toBeVisible();
+    await expect(card.getByRole("link", { name: "초대 코드 만들기" })).toBeVisible();
+    await context.close();
+
+    // 회원이 연결되면 첫 단계가 끝나고 다음 단계가 안내된다.
+    const pair = await connectPair(browser);
+    await pair.trainer.page.goto("/trainer");
+    const next = pair.trainer.page.getByRole("region", { name: "시작하기" });
+    await expect(next.getByText("1/4 완료")).toBeVisible();
+    await expect(next.getByRole("link", { name: "회원 고르기" })).toBeVisible();
+    await pair.trainer.context.close();
+    await pair.member.context.close();
   });
 });
