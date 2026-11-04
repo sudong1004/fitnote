@@ -58,6 +58,11 @@ export type AuthFormState =
         consent?: string[];
       };
       message?: string;
+      /**
+       * 방금 입력한 값. 실패해도 React 가 폼을 비우므로, 이름·이메일·가입 유형은
+       * 서버가 돌려줘서 다시 채운다. 비밀번호는 돌려주지 않는다.
+       */
+      values?: { role?: string; name?: string; email?: string };
     }
   | undefined;
 

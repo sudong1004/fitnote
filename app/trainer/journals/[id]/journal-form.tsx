@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 
+import { useSubmitKeep } from "@/app/lib/use-submit-keep";
+
 import { saveJournalAction, type SaveState } from "../actions";
 
 interface SessionOption {
@@ -65,9 +67,10 @@ export function JournalForm(props: Props) {
     SaveState | undefined,
     FormData
   >(saveJournalAction, undefined);
+  const submit = useSubmitKeep(formAction);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form onSubmit={submit} className="flex flex-col gap-4">
       <input type="hidden" name="journalId" value={props.journalId} />
 
       {props.sessionOptions.length > 0 ? (

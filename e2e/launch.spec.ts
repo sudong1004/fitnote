@@ -98,4 +98,61 @@ test.describe("출시 필수 기능", () => {
     await pair.trainer.context.close();
     await pair.member.context.close();
   });
+  test("가입에 한 번 실패해도 가입 유형·이름·이메일·동의가 남아서, 고치고 다시 내면 가입된다", async ({ browser }) => {
+    const { context, page } = await newPage(browser);
+    const email = uniqueEmail("keep");
+    await page.goto("/signup");
+    await page.locator("input[name=role][value=TRAINER]").check({ force: true });
+    await page.fill("#name", "유지트레이너");
+    await page.fill("#email", email);
+    await page.fill("#password", "abc"); // 너무 짧아서 실패한다
+    await agreeAll(page);
+    await page.getByRole("button", { name: "가입하기" }).click();
+    await expect(page.getByText("비밀번호는 8자 이상이어야 합니다.")).toBeVisible();
+
+    // 실패 뒤에도 입력과 동의가 그대로다.
+    await expect(page.locator("input[name=role][value=TRAINER]")).toBeChecked();
+    await expect(page.locator("#name")).toHaveValue("유지트레이너");
+    await expect(page.locator("#email")).toHaveValue(email);
+    for (const name of ["agreeAge", "agreeTerms", "agreePrivacy", "agreeSensitive"]) {
+      await expect(page.locator(`input[name=${name}]`)).toBeChecked();
+    }
+
+    // 동의를 다시 누르지 않고 비밀번호만 고쳐서 내면 트레이너로 가입된다.
+    await page.fill("#password", PASSWORD);
+    await page.getByRole("button", { name: "가입하기" }).click();
+    await page.waitForURL("**/trainer");
+    await context.close();
+  });
+
+  test("알림장 게시가 실패해도 쓴 글이 지워지지 않는다", async ({ browser }) => {
+    const pair = await connectPair(browser);
+    const page = pair.trainer.page;
+    // 계약 → 수업 → 수업 기록에서 알림장 쓰기 (pt-flow 와 같은 길).
+    await page.getByRole("link", { name: "계약 등록" }).first().click();
+    await page.fill("input[name=title]", "PT 10회");
+    await page.getByRole("button", { name: "계약 등록하기" }).click();
+    await page.waitForURL(pair.memberUrl);
+    await page.getByRole("link", { name: /PT 10회/ }).first().click();
+    await page.waitForURL(/\/contracts\/[^/]+$/);
+    await page.evaluate(() => document.querySelectorAll("details").forEach((d) => (d.open = true)));
+    await page.locator("button:has-text('수업 잡기')").first().click();
+    await expect(page.getByText("1회차 수업")).toBeVisible();
+    await page.locator("button:has-text('수업 완료')").first().click();
+    await expect(page.getByText("총 10회 중 1회 완료")).toBeVisible();
+    await page.goto("/trainer/journals");
+    await page.getByText("수업 기록", { exact: true }).last().click();
+    await page.waitForURL(/\/trainer\/sessions\/[^/]+$/);
+    await page.getByRole("button", { name: "알림장 쓰기" }).click();
+    await page.waitForURL(/\/trainer\/journals\/[^/]+$/);
+    await page.locator("input[name=title]").fill("지워지면 안 되는 제목");
+    await page.locator("textarea[name=workoutSummary]").fill("스쿼트 60kg 10회 3세트");
+    // 한마디를 비운 채 게시하면 실패한다.
+    await page.getByRole("button", { name: /게시하기|수정 반영/ }).click();
+    await page.waitForTimeout(1500);
+    await expect(page.locator("input[name=title]")).toHaveValue("지워지면 안 되는 제목");
+    await expect(page.locator("textarea[name=workoutSummary]")).toHaveValue("스쿼트 60kg 10회 3세트");
+    await pair.trainer.context.close();
+    await pair.member.context.close();
+  });
 });

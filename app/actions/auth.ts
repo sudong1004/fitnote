@@ -37,7 +37,7 @@ const SALT_ROUNDS = 10;
 const DUMMY_HASH =
   "$2b$10$kLb.J.yOyj1k9CAE8neuN.Giho6zF0SBQo5Al70SWGVLMLfWbPUoC";
 
-export async function signup(
+async function signupImpl(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
@@ -105,7 +105,7 @@ export async function signup(
   redirect(isTrainer ? "/trainer" : "/home");
 }
 
-export async function claimAccount(
+async function claimAccountImpl(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
@@ -170,7 +170,7 @@ export async function claimAccount(
   }
 }
 
-export async function login(
+async function loginImpl(
   _state: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
@@ -248,6 +248,33 @@ export async function login(
   }
 
   redirect("/home");
+}
+
+/** 실패했을 때 폼을 다시 채울 수 있게, 입력값(비밀번호 제외)을 결과에 실어 보낸다. */
+function withValues(result: AuthFormState, formData: FormData): AuthFormState {
+  if (!result) return result;
+
+  const text = (key: string) => {
+    const value = formData.get(key);
+    return typeof value === "string" ? value : undefined;
+  };
+
+  return {
+    ...result,
+    values: { role: text("role"), name: text("name"), email: text("email") },
+  };
+}
+
+export async function signup(state: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  return withValues(await signupImpl(state, formData), formData);
+}
+
+export async function claimAccount(state: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  return withValues(await claimAccountImpl(state, formData), formData);
+}
+
+export async function login(state: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  return withValues(await loginImpl(state, formData), formData);
 }
 
 export async function logout() {

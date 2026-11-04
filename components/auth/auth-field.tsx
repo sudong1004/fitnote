@@ -17,6 +17,7 @@ export function AuthField({
   placeholder,
   autoComplete,
   hint,
+  defaultValue,
   errors,
 }: {
   id: string;
@@ -27,6 +28,8 @@ export function AuthField({
   placeholder?: string;
   autoComplete?: string;
   hint?: string;
+  /** 실패 뒤 다시 채울 값. */
+  defaultValue?: string;
   errors?: string[];
 }) {
   const [shown, setShown] = useState(false);
@@ -49,6 +52,7 @@ export function AuthField({
         <input
           id={id}
           name={name}
+          defaultValue={defaultValue}
           type={isPassword && shown ? "text" : type}
           placeholder={placeholder}
           autoComplete={autoComplete}

@@ -7,6 +7,7 @@ import { Suspense, useActionState } from "react";
 import { CircleCheck, Lock, Mail } from "lucide-react";
 
 import { login } from "@/app/actions/auth";
+import { useSubmitKeep } from "@/app/lib/use-submit-keep";
 import { AuthField } from "@/components/auth/auth-field";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { SubmitButton } from "@/components/auth/submit-button";
@@ -34,6 +35,7 @@ function LoginNotice() {
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, undefined);
+  const onSubmit = useSubmitKeep(formAction);
 
   return (
     <AuthShell
@@ -45,7 +47,7 @@ export default function LoginPage() {
         <LoginNotice />
       </Suspense>
 
-      <form action={formAction} className="flex flex-col gap-4">
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <AuthField
           id="email"
           name="email"
@@ -53,6 +55,7 @@ export default function LoginPage() {
           type="email"
           icon={Mail}
           autoComplete="email"
+          defaultValue={state?.values?.email}
           placeholder="fitnote@example.com"
           errors={state?.errors?.email}
         />
