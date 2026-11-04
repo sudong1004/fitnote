@@ -187,6 +187,9 @@
   body {
     @apply bg-background text-foreground font-sans;
     min-height: 100vh;
+    /* 한글이 단어 중간에서 끊겨 "돌아와요"가 "돌아/와요"로 갈라지지 않게 한다. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 
   button,
@@ -200,14 +203,16 @@
     outline-offset: 3px;
   }
 
-  /* iOS Safari: 날짜·시간 입력은 기본 너비가 있어 칸 밖으로 삐져나온다. 칸에 맞춘다. */
+  /* iOS Safari: 날짜·시간 입력은 기본 너비가 있어 칸 밖으로 삐져나온다. 칸에 맞추고,
+     appearance 를 없애면 글자가 위로 붙으므로 세로 가운데로 맞춘다. */
   input[type="date"],
   input[type="time"],
   input[type="datetime-local"],
   input[type="month"] {
     -webkit-appearance: none;
     appearance: none;
-    display: block;
+    display: flex;
+    align-items: center;
     width: 100%;
     min-width: 0;
     max-width: 100%;
@@ -215,9 +220,12 @@
   }
 
   input[type="date"]::-webkit-date-and-time-value,
-  input[type="time"]::-webkit-date-and-time-value {
+  input[type="time"]::-webkit-date-and-time-value,
+  input[type="datetime-local"]::-webkit-date-and-time-value,
+  input[type="month"]::-webkit-date-and-time-value {
     text-align: left;
-    min-height: 1.25em;
+    margin: 0;
+    min-height: 0;
   }
 }
 
