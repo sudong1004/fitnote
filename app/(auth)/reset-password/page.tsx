@@ -1,6 +1,8 @@
 import Link from "next/link";
 
-import { BrandMark } from "@/components/layout/brand-mark";
+import { TriangleAlert } from "lucide-react";
+
+import { AuthShell } from "@/components/auth/auth-shell";
 import { isResetTokenUsable } from "@/server/account/password-reset.service";
 
 import { ResetForm } from "./reset-form";
@@ -16,14 +18,17 @@ export default async function ResetPasswordPage({
   const usable = typeof token === "string" && (await isResetTokenUsable(token));
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-6">
-      <BrandMark />
-      <h1 className="mb-6 text-2xl font-extrabold tracking-tight">새 비밀번호 정하기</h1>
+    <AuthShell
+      compact
+      title="새 비밀번호 정하기"
+      subtitle={usable ? "앞으로 쓸 새 비밀번호를 정해 주세요. 바꾸면 다른 기기의 로그인은 풀려요." : undefined}
+    >
       {usable ? (
         <ResetForm token={token as string} />
       ) : (
         <div className="flex flex-col gap-4">
-          <p className="rounded-2xl bg-status-urgent-bg px-4 py-3.5 text-sm font-bold text-status-urgent">
+          <p className="flex items-start gap-2 rounded-2xl bg-status-urgent-bg px-4 py-3.5 text-sm font-bold text-status-urgent">
+            <TriangleAlert className="mt-0.5 size-4.5 shrink-0" aria-hidden />
             링크가 만료됐거나 이미 쓴 링크예요.
           </p>
           <Link
@@ -34,6 +39,6 @@ export default async function ResetPasswordPage({
           </Link>
         </div>
       )}
-    </main>
+    </AuthShell>
   );
 }

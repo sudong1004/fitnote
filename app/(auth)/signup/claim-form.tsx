@@ -1,15 +1,17 @@
 "use client";
 
-import { BrandMark } from "@/components/layout/brand-mark";
+import Link from "next/link";
 import { useActionState } from "react";
 
-import Link from "next/link";
+import { Lock, Mail } from "lucide-react";
 
 import { claimAccount } from "@/app/actions/auth";
+import { AuthField } from "@/components/auth/auth-field";
+import { SubmitButton } from "@/components/auth/submit-button";
 import { ConsentFields } from "@/components/legal/consent-fields";
 
 /**
- * 트레이너가 만들어 둔 계정을 이어받는 화면.
+ * 트레이너가 만들어 둔 계정을 이어받는 폼. 제목(누구의 계정인지)은 위 틀에 있다.
  *
  * 맨 위에 누구의 계정을 가져가는지 먼저 적는다. 이 확인 없이 비밀번호부터
  * 정하게 하면, 잘못 전달된 링크로 남의 기록을 가져가고도 아무도 모른다.
@@ -18,88 +20,48 @@ import { ConsentFields } from "@/components/legal/consent-fields";
  * 알림장이 쌓여 있다. 여기서 다시 물으면 트레이너의 목록에서 사람이 바뀐
  * 것처럼 보인다.
  */
-export function ClaimForm({
-  code,
-  memberName,
-  trainerName,
-}: {
-  code: string;
-  memberName: string;
-  trainerName: string;
-}) {
+export function ClaimForm({ code }: { code: string }) {
   const [state, formAction, pending] = useActionState(claimAccount, undefined);
 
   return (
     <>
-      <BrandMark />
-      <h1 className="mb-2 text-2xl font-extrabold">{memberName}님, 반가워요</h1>
-      <p className="mb-8 text-sm text-muted-foreground">
-        <b className="font-bold text-ink">{trainerName}</b> 트레이너가 먼저
-        만들어 둔 계정이에요. 이메일과 비밀번호만 정하면 그동안 쌓인 PT 기록과
-        알림장을 바로 볼 수 있어요.
-      </p>
-
       <form action={formAction} className="flex flex-col gap-4">
         <input type="hidden" name="code" value={code} />
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="mx-1 text-[0.8125rem] font-bold">
-            이메일
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            placeholder="fitnote@example.com"
-            className="h-12 rounded-2xl border border-border bg-card px-4 outline-none focus:border-[1.5px] focus:border-primary"
-          />
-          {state?.errors?.email && (
-            <p className="text-sm text-destructive">{state.errors.email[0]}</p>
-          )}
-        </div>
+        <AuthField
+          id="email"
+          name="email"
+          label="이메일"
+          type="email"
+          icon={Mail}
+          autoComplete="email"
+          placeholder="fitnote@example.com"
+          errors={state?.errors?.email}
+        />
+        <AuthField
+          id="password"
+          name="password"
+          label="비밀번호"
+          hint="영문·숫자 포함 8자 이상"
+          type="password"
+          icon={Lock}
+          autoComplete="new-password"
+          errors={state?.errors?.password}
+        />
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="password" className="mx-1 text-[0.8125rem] font-bold">
-            비밀번호
-          </label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="new-password"
-            className="h-12 rounded-2xl border border-border bg-card px-4 outline-none focus:border-[1.5px] focus:border-primary"
-          />
-          {state?.errors?.password && (
-            <ul className="text-sm text-destructive">
-              {state.errors.password.map((error) => (
-                <li key={error}>{error}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        {state?.message && (
-          <p className="text-sm text-destructive">{state.message}</p>
-        )}
+        {state?.message && <p className="mx-1 text-sm text-destructive">{state.message}</p>}
 
         <ConsentFields error={state?.errors?.consent?.[0]} />
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="mt-2 h-13 rounded-full bg-primary text-[0.9375rem] font-extrabold text-primary-foreground disabled:opacity-50"
-        >
-          {pending ? "시작하는 중..." : "시작하기"}
-        </button>
+        <SubmitButton pending={pending} idle="시작하기" busy="시작하는 중..." />
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
+      <div className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
         내가 아닌가요?{" "}
         <Link href="/signup" className="font-bold text-primary underline underline-offset-4">
           새로 가입하기
         </Link>
-      </p>
+      </div>
     </>
   );
 }
