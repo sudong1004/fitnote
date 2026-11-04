@@ -20,8 +20,11 @@ import {
   memberContractGroup,
 } from "@/server/trainers/trainer.service";
 
+import { getTrainerStartProgress } from "@/server/trainers/trainer-start-guide.service";
+
 import { MemberCard, NoMembers } from "./member-card";
 import { EmptyDay, SessionRow } from "./session-row";
+import { StartGuide } from "./start-guide";
 import { cn } from "@/lib/utils";
 
 export const metadata = { title: "트레이너 | FitNote" };
@@ -99,10 +102,11 @@ function replyReason(reply: TrainerReplyRow) {
 export default async function TrainerHomePage() {
   const user = await requireUser();
 
-  const [today, todos, home] = await Promise.all([
+  const [today, todos, home, startProgress] = await Promise.all([
     getTrainerToday(user.id),
     getTrainerTodos(user.id),
     getTrainerHome(user.id),
+    getTrainerStartProgress(user.id),
   ]);
 
   /**
@@ -212,6 +216,7 @@ export default async function TrainerHomePage() {
           </div>
         </div>
       </header>
+      <StartGuide progress={startProgress} />
       {/* Today's Summary */}
       <section aria-label="오늘 요약" className="grid grid-cols-3 gap-2">
         <SummaryCard
