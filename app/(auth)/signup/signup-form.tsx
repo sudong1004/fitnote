@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import { Dumbbell, Lock, Mail, User, UserRound } from "lucide-react";
 
 import { signup } from "@/app/actions/auth";
+import { useSubmitKeep } from "@/app/lib/use-submit-keep";
 import { AuthField } from "@/components/auth/auth-field";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { ConsentFields } from "@/components/legal/consent-fields";
@@ -17,10 +18,11 @@ const ROLES = [
 
 export function SignupForm() {
   const [state, formAction, pending] = useActionState(signup, undefined);
+  const onSubmit = useSubmitKeep(formAction);
 
   return (
     <>
-      <form action={formAction} className="flex flex-col gap-4">
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <fieldset className="flex flex-col gap-1.5">
           <legend className="mx-1 mb-1.5 text-[0.8125rem] font-bold">가입 유형</legend>
           <div className="grid grid-cols-2 gap-2.5">
@@ -30,7 +32,7 @@ export function SignupForm() {
                   type="radio"
                   name="role"
                   value={option.value}
-                  defaultChecked={option.value === "MEMBER"}
+                  defaultChecked={(state?.values?.role ?? "MEMBER") === option.value}
                   className="peer sr-only"
                 />
                 <span className="flex h-20 flex-col items-center justify-center gap-0.5 rounded-2xl border-[1.5px] border-border bg-surface/60 text-sm font-bold text-muted-foreground transition-colors peer-checked:border-primary peer-checked:bg-brand-muted peer-checked:text-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ring">
@@ -49,6 +51,7 @@ export function SignupForm() {
           label="이름"
           icon={User}
           autoComplete="name"
+          defaultValue={state?.values?.name}
           placeholder="홍길동"
           errors={state?.errors?.name}
         />
@@ -59,6 +62,7 @@ export function SignupForm() {
           type="email"
           icon={Mail}
           autoComplete="email"
+          defaultValue={state?.values?.email}
           placeholder="fitnote@example.com"
           errors={state?.errors?.email}
         />

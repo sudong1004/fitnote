@@ -6,12 +6,14 @@ import { useActionState, useState } from "react";
 import { Info, Mail, MailCheck } from "lucide-react";
 
 import { requestPasswordReset } from "@/app/actions/password-reset";
+import { useSubmitKeep } from "@/app/lib/use-submit-keep";
 import { AuthField } from "@/components/auth/auth-field";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { SubmitButton } from "@/components/auth/submit-button";
 
 function ForgotForm({ onRetry }: { onRetry: () => void }) {
   const [state, action, pending] = useActionState(requestPasswordReset, undefined);
+  const onSubmit = useSubmitKeep(action);
 
   if (state?.ok) {
     return (
@@ -45,7 +47,7 @@ function ForgotForm({ onRetry }: { onRetry: () => void }) {
   }
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <AuthField
         id="email"
         name="email"

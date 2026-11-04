@@ -5,15 +5,17 @@ import { useActionState } from "react";
 import { Lock } from "lucide-react";
 
 import { resetPassword } from "@/app/actions/password-reset";
+import { useSubmitKeep } from "@/app/lib/use-submit-keep";
 import { AuthField } from "@/components/auth/auth-field";
 import { SubmitButton } from "@/components/auth/submit-button";
 
 export function ResetForm({ token }: { token: string }) {
   const [state, action, pending] = useActionState(resetPassword, undefined);
+  const onSubmit = useSubmitKeep(action);
   const errors = state?.errors ?? {};
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <input type="hidden" name="token" value={token} />
       <AuthField
         id="newPassword"

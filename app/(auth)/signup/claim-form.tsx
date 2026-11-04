@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import { Lock, Mail } from "lucide-react";
 
 import { claimAccount } from "@/app/actions/auth";
+import { useSubmitKeep } from "@/app/lib/use-submit-keep";
 import { AuthField } from "@/components/auth/auth-field";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { ConsentFields } from "@/components/legal/consent-fields";
@@ -22,10 +23,11 @@ import { ConsentFields } from "@/components/legal/consent-fields";
  */
 export function ClaimForm({ code }: { code: string }) {
   const [state, formAction, pending] = useActionState(claimAccount, undefined);
+  const onSubmit = useSubmitKeep(formAction);
 
   return (
     <>
-      <form action={formAction} className="flex flex-col gap-4">
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <input type="hidden" name="code" value={code} />
 
         <AuthField
@@ -35,6 +37,7 @@ export function ClaimForm({ code }: { code: string }) {
           type="email"
           icon={Mail}
           autoComplete="email"
+          defaultValue={state?.values?.email}
           placeholder="fitnote@example.com"
           errors={state?.errors?.email}
         />
