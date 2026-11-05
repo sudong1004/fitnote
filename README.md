@@ -3,7 +3,7 @@
 PT 센터 · 트레이너 · 회원을 위한 **운동 기록 + PT 알림장 + 수업 관리** 웹앱.
 트레이너가 회원을 관리하고 수업을 기록하면, 그 내용이 회원의 운동 기록으로 이어진다.
 
-개발 경과와 설계 판단은 [`docs/PROGRESS.md`](docs/PROGRESS.md) 에 있다.
+개발 경과와 설계 판단은 [`docs/PROGRESS.md`](docs/PROGRESS.md) 에, 지금 동작을 정리한 명세(요구사항·기능·화면·데이터·권한·테스트)는 [`docs/spec/`](docs/spec/README.md) 에 있다.
 
 ## 기술 스택
 
