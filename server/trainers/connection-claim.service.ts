@@ -47,6 +47,13 @@ export async function createPendingMember(
 
   const phone = input.phone?.trim() ? input.phone.trim() : null;
 
+  if (phone && !/^[0-9+\-\s()]{9,20}$/.test(phone)) {
+    throw new ConnectionError(
+      "NOT_FOUND",
+      "전화번호는 숫자와 - 만 써서 입력해주세요.",
+    );
+  }
+
   // 같은 트레이너 밑에 같은 이름이 이미 있으면 막는다. 동명이인이 있을 수는
   // 있지만, 목록에 똑같은 이름이 둘 있으면 트레이너가 누구에게 알림장을 쓰는지
   // 알 수 없다. 정말 동명이인이라면 "김민수(수)"처럼 구분해서 적게 한다.

@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 
 import { CalendarPlus, Loader2 } from "lucide-react";
 
+import { useSubmitKeep } from "@/app/lib/use-submit-keep";
 import { cn } from "@/lib/utils";
 
 import { scheduleFromCalendarAction } from "./actions";
@@ -42,6 +43,19 @@ export function NewSessionPanel({
   const [pending, startTransition] = useTransition();
   const router = useRouter();
 
+  const onSubmit = useSubmitKeep((formData) => {
+    setError(null);
+    startTransition(async () => {
+      const result = await scheduleFromCalendarAction(formData);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      router.push(`/trainer/schedule?date=${result.dateKey}`);
+      router.refresh();
+    });
+  });
+
   const fieldClass =
     "mt-1.5 h-11.5 w-full min-w-0 rounded-[0.875rem] border border-border bg-card px-3 text-sm tabular-nums outline-none focus:border-primary focus:ring-2 focus:ring-primary/15";
 
@@ -61,18 +75,7 @@ export function NewSessionPanel({
       ) : (
         <form
           className="mt-3.5 flex flex-col gap-2.5"
-          action={(formData) => {
-            setError(null);
-            startTransition(async () => {
-              const result = await scheduleFromCalendarAction(formData);
-              if (result.error) {
-                setError(result.error);
-                return;
-              }
-              router.push(`/trainer/schedule?date=${result.dateKey}`);
-              router.refresh();
-            });
-          }}
+          onSubmit={onSubmit}
         >
           <label className="block">
             <span className="text-xs font-bold text-muted-foreground">회원</span>

@@ -42,6 +42,19 @@ export async function createContract(
     throw new PTError("INVALID", "시작일을 확인해주세요.");
   }
 
+  const year = (date: Date) => date.getUTCFullYear();
+  if (
+    year(input.startedAt) < 2000 ||
+    year(input.startedAt) > 2100 ||
+    (input.expiresAt && (year(input.expiresAt) < 2000 || year(input.expiresAt) > 2100))
+  ) {
+    throw new PTError("INVALID", "날짜를 2000년~2100년 사이로 입력해주세요.");
+  }
+
+  if ((input.title?.trim().length ?? 0) > 60) {
+    throw new PTError("INVALID", "계약 이름은 60자 이하로 적어 주세요.");
+  }
+
   if (
     input.expiresAt &&
     input.expiresAt.getTime() < input.startedAt.getTime()
