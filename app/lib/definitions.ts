@@ -10,22 +10,44 @@ const EmailSchema = z
   .string()
   .trim()
   .toLowerCase()
+  .max(254, { error: "이메일이 너무 길어요." })
   .pipe(z.email({ error: "올바른 이메일 형식이 아닙니다." }));
 
-export const SignupFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, { error: "이름은 2자 이상 입력해주세요." })
-    .max(20, { error: "이름은 20자 이하로 입력해주세요." })
-    .trim(),
-  email: EmailSchema,
-  password: z
-    .string()
-    .min(8, { error: "비밀번호는 8자 이상이어야 합니다." })
-    .regex(/[a-zA-Z]/, { error: "영문을 최소 1자 포함해야 합니다." })
-    .regex(/[0-9]/, { error: "숫자를 최소 1자 포함해야 합니다." })
-    .trim(),
-});
+/**
+ * 새 비밀번호 규칙. 가입·이어받기·변경·재설정이 모두 같은 규칙을 쓴다.
+ *
+ * - trim 하지 않는다. 앞뒤 공백도 비밀번호의 일부다. 가입 때만 잘라 두면 로그인에서
+ *   공백을 넣어 친 사람이 영영 못 들어온다.
+ * - bcrypt 는 72바이트 뒤를 버린다. 그보다 긴 값은 뒤쪽이 의미 없는 채로 저장되므로
+ *   처음부터 받지 않는다. 한글은 글자당 3바이트라 글자 수가 아니라 바이트로 센다.
+ */
+export const PasswordSchema = z
+  .string()
+  .min(8, { error: "비밀번호는 8자 이상이어야 합니다." })
+  .refine((value) => new TextEncoder().encode(value).length <= 72, {
+    error: "비밀번호가 너무 길어요. 영문·숫자 기준 72자 이하로 정해 주세요.",
+  })
+  .regex(/[a-zA-Z]/, { error: "영문을 최소 1자 포함해야 합니다." })
+  .regex(/[0-9]/, { error: "숫자를 최소 1자 포함해야 합니다." });
+
+const SAME_PASSWORD_ERROR = "비밀번호가 서로 달라요.";
+
+export const SignupFormSchema = z
+  .object({
+    // 공백을 먼저 자른 뒤 길이를 센다. 반대로 하면 " a" 가 2자로 통과한다.
+    name: z
+      .string()
+      .trim()
+      .min(2, { error: "이름은 2자 이상 입력해주세요." })
+      .max(20, { error: "이름은 20자 이하로 입력해주세요." }),
+    email: EmailSchema,
+    password: PasswordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((value) => value.password === value.confirmPassword, {
+    error: SAME_PASSWORD_ERROR,
+    path: ["confirmPassword"],
+  });
 
 /**
  * 트레이너가 만들어 둔 계정을 이어받을 때.
@@ -34,15 +56,16 @@ export const SignupFormSchema = z.object({
  * 수업이 쌓여 있다. 여기서 다시 물으면 회원이 다른 이름을 적을 수 있고 그러면
  * 트레이너의 목록에서 사람이 바뀐 것처럼 보인다.
  */
-export const ClaimFormSchema = z.object({
-  email: EmailSchema,
-  password: z
-    .string()
-    .min(8, { error: "비밀번호는 8자 이상이어야 합니다." })
-    .regex(/[a-zA-Z]/, { error: "영문을 최소 1자 포함해야 합니다." })
-    .regex(/[0-9]/, { error: "숫자를 최소 1자 포함해야 합니다." })
-    .trim(),
-});
+export const ClaimFormSchema = z
+  .object({
+    email: EmailSchema,
+    password: PasswordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((value) => value.password === value.confirmPassword, {
+    error: SAME_PASSWORD_ERROR,
+    path: ["confirmPassword"],
+  });
 
 export const LoginFormSchema = z.object({
   email: EmailSchema,
@@ -55,6 +78,7 @@ export type AuthFormState =
         name?: string[];
         email?: string[];
         password?: string[];
+        confirmPassword?: string[];
         consent?: string[];
       };
       message?: string;
@@ -65,13 +89,6 @@ export type AuthFormState =
       values?: { role?: string; name?: string; email?: string };
     }
   | undefined;
-
-const PasswordSchema = z
-  .string()
-  .min(8, { error: "비밀번호는 8자 이상이어야 합니다." })
-  .regex(/[a-zA-Z]/, { error: "영문을 최소 1자 포함해야 합니다." })
-  .regex(/[0-9]/, { error: "숫자를 최소 1자 포함해야 합니다." })
-  .trim();
 
 /** 빈칸은 "지운다"는 뜻이라 null 로 바꾼다. */
 const optionalText = (max: number, label: string) =>

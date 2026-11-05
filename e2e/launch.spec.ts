@@ -9,6 +9,7 @@ test.describe("출시 필수 기능", () => {
     await page.fill("#name", "동의회원");
     await page.fill("#email", uniqueEmail("consent"));
     await page.fill("#password", PASSWORD);
+    await page.fill("#confirmPassword", PASSWORD);
     await page.getByRole("button", { name: "가입하기" }).click();
     await expect(page.getByText("필수 항목에 모두 동의해 주세요.")).toBeVisible();
 
@@ -21,6 +22,7 @@ test.describe("출시 필수 기능", () => {
     await page.fill("#name", "동의회원");
     await page.fill("#email", uniqueEmail("consent2"));
     await page.fill("#password", PASSWORD);
+    await page.fill("#confirmPassword", PASSWORD);
     await agreeAll(page);
     await page.getByRole("button", { name: "가입하기" }).click();
     await page.waitForURL(/\/(home|trainer)/);
@@ -106,6 +108,7 @@ test.describe("출시 필수 기능", () => {
     await page.fill("#name", "유지트레이너");
     await page.fill("#email", email);
     await page.fill("#password", "abc"); // 너무 짧아서 실패한다
+    await page.fill("#confirmPassword", "abc");
     await agreeAll(page);
     await page.getByRole("button", { name: "가입하기" }).click();
     await expect(page.getByText("비밀번호는 8자 이상이어야 합니다.")).toBeVisible();
@@ -120,6 +123,7 @@ test.describe("출시 필수 기능", () => {
 
     // 동의를 다시 누르지 않고 비밀번호만 고쳐서 내면 트레이너로 가입된다.
     await page.fill("#password", PASSWORD);
+    await page.fill("#confirmPassword", PASSWORD);
     await page.getByRole("button", { name: "가입하기" }).click();
     await page.waitForURL("**/trainer");
     await context.close();
@@ -154,5 +158,50 @@ test.describe("출시 필수 기능", () => {
     await expect(page.locator("textarea[name=workoutSummary]")).toHaveValue("스쿼트 60kg 10회 3세트");
     await pair.trainer.context.close();
     await pair.member.context.close();
+  });
+  test("가입 입력 검사: 비밀번호 확인, 공백 이름, 너무 긴 비밀번호", async ({ browser }) => {
+    const { context, page } = await newPage(browser);
+    await page.goto("/signup");
+    await page.fill("#name", " 김");
+    await page.fill("#email", uniqueEmail("val"));
+    await page.fill("#password", PASSWORD);
+    await page.fill("#confirmPassword", PASSWORD + "x");
+    await agreeAll(page);
+    await page.getByRole("button", { name: "가입하기" }).click();
+    // 앞뒤 공백을 자른 뒤 길이를 세므로 " 김" 은 1자다.
+    await expect(page.getByText("이름은 2자 이상")).toBeVisible();
+
+    await page.fill("#name", "김가입");
+    await page.getByRole("button", { name: "가입하기" }).click();
+    await expect(page.getByText("비밀번호가 서로 달라요.")).toBeVisible();
+
+    const tooLong = "Aa1" + "b".repeat(70); // 73자
+    await page.fill("#password", tooLong);
+    await page.fill("#confirmPassword", tooLong);
+    await page.getByRole("button", { name: "가입하기" }).click();
+    await expect(page.getByText("비밀번호가 너무 길어요")).toBeVisible();
+    await context.close();
+  });
+
+  test("비밀번호의 앞뒤 공백도 비밀번호의 일부라서, 그대로 다시 로그인된다", async ({ browser }) => {
+    const { context, page } = await newPage(browser);
+    const email = uniqueEmail("space");
+    const password = " Pass word1 ";
+    await page.goto("/signup");
+    await page.fill("#name", "공백회원");
+    await page.fill("#email", email);
+    await page.fill("#password", password);
+    await page.fill("#confirmPassword", password);
+    await agreeAll(page);
+    await page.getByRole("button", { name: "가입하기" }).click();
+    await page.waitForURL("**/home");
+
+    await page.context().clearCookies();
+    await page.goto("/login");
+    await page.fill("#email", email.toUpperCase());
+    await page.fill("#password", password);
+    await page.getByRole("button", { name: "로그인" }).click();
+    await page.waitForURL("**/home");
+    await context.close();
   });
 });
