@@ -31,6 +31,7 @@ test.describe("가입과 로그인", () => {
     await page.fill("#name", "김");
     await page.fill("#email", "ok@e2e.test");
     await page.fill("#password", "short");
+    await page.fill("#confirmPassword", "short");
     await page.getByRole("button", { name: "가입하기" }).click();
 
     await expect(page.getByText("이름은 2자 이상")).toBeVisible();
@@ -78,6 +79,7 @@ test.describe("가입과 로그인", () => {
     await second.page.fill("#name", "두번째");
     await second.page.fill("#email", email);
     await second.page.fill("#password", PASSWORD);
+    await second.page.fill("#confirmPassword", PASSWORD);
     await agreeAll(second.page);
     await second.page.getByRole("button", { name: "가입하기" }).click();
 

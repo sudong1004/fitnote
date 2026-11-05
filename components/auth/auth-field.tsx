@@ -56,6 +56,10 @@ export function AuthField({
           type={isPassword && shown ? "text" : type}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          autoCapitalize={type === "text" ? undefined : "none"}
+          autoCorrect={type === "text" ? undefined : "off"}
+          spellCheck={type === "text" ? undefined : false}
+          inputMode={type === "email" ? "email" : undefined}
           aria-invalid={hasError || undefined}
           className={`h-13 w-full rounded-2xl border bg-surface/60 pl-11 text-[0.9375rem] outline-none placeholder:text-faint focus:bg-card focus:border-[1.5px] focus:border-primary ${
             isPassword ? "pr-12" : "pr-4"

@@ -76,6 +76,15 @@ export function SignupForm() {
           autoComplete="new-password"
           errors={state?.errors?.password}
         />
+        <AuthField
+          id="confirmPassword"
+          name="confirmPassword"
+          label="비밀번호 확인"
+          type="password"
+          icon={Lock}
+          autoComplete="new-password"
+          errors={state?.errors?.confirmPassword}
+        />
 
         {state?.message && <p className="mx-1 text-sm text-destructive">{state.message}</p>}
 

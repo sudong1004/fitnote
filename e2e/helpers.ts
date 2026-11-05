@@ -30,6 +30,7 @@ export async function signup(
   await page.fill("#name", name);
   await page.fill("#email", email);
   await page.fill("#password", PASSWORD);
+  await page.fill("#confirmPassword", PASSWORD);
   await agreeAll(page);
   await page.getByRole("button", { name: "가입하기" }).click();
   await page.waitForURL(role === "TRAINER" ? "**/trainer" : "**/home");

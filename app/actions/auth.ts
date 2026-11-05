@@ -45,6 +45,7 @@ async function signupImpl(
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
   });
 
   if (!validated.success) {
@@ -84,21 +85,33 @@ async function signupImpl(
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      name,
-      passwordHash,
-      termsVersion: TERMS_VERSION,
-      termsAgreedAt: new Date(),
-      ...(isTrainer
-        ? { trainerProfile: { create: {} } }
-        : { memberProfile: { create: {} } }),
-    },
-    select: {
-      id: true,
-    },
-  });
+  let user: { id: string };
+
+  try {
+    user = await prisma.user.create({
+      data: {
+        email,
+        name,
+        passwordHash,
+        termsVersion: TERMS_VERSION,
+        termsAgreedAt: new Date(),
+        ...(isTrainer
+          ? { trainerProfile: { create: {} } }
+          : { memberProfile: { create: {} } }),
+      },
+      select: {
+        id: true,
+      },
+    });
+  } catch (error) {
+    // 위에서 조회할 때는 없었는데 그 사이에 같은 이메일로 가입한 경우(버튼을 두 번 누른
+    // 경우 포함). 서버 오류 화면 대신 같은 안내를 보여 준다.
+    if ((error as { code?: string })?.code === "P2002") {
+      return { message: "이미 가입된 이메일이에요." };
+    }
+
+    throw error;
+  }
 
   await createSession(user.id);
 
@@ -112,6 +125,7 @@ async function claimAccountImpl(
   const validated = ClaimFormSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
   });
 
   if (!validated.success) {
