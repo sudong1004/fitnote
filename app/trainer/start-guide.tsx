@@ -6,7 +6,7 @@ import type { TrainerStartProgress } from "@/server/trainers/trainer-start-guide
 import { cn } from "@/lib/utils";
 
 type Step = {
-  key: keyof TrainerStartProgress;
+  key: "hasMember" | "hasContract" | "hasSession" | "hasJournal";
   title: string;
   hint: string;
   href: string;
@@ -17,9 +17,9 @@ const STEPS: Step[] = [
   {
     key: "hasMember",
     title: "회원 연결하기",
-    hint: "초대 코드를 만들어 회원에게 보내거나, 회원을 먼저 등록해요.",
-    href: "/trainer/profile",
-    action: "초대 코드 만들기",
+    hint: "이름만 적어도 바로 회원으로 등록돼요. 회원이 가입하면 기록이 이어져요.",
+    href: "/trainer/members",
+    action: "회원 추가하기",
   },
   {
     key: "hasContract",
@@ -118,6 +118,20 @@ export function StartGuide({ progress }: { progress: TrainerStartProgress }) {
                     >
                       {step.action}
                     </Link>
+
+                    {step.key === "hasMember" && (
+                      <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">
+                        {progress.hasInvite
+                          ? "초대 코드는 만들어 뒀어요. 회원이 앱에서 코드를 입력해야 연결되니, 기다리지 말고 먼저 회원을 추가해도 돼요. "
+                          : "회원이 직접 가입하게 하려면 "}
+                        <Link
+                          href="/trainer/profile"
+                          className="font-bold text-primary underline underline-offset-2"
+                        >
+                          {progress.hasInvite ? "초대 코드 보기" : "초대 코드 만들기"}
+                        </Link>
+                      </p>
+                    )}
                   </>
                 )}
               </div>

@@ -7,6 +7,8 @@ import { requireTrainerProfile } from "./trainer-shared";
 
 export type TrainerStartProgress = {
   hasMember: boolean;
+  /** 아직 쓰이지 않았더라도 살아 있는 초대 코드를 만들어 둔 적이 있는지. */
+  hasInvite: boolean;
   hasContract: boolean;
   hasSession: boolean;
   hasJournal: boolean;
@@ -24,9 +26,13 @@ export async function getTrainerStartProgress(
   const trainer = await requireTrainerProfile(userId);
   const where = { trainerProfileId: trainer.id };
 
-  const [member, contract, session, journal] = await Promise.all([
+  const [member, invite, contract, session, journal] = await Promise.all([
     prisma.trainerMemberConnection.findFirst({
       where: { ...where, status: ConnectionStatus.ACTIVE },
+      select: { id: true },
+    }),
+    prisma.trainerInvitation.findFirst({
+      where: { ...where, revokedAt: null, expiresAt: { gt: new Date() } },
       select: { id: true },
     }),
     prisma.pTContract.findFirst({ where, select: { id: true } }),
@@ -39,6 +45,7 @@ export async function getTrainerStartProgress(
 
   return {
     hasMember: member !== null,
+    hasInvite: invite !== null,
     hasContract: contract !== null,
     hasSession: session !== null,
     hasJournal: journal !== null,
