@@ -2,6 +2,8 @@
 
 import { useActionState, useState } from "react";
 
+import { useSubmitKeep } from "@/app/lib/use-submit-keep";
+
 import { Eye, EyeOff } from "lucide-react";
 
 import { savePassword, saveProfile } from "@/app/actions/account";
@@ -62,9 +64,10 @@ export type AccountDefaults = {
 export function ProfileForm({ defaults }: { defaults: AccountDefaults }) {
   const [state, action, pending] = useActionState(saveProfile, undefined);
   const errors = state?.errors ?? {};
+  const onSubmit = useSubmitKeep(action);
 
   return (
-    <form action={action} className="flex flex-col gap-4 rounded-[1.375rem] border border-border p-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4 rounded-[1.375rem] border border-border p-4">
       <b className="text-[0.9375rem]">기본 정보</b>
 
       <Field label="이메일" hint="로그인 아이디라 바꿀 수 없어요">
@@ -178,10 +181,11 @@ function PasswordInput({ name, autoComplete }: { name: string; autoComplete: str
 export function PasswordForm() {
   const [state, action, pending] = useActionState(savePassword, undefined);
   const errors = state?.errors ?? {};
+  const onSubmit = useSubmitKeep(action);
 
   return (
     <form
-      action={action}
+      onSubmit={onSubmit}
       // 성공하면 폼을 새로 그려서 입력한 비밀번호가 화면에 남지 않게 한다.
       key={state?.ok ? "done" : "editing"}
       className="flex flex-col gap-4 rounded-[1.375rem] border border-border p-4"

@@ -204,4 +204,29 @@ test.describe("출시 필수 기능", () => {
     await page.waitForURL("**/home");
     await context.close();
   });
+  test("트레이너 입력 검사: 잘못된 연락처·긴 계약 이름·긴 수업 메모는 오류 화면 없이 안내가 뜬다", async ({ browser }) => {
+    const { context, page } = await newPage(browser);
+    await signup(page, "TRAINER", "검사트레이너", uniqueEmail("tval"));
+
+    await page.goto("/trainer/members");
+    await page.getByRole("button", { name: /회원 추가/ }).first().click();
+    await page.fill("input[name=name]", "검사회원");
+    await page.fill("input[name=phone]", "abcdefghij");
+    await page.getByRole("button", { name: "회원 등록하기" }).click();
+    await expect(page.getByText("전화번호는 숫자와 - 만")).toBeVisible();
+
+    await page.fill("input[name=phone]", "010-1234-5678");
+    await page.getByRole("button", { name: "회원 등록하기" }).click();
+    await page.waitForURL(/\/trainer\/members\/[^/]+$/);
+    const memberUrl = page.url();
+
+    // 연도를 비정상적으로 넣어 계약을 만들면 안내가 뜬다.
+    await page.goto(`${memberUrl}/contracts/new`);
+    await page.fill("input[name=totalSessions]", "10");
+    await page.fill("input[name=startedAt]", "1900-01-01");
+    await page.getByRole("button", { name: "계약 등록하기" }).click();
+    await expect(page.getByText("입력한 값을 확인해주세요.")).toBeVisible();
+    await expect(page.getByText("Application error")).toHaveCount(0);
+    await context.close();
+  });
 });

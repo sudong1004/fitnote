@@ -44,6 +44,15 @@ export async function scheduleSession(
   if (Number.isNaN(input.scheduledAt.getTime())) {
     throw new PTError("INVALID", "수업 시각을 확인해주세요.");
   }
+  if (
+    input.scheduledAt.getUTCFullYear() < 2000 ||
+    input.scheduledAt.getUTCFullYear() > 2100
+  ) {
+    throw new PTError("INVALID", "날짜를 2000년~2100년 사이로 입력해주세요.");
+  }
+  if ((input.memo?.trim().length ?? 0) > 200) {
+    throw new PTError("INVALID", "메모는 200자 이하로 적어 주세요.");
+  }
   if (input.durationMinutes !== undefined && !isValidSessionDuration(input.durationMinutes)) {
     throw new PTError(
       "INVALID",

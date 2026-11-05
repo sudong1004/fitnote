@@ -281,6 +281,13 @@ export async function saveJournal(
     throw new JournalEditError("INVALID", "내용을 적어주세요.");
   }
 
+  if (content.length > 5000) {
+    throw new JournalEditError(
+      "INVALID",
+      "내용이 너무 길어요. 5000자 이하로 줄여 주세요.",
+    );
+  }
+
   let ptSessionId = journal.ptSessionId;
 
   if (input.ptSessionId !== undefined) {
@@ -311,7 +318,7 @@ export async function saveJournal(
       where: { id: journalId },
       data: {
         title: clean(input.title, 100),
-        content: content.slice(0, 5000),
+        content,
         workoutSummary: clean(input.workoutSummary, 2000),
         dietGuidance: clean(input.dietGuidance, 2000),
         caution: clean(input.caution, 2000),

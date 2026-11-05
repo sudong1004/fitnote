@@ -13,6 +13,8 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 
+import { useSubmitKeep } from "@/app/lib/use-submit-keep";
+
 import { createMemberAction } from "./actions";
 
 /**
@@ -45,6 +47,8 @@ export function AddMemberDrawer() {
       router.push(`/trainer/members/${result.connectionId}`);
     });
   }
+
+  const onSubmit = useSubmitKeep(submit);
 
   return (
     <>
@@ -79,7 +83,7 @@ export function AddMemberDrawer() {
             </DrawerDescription>
           </DrawerHeader>
 
-          <form action={submit} className="flex flex-col gap-5 px-4 pb-7">
+          <form onSubmit={onSubmit} className="flex flex-col gap-5 px-4 pb-7">
             <label className="flex flex-col gap-2">
               <span className="text-sm font-bold">
                 이름 <span className="text-destructive">*</span>
