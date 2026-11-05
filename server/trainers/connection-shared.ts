@@ -11,6 +11,7 @@ export class ConnectionError extends Error {
       | "EXHAUSTED"
       | "SELF"
       | "ALREADY_CONNECTED"
+      | "HAS_TRAINER"
       | "NOT_FOUND",
     message: string,
   ) {

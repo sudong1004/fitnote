@@ -185,6 +185,9 @@ export async function redeemTrainerCode(userId: string, rawCode: string) {
       throw new ConnectionError("SELF", "내 코드는 넣을 수 없어요.");
     }
 
+    // 같은 회원이 두 코드를 동시에 넣어도 한 번에 하나만 통과하게 줄을 세운다.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${userId}))`;
+
     const existing = await tx.trainerMemberConnection.findUnique({
       where: {
         trainerProfileId_memberUserId: {
@@ -199,6 +202,27 @@ export async function redeemTrainerCode(userId: string, rawCode: string) {
       throw new ConnectionError(
         "ALREADY_CONNECTED",
         "이미 연결된 트레이너예요.",
+      );
+    }
+
+    /*
+      한 회원은 한 번에 한 트레이너만 만난다. 공유 설정이 회원에게 하나뿐이고
+      트레이너 화면도 한 명을 기준으로 만들어져 있어서, 둘을 허용하면 식단이
+      의도치 않게 두 사람에게 열린다. 바꾸려면 먼저 지금 연결을 끊게 한다.
+    */
+    const current = await tx.trainerMemberConnection.findFirst({
+      where: { memberUserId: userId, status: ConnectionStatus.ACTIVE },
+      select: {
+        trainerProfile: {
+          select: { displayName: true, user: { select: { name: true } } },
+        },
+      },
+    });
+
+    if (current) {
+      throw new ConnectionError(
+        "HAS_TRAINER",
+        `이미 담당 트레이너(${displayName(current.trainerProfile)})가 있어요. 트레이너를 바꾸려면 먼저 내 정보에서 연결을 끊어 주세요.`,
       );
     }
 
