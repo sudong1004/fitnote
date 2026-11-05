@@ -88,7 +88,17 @@ test.describe("출시 필수 기능", () => {
     const card = page.getByRole("region", { name: "시작하기" });
     await expect(card).toBeVisible();
     await expect(card.getByText("0/4 완료")).toBeVisible();
+    await expect(card.getByRole("link", { name: "회원 추가하기" })).toBeVisible();
     await expect(card.getByRole("link", { name: "초대 코드 만들기" })).toBeVisible();
+
+    // 초대 코드를 만들어도 회원이 입력하기 전에는 연결된 게 아니라서 첫 단계에 머물고, 이유를 알려 준다.
+    await page.goto("/trainer/members");
+    await page.getByRole("button", { name: "회원 초대 코드 만들기" }).click();
+    await expect(page.getByText(/^[A-Z0-9]{6,}$/).first()).toBeVisible();
+    await page.goto("/trainer");
+    await expect(card.getByText("0/4 완료")).toBeVisible();
+    await expect(card.getByText(/초대 코드는 만들어 뒀어요/)).toBeVisible();
+    await expect(card.getByRole("link", { name: "초대 코드 보기" })).toBeVisible();
     await context.close();
 
     // 회원이 연결되면 첫 단계가 끝나고 다음 단계가 안내된다.
