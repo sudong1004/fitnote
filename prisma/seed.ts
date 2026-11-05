@@ -350,6 +350,56 @@ const equipments = [
     category: EquipmentCategory.MACHINE,
     description: "몸통을 세워 앞으로 기대어 당기는 로우 머신",
   },
+  {
+    name: "스탠딩 힙쓰러스트 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "선 자세로 골반을 밀어 올리는 둔근 머신",
+  },
+  {
+    name: "스탠딩 어브덕터 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "선 자세로 다리를 옆으로 벌리는 머신",
+  },
+  {
+    name: "리버스 런지 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "뒤로 내딛는 런지 동작을 가이드하는 머신",
+  },
+  {
+    name: "머신 데드리프트 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "궤적이 고정된 데드리프트 머신",
+  },
+  {
+    name: "펜듈럼 힙프레스 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "진자 궤적으로 엉덩이를 미는 머신",
+  },
+  {
+    name: "멀티앵글 글루트 프레스 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "각도를 바꿔 둔근을 미는 머신",
+  },
+  {
+    name: "스텝업 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "궤적이 고정된 스텝업 머신",
+  },
+  {
+    name: "스탠딩 레그컬 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "선 자세로 한 다리씩 하는 햄스트링 머신",
+  },
+  {
+    name: "리니어 레그프레스 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "수평 레일을 따라 미는 레그프레스 머신",
+  },
+  {
+    name: "스플릿 스쿼트 머신",
+    category: EquipmentCategory.MACHINE,
+    description: "한 다리를 뒤에 두고 하는 스쿼트 머신",
+  },
 ];
 
 // ============================================================
@@ -2303,6 +2353,140 @@ const exercises = [
     breathing: "접을 때 내쉽니다.",
     caution: "반동 없이 천천히 합니다.",
     equipment: ["옵리크 크런치 머신"],
+  },
+
+  // ----------------------------------------------------------
+  // ADDED (2026-11) — 자주 쓰는 운동 보강
+  // ----------------------------------------------------------
+  {
+    name: "스탠딩 힙쓰러스트",
+    bodyPart: WorkoutBodyPart.GLUTE,
+    targetMuscle: "대둔근",
+    movementType: ExerciseMovementType.HINGE,
+    difficulty: Difficulty.BEGINNER,
+    description: "선 자세로 하는 머신 힙쓰러스트",
+    instruction:
+      "패드를 골반에 대고 서서 엉덩이를 앞으로 밀어 올렸다 천천히 돌아옵니다.",
+    breathing: "밀 때 내쉽니다.",
+    caution: "허리를 젖히지 않고 골반을 말아 올립니다.",
+    equipment: ["스탠딩 힙쓰러스트 머신"],
+  },
+  {
+    name: "스탠딩 힙 어브덕션",
+    bodyPart: WorkoutBodyPart.GLUTE,
+    targetMuscle: "중둔근",
+    movementType: ExerciseMovementType.ISOLATION,
+    difficulty: Difficulty.BEGINNER,
+    description: "선 자세로 하는 머신 어브덕션",
+    instruction:
+      "패드를 다리에 대고 서서 다리를 옆으로 벌렸다 천천히 모읍니다.",
+    breathing: "벌릴 때 내쉽니다.",
+    caution: "몸통이 기울지 않게 합니다.",
+    equipment: ["스탠딩 어브덕터 머신"],
+  },
+  {
+    name: "리버스 런지",
+    bodyPart: WorkoutBodyPart.LEG,
+    targetMuscle: "대퇴사두근, 둔근",
+    movementType: ExerciseMovementType.LUNGE,
+    difficulty: Difficulty.INTERMEDIATE,
+    description: "뒤로 내딛는 머신 런지",
+    instruction:
+      "머신에 서서 한 발을 뒤로 내딛어 앉았다 앞발로 밀어 올라옵니다.",
+    breathing: "내려갈 때 들이마시고 올라올 때 내쉽니다.",
+    caution: "앞 무릎이 안쪽으로 모이지 않게 합니다.",
+    equipment: ["리버스 런지 머신"],
+  },
+  {
+    name: "머신 데드리프트",
+    bodyPart: WorkoutBodyPart.BACK,
+    targetMuscle: "둔근, 햄스트링, 척추기립근",
+    movementType: ExerciseMovementType.HINGE,
+    difficulty: Difficulty.BEGINNER,
+    description: "궤적이 고정된 데드리프트",
+    instruction:
+      "손잡이를 잡고 가슴을 펴고 엉덩이를 뒤로 뺀 채 들어 올립니다.",
+    breathing: "들 때 내쉽니다.",
+    caution: "허리를 곧게 유지합니다.",
+    equipment: ["머신 데드리프트 머신"],
+  },
+  {
+    name: "펜듈럼 힙프레스",
+    bodyPart: WorkoutBodyPart.GLUTE,
+    targetMuscle: "대둔근",
+    movementType: ExerciseMovementType.SQUAT,
+    difficulty: Difficulty.INTERMEDIATE,
+    description: "진자 궤적으로 엉덩이를 미는 운동",
+    instruction:
+      "패드에 몸을 대고 발판을 뒤로 밀었다 천천히 돌아옵니다.",
+    breathing: "밀 때 내쉽니다.",
+    caution: "허리가 뜨지 않게 합니다.",
+    equipment: ["펜듈럼 힙프레스 머신"],
+  },
+  {
+    name: "멀티앵글 글루트 프레스",
+    bodyPart: WorkoutBodyPart.GLUTE,
+    targetMuscle: "대둔근",
+    movementType: ExerciseMovementType.SQUAT,
+    difficulty: Difficulty.INTERMEDIATE,
+    description: "각도를 바꿔 둔근을 미는 머신 운동",
+    instruction:
+      "각도를 맞추고 발판을 밀었다 천천히 돌아옵니다.",
+    breathing: "밀 때 내쉽니다.",
+    caution: "무릎이 안쪽으로 모이지 않게 합니다.",
+    equipment: ["멀티앵글 글루트 프레스 머신"],
+  },
+  {
+    name: "머신 스텝업",
+    bodyPart: WorkoutBodyPart.LEG,
+    targetMuscle: "대퇴사두근, 둔근",
+    movementType: ExerciseMovementType.LUNGE,
+    difficulty: Difficulty.BEGINNER,
+    description: "궤적이 고정된 스텝업",
+    instruction:
+      "발판에 한 발을 올려 몸을 끌어올렸다 천천히 내려옵니다.",
+    breathing: "올라갈 때 내쉽니다.",
+    caution: "뒤꿈치로 밀어 올립니다.",
+    equipment: ["스텝업 머신"],
+  },
+  {
+    name: "스탠딩 레그컬",
+    bodyPart: WorkoutBodyPart.LEG,
+    targetMuscle: "햄스트링",
+    movementType: ExerciseMovementType.ISOLATION,
+    difficulty: Difficulty.BEGINNER,
+    description: "서서 한 다리씩 하는 레그컬",
+    instruction:
+      "패드를 발목 뒤에 맞추고 무릎을 굽혀 당깁니다.",
+    breathing: "당길 때 내쉽니다.",
+    caution: "상체가 앞으로 쏠리지 않게 합니다.",
+    equipment: ["스탠딩 레그컬 머신"],
+  },
+  {
+    name: "리니어 레그프레스",
+    bodyPart: WorkoutBodyPart.LEG,
+    targetMuscle: "대퇴사두근, 둔근",
+    movementType: ExerciseMovementType.SQUAT,
+    difficulty: Difficulty.BEGINNER,
+    description: "수평 레일을 따라 미는 레그프레스",
+    instruction:
+      "등을 붙이고 발판을 밀었다 무릎을 굽혀 돌아옵니다.",
+    breathing: "밀 때 내쉽니다.",
+    caution: "무릎을 끝까지 잠그지 않습니다.",
+    equipment: ["리니어 레그프레스 머신"],
+  },
+  {
+    name: "스플릿 스쿼트 머신",
+    bodyPart: WorkoutBodyPart.LEG,
+    targetMuscle: "대퇴사두근, 둔근",
+    movementType: ExerciseMovementType.LUNGE,
+    difficulty: Difficulty.INTERMEDIATE,
+    description: "한 다리를 뒤에 두고 하는 머신 스쿼트",
+    instruction:
+      "뒷발을 받침에 올리고 앞다리로 앉았다 일어납니다.",
+    breathing: "내려갈 때 들이마시고 일어날 때 내쉽니다.",
+    caution: "상체를 세우고 앞 무릎이 발끝 방향을 향하게 합니다.",
+    equipment: ["스플릿 스쿼트 머신"],
   },
 ];
 
