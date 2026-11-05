@@ -5,6 +5,9 @@ import {
   ConnectionError,
   claimMemberAccount,
   createMemberClaimCode,
+  createTrainerInvitation,
+  endConnection,
+  redeemTrainerCode,
 } from "@/server/trainers/connection.service";
 
 import {
@@ -153,5 +156,72 @@ describe("claimMemberAccount", () => {
     await expect(
       createMemberClaimCode(trainer.userId, member.connectionId),
     ).rejects.toMatchObject({ code: "ALREADY_CONNECTED" });
+  });
+});
+
+describe("한 회원은 한 번에 한 트레이너", () => {
+  async function makeMember() {
+    return prisma.user.create({
+      data: {
+        name: `일반회원${uniq()}`,
+        email: `solo-${uniq()}@test.com`,
+        passwordHash: "x",
+      },
+      select: { id: true },
+    });
+  }
+
+  it("담당 트레이너가 있으면 다른 트레이너 코드는 거절하고, 끊은 뒤에는 연결된다", async () => {
+    const first = await makeTrainer();
+    const second = await makeTrainer();
+    const member = await makeMember();
+
+    const a = await createTrainerInvitation(first.userId);
+    const b = await createTrainerInvitation(second.userId);
+
+    const joined = await redeemTrainerCode(member.id, a.code);
+
+    await expect(redeemTrainerCode(member.id, b.code)).rejects.toMatchObject({
+      code: "HAS_TRAINER",
+    });
+    // 거절된 코드는 쓴 횟수에 잡히지 않는다.
+    const unused = await prisma.trainerInvitation.findUniqueOrThrow({
+      where: { id: b.id },
+      select: { usedCount: true },
+    });
+    expect(unused.usedCount).toBe(0);
+
+    await endConnection(member.id, joined.connectionId);
+    await expect(redeemTrainerCode(member.id, b.code)).resolves.toBeTruthy();
+  });
+
+  it("같은 트레이너 코드를 다시 넣으면 기존처럼 이미 연결됐다고 답한다", async () => {
+    const trainer = await makeTrainer();
+    const member = await makeMember();
+    const inv = await createTrainerInvitation(trainer.userId);
+
+    await redeemTrainerCode(member.id, inv.code);
+    await expect(redeemTrainerCode(member.id, inv.code)).rejects.toMatchObject({
+      code: "ALREADY_CONNECTED",
+    });
+  });
+
+  it("두 코드를 동시에 넣어도 한 쪽만 연결된다", async () => {
+    const first = await makeTrainer();
+    const second = await makeTrainer();
+    const member = await makeMember();
+    const a = await createTrainerInvitation(first.userId);
+    const b = await createTrainerInvitation(second.userId);
+
+    const results = await Promise.allSettled([
+      redeemTrainerCode(member.id, a.code),
+      redeemTrainerCode(member.id, b.code),
+    ]);
+
+    expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+    const active = await prisma.trainerMemberConnection.count({
+      where: { memberUserId: member.id, status: "ACTIVE" },
+    });
+    expect(active).toBe(1);
   });
 });
