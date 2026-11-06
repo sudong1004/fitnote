@@ -11,6 +11,7 @@ import {
   getSessionSummary,
   openManualSession,
   startSession,
+  updateSessionDuration,
   updateSet,
 } from "@/server/workouts/workout.service";
 
@@ -209,3 +210,76 @@ describe("몰아서 입력한 기록의 운동 시간", () => {
     expect(done?.durationSec).toBeLessThan(60);
   });
 });
+
+describe("운동 시간 자동 계산", () => {
+  const MIN = 60_000;
+
+  /** 시작 시각을 과거로 옮기고, 세트 하나를 시작 + atMinutes 에 적은 것으로 만든다. */
+  async function liveWith(startedMinutesAgo: number, setAtMinutes: number | null) {
+    const { userId, exerciseId } = await setup();
+    const started = await startSession(userId, { mode: "new" });
+    const sessionId = started.session!.id;
+    const startedAt = new Date(Date.now() - startedMinutesAgo * MIN);
+
+    await prisma.workoutSession.update({
+      where: { id: sessionId },
+      data: { startedAt },
+    });
+
+    if (setAtMinutes !== null) {
+      const record = await addRecord(userId, sessionId, { exerciseId });
+      await addSet(userId, record!.record.id, { weight: 50, reps: 10, completed: true });
+      const at = new Date(startedAt.getTime() + setAtMinutes * MIN);
+      await prisma.workoutRecord.update({ where: { id: record!.record.id }, data: { createdAt: at } });
+      await prisma.workoutSet.updateMany({ where: { recordId: record!.record.id }, data: { createdAt: at } });
+    }
+
+    return { userId, sessionId };
+  }
+
+  it("끝내기를 잊고 한참 뒤에 눌러도 마지막 기록 + 5분까지만 잰다", async () => {
+    const { userId, sessionId } = await liveWith(300, 60);
+    const done = await finishSession(userId, sessionId);
+
+    expect(done?.durationSec).toBe(65 * 60);
+  });
+
+  it("마지막 기록 직후에 끝내면 지금까지 잰 시간 그대로다", async () => {
+    const { userId, sessionId } = await liveWith(30, 28);
+    const done = await finishSession(userId, sessionId);
+
+    expect(Math.abs((done?.durationSec ?? 0) - 30 * 60)).toBeLessThan(5);
+  });
+
+  it("기록이 하나도 없으면 4시간을 넘기지 않는다", async () => {
+    const { userId, sessionId } = await liveWith(600, null);
+    const done = await finishSession(userId, sessionId);
+
+    expect(done?.durationSec).toBe(4 * 3600);
+  });
+
+  it("끝난 운동의 시간을 고칠 수 있고, 범위 밖이거나 진행 중이면 거절한다", async () => {
+    const { userId, sessionId } = await liveWith(40, 38);
+    await expect(updateSessionDuration(userId, sessionId, 50)).rejects.toMatchObject({
+      code: "SESSION_NOT_COMPLETED",
+    });
+
+    await finishSession(userId, sessionId);
+    const fixed = await updateSessionDuration(userId, sessionId, 50);
+    expect(fixed?.durationSec).toBe(50 * 60);
+
+    for (const bad of [0, -3, 1.5, 1441]) {
+      await expect(updateSessionDuration(userId, sessionId, bad)).rejects.toMatchObject({
+        code: "INVALID_DURATION",
+      });
+    }
+  });
+
+  it("남의 운동 시간은 고치지 못한다", async () => {
+    const { sessionId } = await liveWith(40, 38);
+    const other = await setup();
+
+    expect(await updateSessionDuration(other.userId, sessionId, 50)).toBeNull();
+  });
+});
+

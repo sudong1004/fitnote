@@ -5,6 +5,7 @@ export {
   getActiveSession,
   getSessionById,
   finishSession,
+  updateSessionDuration,
   startSession,
   updateSessionMemo,
   listSessions,

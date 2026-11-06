@@ -9,6 +9,8 @@ import { BODY_PART_LABEL } from "@/lib/exercise-labels";
 import { cn } from "@/lib/utils";
 import { getSessionSummary } from "@/server/workouts/workout.service";
 
+import { DurationEditor } from "./duration-editor";
+
 export const metadata = {
   title: "운동 요약 | FitNote",
 };
@@ -79,6 +81,17 @@ export default async function WorkoutSummaryPage({
           </dd>
         </div>
       </dl>
+
+      {summary.isPt ? null : (
+        <DurationEditor
+          sessionId={summary.id}
+          initialMinutes={
+            summary.durationSec === null
+              ? null
+              : Math.max(1, Math.round(summary.durationSec / 60))
+          }
+        />
+      )}
 
       {summary.prCount > 0 || summary.skippedSets > 0 ? (
         <p className="text-center text-xs text-muted-foreground">

@@ -2382,6 +2382,14 @@ CI(`.github/workflows/ci.yml`)는 PR 과 `main` 푸시에서 typecheck → lint 
 - 앱 안에서 운동을 직접 추가하는 기능은 아직 없다(트레이너·회원이 없는 운동은 요청해야 한다). 필요하면 8장에 있다
 - 운동 이름·설명은 직접 쓴 초안이라, 트레이너가 한 번 훑어 보고 어색한 설명은 고친다
 
+**운동 시간 (2026-11-06)**
+
+- 운동 중 시계를 스톱워치처럼(`12:34`, 1초마다) 바꾸고, 아래 "시간" 칸은 "진행 중"으로 뒀다(`components/elapsed-time.tsx`, `formatClock`)
+- 끝낼 때 시간은 마지막으로 적은 때 기준: 20분 안이면 지금까지, 더 지났으면 마지막 기록 + 5분, 기록이 없으면 4시간 상한
+  (`resolveLiveEnd`, `workout-session.service.ts`). 끝내기를 잊어도 시간이 부풀지 않는다
+- 요약 화면에서 시간을 고칠 수 있다(`updateSessionDuration`, `summary/duration-editor.tsx`). PT 기록은 고칠 수 없다
+- 통합 테스트 5개, E2E 1개 보강. 기존 데이터의 부풀려진 시간은 그대로다
+
 ## 8. 다음 작업
 
 ### 남은 것

@@ -117,7 +117,9 @@ export default async function WorkoutSessionPage({
           <dt className="text-[0.6875rem] text-muted-foreground">시간</dt>
           <dd className="truncate text-lg font-extrabold tabular-nums">
             {session.elapsedSec !== null && inProgress ? (
-              `${Math.floor(session.elapsedSec / 60)}분`
+              // 위쪽 알약이 흐르는 시계를 보여 준다. 같은 값을 분 단위로 또 적으면
+              // 두 군데가 서로 다른 값처럼 읽힌다.
+              <span className="text-base text-muted-foreground">진행 중</span>
             ) : session.durationSec !== null ? (
               `${Math.round(session.durationSec / 60)}분`
             ) : (
