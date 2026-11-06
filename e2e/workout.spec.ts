@@ -59,10 +59,22 @@ test.describe("운동 기록", () => {
     await page.getByLabel("2세트 횟수").blur();
     await expect(page.getByText("950kg").first()).toBeVisible();
 
+    // 운동 중에는 스톱워치처럼 흐르는 시계가 보인다.
+    await expect(page.getByText(/^\d{2}:\d{2}$/).first()).toBeVisible();
+
     await page.getByRole("button", { name: "운동 종료" }).click();
     await page.waitForURL(/\/summary$/);
     await expect(page.getByRole("heading", { name: "운동을 마쳤어요" })).toBeVisible();
     await expect(page.getByText("950").first()).toBeVisible();
+
+    // 자동으로 잰 시간이 실제와 다르면 요약에서 고친다.
+    await page.getByRole("button", { name: "시간이 다르면 고치기" }).click();
+    await page.getByLabel("운동 시간(분) 고치기").fill("0");
+    await page.getByRole("button", { name: "저장", exact: true }).click();
+    await expect(page.getByText(/1분에서 1440분 사이/)).toBeVisible();
+    await page.getByLabel("운동 시간(분) 고치기").fill("52");
+    await page.getByRole("button", { name: "저장", exact: true }).click();
+    await expect(page.locator("dt:has-text('시간') + dd")).toHaveText("52분");
 
     // 끝난 운동은 진행 중 배너에 남지 않는다.
     await page.goto("/home");

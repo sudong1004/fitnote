@@ -16,6 +16,7 @@ import {
   finishSession,
   openManualSession,
   startSession,
+  updateSessionDuration,
   updateSet,
   WorkoutError,
   type SetInput,
@@ -110,6 +111,32 @@ export async function finishWorkout(
   revalidatePath(`/workouts/${sessionId}`);
   // 끝내자마자 홈으로 튕기면 방금 한 운동이 어땠는지 볼 곳이 없다.
   redirect(`/workouts/${sessionId}/summary`);
+}
+
+/** 끝난 운동의 시간을 고친다(요약 화면). */
+export async function updateWorkoutDuration(
+  sessionId: string,
+  minutes: number,
+): Promise<{ error: string | null }> {
+  const user = await requireUser();
+
+  try {
+    const result = await updateSessionDuration(user.id, sessionId, minutes);
+
+    if (!result) return { error: "운동을 찾을 수 없어요." };
+  } catch (error) {
+    if (error instanceof WorkoutError) {
+      return { error: error.message };
+    }
+    throw error;
+  }
+
+  revalidatePath("/home");
+  revalidatePath("/calendar");
+  revalidatePath(`/workouts/${sessionId}`);
+  revalidatePath(`/workouts/${sessionId}/summary`);
+
+  return { error: null };
 }
 
 export type ActionResult = { error: string | null };

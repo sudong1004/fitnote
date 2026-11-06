@@ -51,6 +51,46 @@ export async function getSessionById(userId: string, sessionId: string) {
 /** 몰아서 입력한 운동 시간으로 받는 최대치. 하루를 넘는 운동은 오타다. */
 const MAX_MANUAL_MINUTES = 24 * 60;
 
+/**
+ * 끝내기를 잊고 한참 뒤에 눌러도 운동 시간이 부풀지 않게, 마지막으로 기록한 때를 기준으로 삼는다.
+ *
+ * 마지막 기록 뒤 이 시간 안에 끝냈다면 아직 운동 중이었다고 보고 지금 시각을 쓴다(쉬는 시간, 마무리 스트레칭).
+ * 더 지났다면 마지막 기록 + 아래 여유만 운동 시간으로 친다. 기록이 하나도 없으면 시작 + 아래 상한을 넘기지 않는다.
+ */
+const ACTIVE_GAP_MS = 20 * 60_000;
+const COOLDOWN_MS = 5 * 60_000;
+const NO_RECORD_CAP_MS = 4 * 3_600_000;
+
+/** 실시간 운동이 끝난 시각. 마지막으로 세트·운동을 적은 때를 기준으로 한다. */
+async function resolveLiveEnd(sessionId: string, startedAt: Date, now: Date) {
+  const [lastSet, lastRecord] = await Promise.all([
+    prisma.workoutSet.aggregate({
+      where: { record: { sessionId } },
+      _max: { createdAt: true },
+    }),
+    prisma.workoutRecord.aggregate({
+      where: { sessionId },
+      _max: { createdAt: true },
+    }),
+  ]);
+
+  const times = [lastSet._max.createdAt, lastRecord._max.createdAt]
+    .filter((value): value is Date => value !== null)
+    .map((value) => value.getTime());
+
+  if (times.length === 0) {
+    return new Date(
+      Math.min(now.getTime(), startedAt.getTime() + NO_RECORD_CAP_MS),
+    );
+  }
+
+  const last = Math.max(startedAt.getTime(), ...times);
+
+  if (now.getTime() - last <= ACTIVE_GAP_MS) return now;
+
+  return new Date(Math.min(now.getTime(), last + COOLDOWN_MS));
+}
+
 export async function finishSession(
   userId: string,
   sessionId: string,
@@ -87,7 +127,9 @@ export async function finishSession(
   // 몰아서 입력한 세션의 소요 시간을 벽시계로 재면, 입력하는 데 걸린 시간이
   // 운동 시간이 된다. 지난 날짜라면 며칠짜리 운동이 되어 버린다.
   // 사용자가 직접 적어 주기 전까지는 비워 둔다. 적어 준 시간은 그대로 쓴다.
-  const endedAt = manual ? session.startedAt : new Date();
+  const endedAt = manual
+    ? session.startedAt
+    : await resolveLiveEnd(session.id, session.startedAt, new Date());
 
   await prisma.workoutSession.update({
     where: { id: session.id },
@@ -104,6 +146,58 @@ export async function finishSession(
               (endedAt.getTime() - session.startedAt.getTime()) / 1000,
             ),
           ),
+    },
+    select: { id: true },
+  });
+
+  return toSessionDto(await loadSession(session.id));
+}
+
+/**
+ * 끝난 운동의 시간을 고친다.
+ *
+ * 자동으로 잰 값이 실제와 다를 수 있어서(쉬었다 끝냈거나 잊고 나중에 눌렀을 때) 요약 화면에서 고칠 수 있게 한다.
+ * 수업(PT)에서 트레이너가 적어 준 기록은 고칠 수 없다.
+ */
+export async function updateSessionDuration(
+  userId: string,
+  sessionId: string,
+  minutes: number,
+) {
+  if (!Number.isInteger(minutes) || minutes < 1 || minutes > MAX_MANUAL_MINUTES) {
+    throw new WorkoutError(
+      "INVALID_DURATION",
+      `운동 시간은 1분에서 ${MAX_MANUAL_MINUTES}분 사이로 적어 주세요.`,
+    );
+  }
+
+  const owner = await resolveOwner(userId, sessionId);
+
+  if (!owner) return null;
+  assertWritable(owner);
+
+  const session = await prisma.workoutSession.findFirst({
+    where: { id: sessionId, userId: owner.ownerUserId },
+    select: { id: true, status: true, entryMode: true, startedAt: true },
+  });
+
+  if (!session) return null;
+
+  if (session.status !== WorkoutSessionStatus.COMPLETED) {
+    throw new WorkoutError(
+      "SESSION_NOT_COMPLETED",
+      "끝난 운동만 시간을 고칠 수 있어요.",
+    );
+  }
+
+  await prisma.workoutSession.update({
+    where: { id: session.id },
+    data: {
+      durationSec: minutes * 60,
+      // 몰아서 입력한 운동은 끝난 시각이 시작 시각과 같게 두는 규칙이 있다.
+      ...(session.entryMode === WorkoutEntryMode.LIVE
+        ? { endedAt: new Date(session.startedAt.getTime() + minutes * 60_000) }
+        : {}),
     },
     select: { id: true },
   });

@@ -103,6 +103,19 @@ export function formatDuration(seconds: number) {
   return `${minutes}분`;
 }
 
+/** 초를 스톱워치처럼 "12:34" / "1:02:15" 형태로 */
+export function formatClock(seconds: number) {
+  const total = Math.max(0, Math.floor(seconds));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const secs = total % 60;
+  const pad = (value: number) => String(value).padStart(2, "0");
+
+  return hours > 0
+    ? `${hours}:${pad(minutes)}:${pad(secs)}`
+    : `${pad(minutes)}:${pad(secs)}`;
+}
+
 const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_VALUE = /^\d{2}:\d{2}$/;
 
