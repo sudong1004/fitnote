@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Download } from "lucide-react";
 
 import { CommentForm } from "@/app/(user)/journal/[id]/comment-form";
 import { EquipmentIcon } from "@/components/fitness/equipment-icon";
@@ -164,18 +164,31 @@ export function JournalView({
               if (src === null) return null;
 
               return (
-                <li key={photo.id}>
+                <li key={photo.id} className="relative">
                   {/*
                     next/image 를 쓰지 않는다. 서명 주소는 열 때마다 값이 달라서 이미지
                     최적화 캐시가 매번 빗나가고, 그때마다 원본을 다시 받아 온다.
                   */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={src}
-                    alt=""
-                    loading="lazy"
-                    className="aspect-square w-full rounded-2xl bg-line object-cover"
-                  />
+                  {/* 사진을 누르면 원본이 새 탭에서 열린다. 아이폰은 길게 눌러 사진첩에 저장할 수 있다. */}
+                  <a href={photo.url ?? src} target="_blank" rel="noreferrer">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={src}
+                      alt="알림장 사진 크게 보기"
+                      loading="lazy"
+                      className="aspect-square w-full rounded-2xl bg-line object-cover"
+                    />
+                  </a>
+                  {photo.downloadUrl ? (
+                    <a
+                      href={photo.downloadUrl}
+                      download
+                      aria-label="사진 저장"
+                      className="absolute right-2 bottom-2 flex size-8 items-center justify-center rounded-full bg-black/55 text-white"
+                    >
+                      <Download className="size-4" aria-hidden />
+                    </a>
+                  ) : null}
                 </li>
               );
             })}

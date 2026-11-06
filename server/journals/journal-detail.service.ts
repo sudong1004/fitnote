@@ -1,7 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
-import { createSignedReadUrls } from "@/lib/storage";
+import { createSignedReadUrls, toDownloadUrl } from "@/lib/storage";
 import { JournalStatus, NotificationType } from "@/generated/prisma/enums";
 import { getCurrentMembership } from "@/server/centers/center.service";
 import { createNotification } from "@/server/notifications/notification.service";
@@ -41,13 +41,20 @@ async function withSignedUrls(
     console.error("photo sign error:", error);
   }
 
-  return photos.map((photo) => ({
-    id: photo.id,
-    url: signed.get(photo.storagePath) ?? null,
-    thumbnailUrl: photo.thumbnailPath
-      ? (signed.get(photo.thumbnailPath) ?? null)
-      : null,
-  }));
+  return photos.map((photo, index) => {
+    const url = signed.get(photo.storagePath) ?? null;
+    const ext = photo.storagePath.split(".").pop() ?? "webp";
+
+    return {
+      id: photo.id,
+      url,
+      /** 눌러서 바로 저장되는 주소. 원본(크게 올린 사진)을 내려 준다. */
+      downloadUrl: url ? toDownloadUrl(url, `fitnote-${index + 1}.${ext}`) : null,
+      thumbnailUrl: photo.thumbnailPath
+        ? (signed.get(photo.thumbnailPath) ?? null)
+        : null,
+    };
+  });
 }
 
 export async function getJournalDetail(userId: string, journalId: string) {
