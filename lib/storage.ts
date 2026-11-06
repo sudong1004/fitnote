@@ -167,6 +167,19 @@ export async function createSignedReadUrls(
   return map;
 }
 
+/**
+ * 서명 주소를 "받기" 주소로 바꾼다.
+ *
+ * 저장소가 `download` 값을 보고 Content-Disposition: attachment 로 내려 주므로
+ * 브라우저가 화면에 띄우지 않고 파일로 저장한다. 서명(토큰)은 그대로라 권한은
+ * 읽기 주소와 같고 수명도 같다.
+ */
+export function toDownloadUrl(signedUrl: string, filename: string) {
+  const url = new URL(signedUrl);
+  url.searchParams.set("download", filename);
+  return url.toString();
+}
+
 /** 지운 사진을 저장소에서도 지운다. DB 만 지우면 요금이 계속 나간다. */
 export async function removeObjects(paths: string[]) {
   const targets = paths.filter(Boolean);
