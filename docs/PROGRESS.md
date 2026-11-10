@@ -2404,6 +2404,21 @@ GitHub 에서 `main` 푸시마다 돌고 있다. `trunk` 푸시에서는 돌지 
 - 의존성을 바꾼 뒤에는 `npx npm@10 install --package-lock-only` 로 락파일을 다시 맞춘다. 맥의 npm 11 이 만든 락파일은
   `@emnapi/core`·`@emnapi/runtime` 항목이 빠져서 CI(리눅스)의 `npm ci` 가 실패한다 (10-25 와 같은 문제가 이번에도 났다)
 
+**출시 전 보강 (2026-11-10)**
+
+- 오류·없는 화면 안내. 그동안은 Next 기본 화면(영문)이 떴다. `app/error.tsx`·`not-found.tsx`·`global-error.tsx` 를 두고,
+  회원·트레이너 화면 안(`app/(user)`, `app/trainer`)에도 같은 것을 둬서 하단 탭이 유지된다. 공용 틀은
+  `components/layout/status-screen.tsx`(`ErrorScreen`, `NotFoundScreen` 이 쓴다). 이 버전의 Next 는 다시 시도 함수 이름이
+  `reset` 이 아니라 `retry` 다. 없는 주소는 루트의 것이, 페이지가 `notFound()` 를 부른 경우는 그 구역의 것이 뜬다
+- 보안 헤더(`next.config.ts`): `X-Frame-Options: DENY`, `Content-Security-Policy: frame-ancestors 'none'`,
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`. 스크립트 출처까지 막는 CSP 는 넣지 않았다
+- Pretendard 를 jsDelivr CDN 대신 `pretendard` 패키지에서 가져와 앱과 같은 주소로 내보낸다(`app/layout.tsx`)
+- 비밀번호 재설정 링크의 주소: `APP_URL` → (운영) Vercel 운영 주소 → 요청 주소 순서. 운영에서는 Host 헤더로 만들지 않는다
+- `.env.example` 에 메일 설정(`SMTP_*`, `RESEND_API_KEY`, `MAIL_FROM`)을 넣고 `APP_URL` 설명을 고쳤다
+- E2E 1개 추가(`launch.spec.ts`: 없는 주소 안내, 헤더, 글꼴). 오류 화면 자체는 자동 테스트가 없다
+- 하지 않은 것: 오류 수집 도구(Sentry 등)는 어떤 서비스를 쓸지 정해야 해서 8장에 남겼다. 가입 화면의 "이미 가입된 이메일"
+  안내는 가입 이메일 인증과 함께 정리한다
+
 ## 8. 다음 작업
 
 ### 남은 것
@@ -2423,6 +2438,7 @@ GitHub 에서 `main` 푸시마다 돌고 있다. `trunk` 푸시에서는 돌지 
 - **`DataAccessLog`.** 회원이 "누가 언제 내 무엇을 봤는지" 를 직접 확인하는 기록.
   지금은 공유가 꺼져 있으면 조회 자체를 하지 않는 것으로 대신한다
 - **테스트 확대.** 6장의 "테스트가 없는 곳"
+- **오류 수집 도구.** 지금은 `console.error` 만 있어서 운영 오류를 Vercel 로그에서 직접 찾아야 한다. Sentry 같은 도구를 정해 붙인다
 - **남은 큰 서비스 파일.** `workout-record.service.ts` 약 600줄, `journal-editor.service.ts`
   약 485줄 정도가 가장 크다. 지금은 나눌 필요가 크지 않다
 - **`trunk` 푸시에서도 CI 돌리기.** 지금은 `main` 에 머지된 뒤에야 돈다. 6장 참고

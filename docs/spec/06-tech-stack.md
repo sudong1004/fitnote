@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | 프레임워크 | Next.js 16 (App Router) | 서버 컴포넌트 + 서버 액션 중심. 화면과 서버가 한 저장소 |
 | UI | React 19, Tailwind CSS v4 | 모바일 우선, 하단 탭 |
+| 글꼴 | Pretendard (`pretendard` 패키지, dynamic-subset) | 외부 CDN 없이 앱과 같은 주소로 내보낸다 |
 | 컴포넌트 | shadcn + `@base-ui/react`, `class-variance-authority`, `lucide-react` | 디자인 시스템 문서가 기준 |
 | 언어 | TypeScript 5 | `strict`, `npm run typecheck` |
 | 검증 | zod 4 | 입력 스키마. 서비스 계층에서 한국어 메시지로 거절 |
@@ -17,10 +18,11 @@
 | 이메일 | `nodemailer` + SMTP (비밀번호 재설정) | 지금은 Gmail SMTP, 발송 한도 있음 |
 | 배포 | Vercel (리전 `hnd1`, 도쿄) | 현재 Hobby 플랜. 유료화 전 Pro 로 |
 | 정기 작업 | Vercel Cron `0 0 * * *` (UTC, 한국 09:00) | `/api/cron/reminders`, `CRON_SECRET` Bearer |
+| 보안 헤더 | `next.config.ts` 의 `headers()` | `X-Frame-Options`·`frame-ancestors`, `nosniff`, `Referrer-Policy`. HSTS 는 Vercel |
 | PWA | `app/manifest.ts`, 아이콘 3종, 서비스 워커 | 앱스토어 없이 홈 화면 추가 |
 | CI | GitHub Actions | typecheck → lint → 단위 → 통합 → build, 별도 e2e 잡 |
 | 테스트 | vitest 4, Playwright, `embedded-postgres` | 단위 · 통합(임시 Postgres) · E2E |
-| Node / 패키지 | Node 24, npm 11 | |
+| Node / 패키지 | Node 24, npm 11 | 락파일은 `npx npm@10 install --package-lock-only` 로 맞춘다(npm 11 이 만든 락파일은 CI 의 `npm ci` 가 실패) |
 
 ## 2. 구조
 
@@ -61,8 +63,8 @@ docs/               PROGRESS.md, spec/
 | `SUPABASE_URL` `SUPABASE_SERVICE_ROLE_KEY` `SUPABASE_PHOTO_BUCKET` | 사진 저장소. 서버 전용 | 선택(없으면 사진 비활성) |
 | `FCM_PROJECT_ID` `FCM_CLIENT_EMAIL` `FCM_PRIVATE_KEY` | 푸시 발송 | 선택 |
 | `NEXT_PUBLIC_FIREBASE_*` | 브라우저 푸시 설정 (공개 값) | 선택 |
-| `APP_URL` | 푸시·메일 링크의 앞부분 | 권장 |
-| `SMTP_*` | 비밀번호 재설정 메일 | 권장 |
+| `APP_URL` | 푸시·메일 링크의 앞부분. 없으면 재설정 링크는 운영에서 Vercel 운영 주소, 그 밖에서는 요청 주소로 만든다 | 운영 필수 |
+| `SMTP_USER` `SMTP_PASS` `SMTP_HOST` `SMTP_PORT` 또는 `RESEND_API_KEY`, `MAIL_FROM` | 비밀번호 재설정 메일. 둘 중 한 방식 | 운영 필수 |
 | `CRON_SECRET` | cron 호출 보호. 없으면 항상 401 | 필수(알림용) |
 
 ## 5. 외부 서비스
