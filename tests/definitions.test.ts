@@ -6,7 +6,11 @@ import {
   SignupFormSchema,
 } from "@/app/lib/definitions";
 
-const valid = { name: "김핏노", password: "abcd1234" };
+const valid = {
+  name: "김핏노",
+  password: "abcd1234",
+  confirmPassword: "abcd1234",
+};
 
 describe("이메일 정규화", () => {
   it("앞뒤 공백과 대소문자를 정리한 뒤 돌려준다", () => {
@@ -48,6 +52,8 @@ describe("비밀번호", () => {
       ...valid,
       email: "a@b.com",
       password,
+      // 확인 칸이 달라서 거절되는 것이 아니라 비밀번호 규칙으로 거절되는지 본다.
+      confirmPassword: password,
     });
 
     expect(result.success).toBe(false);

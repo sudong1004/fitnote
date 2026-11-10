@@ -1,6 +1,6 @@
 # FitNote 개발 진행 현황
 
-> 최종 갱신: 2026-11-05
+> 최종 갱신: 2026-11-10
 > 현재 동작을 정리한 명세: `docs/spec/` (요구사항·기능·화면·데이터/권한·테스트)
 > 기획 원본: `~/Downloads/FitNote_통합기획서_v3_참고화면반영/08_재구성_기획_v1.md`
 
@@ -49,7 +49,7 @@ MEMBER (회원)
 
 | 영역          | 선택                                                      |
 | ------------- | --------------------------------------------------------- |
-| 프레임워크    | Next.js **16.3.4** (Turbopack, App Router)                |
+| 프레임워크    | Next.js **16.4.6** (Turbopack, App Router)                |
 | ORM           | Prisma **7.10.0** + `@prisma/adapter-pg` (driver adapter) |
 | DB            | Supabase Postgres                                         |
 | 인증          | 직접 구현 (JWT `jose` + `bcryptjs`)                       |
@@ -2043,7 +2043,7 @@ PTSession ─┬─ WorkoutSession ─ WorkoutRecord ─ WorkoutSet   (수업 �
 
 | 영역                | 건수 | 검증하는 것                                                                  |
 | ------------------- | ---- | ---------------------------------------------------------------------------- |
-| 단위                | 33   | 이메일 정규화, 비밀번호 규칙, 사진 경로, 시도 제한 키, 새 수업 시각, KST 날짜, 세트 입력 |
+| 단위                | 35   | 이메일 정규화, 비밀번호 규칙, 사진 경로, 시도 제한 키, 새 수업 시각, KST 날짜, 세트 입력 |
 | 통합: 이어받기      | 7    | 동시 이어받기에서 한쪽만 성공, 만료·회수·중복 이메일, 새 코드 발급           |
 | 통합: PT            | 7    | 차감과 계약 상태 전이, 동시 완료·동시 예약, 남의 수업 접근                   |
 | 통합: 시도 제한     | 4    | 한도, 창 밖 기록, 키 격리, 성공 시 초기화                                    |
@@ -2076,8 +2076,9 @@ PTSession ─┬─ WorkoutSession ─ WorkoutRecord ─ WorkoutSet   (수업 �
 
 CI(`.github/workflows/ci.yml`)는 PR 과 `main` 푸시에서 typecheck → lint → 단위 →
 통합 → build 순서로 돌고, E2E 는 별도 작업(`e2e`)으로 돈다. 실패하면 리포트를 아티팩트로 남긴다. 빌드는 더미 `DATABASE_URL` / `SESSION_SECRET` 으로 한다.
-**아직 GitHub 에서 실제로 돌려 본 적은 없다.** 첫 PR 에서 통합 테스트 단계가
-통과하는지 확인할 것.
+GitHub 에서 `main` 푸시마다 돌고 있다. `trunk` 푸시에서는 돌지 않아서 깨진 채로 머지될 수 있다
+(2026-11-05 ~ 11-06 의 머지 6번이 단위 테스트에서 실패했다. 7-8 의 "CI 복구와 보안 업데이트" 참고).
+머지한 뒤 `gh run list` 로 결과를 확인할 것.
 
 **아직 테스트가 없는 곳:** 실기기 푸시. 식단 사진은 `e2e/server.mjs` 의 가짜 Supabase Storage(메모리)로 덮는다 — 실제 Supabase 와의 연동은 못 본다. 권한은
 서비스가 직접 확인하므로 서비스 수준에서 덮었다. 동시성·정합성이 걸린 곳(PT, 이어받기)을
@@ -2390,6 +2391,17 @@ CI(`.github/workflows/ci.yml`)는 PR 과 `main` 푸시에서 typecheck → lint 
 - 요약 화면에서 시간을 고칠 수 있다(`updateSessionDuration`, `summary/duration-editor.tsx`). PT 기록은 고칠 수 없다
 - 통합 테스트 5개, E2E 1개 보강. 기존 데이터의 부풀려진 시간은 그대로다
 
+**CI 복구와 보안 업데이트 (2026-11-10)**
+
+- `main` 의 CI 가 11-05 부터 머지 6번 연속 `npm test` 에서 실패하고 있었다. 가입·이어받기 스키마에 `confirmPassword` 가
+  생겼는데 `tests/definitions.test.ts` 의 입력값에는 없었다. 이 단계에서 멈춰서 통합 테스트와 빌드도 그동안 CI 에서 돌지 않았다.
+  입력값에 확인 칸을 넣었고, 비밀번호 규칙 테스트는 확인 칸을 같은 값으로 맞춰 규칙 때문에 거절되는지를 보게 했다
+- Next.js 16.3.4 → 16.4.6 (`eslint-config-next` 포함). 16.4.0 이하에 이미지 최적화·서버 액션 등 보안 권고가 걸려 있었다
+- zod 4.5.4 → 4.6.7 (큰 입력으로 메모리를 고갈시키는 권고)
+- `shadcn`(CLI)과 `@types/nodemailer` 를 `devDependencies` 로 옮겼다. 앱이 쓰는 것은 `globals.css` 의 `shadcn/tailwind.css` 뿐이다
+- `npm audit fix` 로 나머지를 정리했다. 34건 → 16건, 운영 의존성 기준 4건. 남은 운영 쪽은 `firebase` 가 끌고 오는
+  `@grpc/grpc-js`(Firestore 용, 앱은 메시징만 쓴다)이고 `npm audit fix --force`(호환이 깨지는 변경)로만 풀려서 그대로 뒀다
+
 ## 8. 다음 작업
 
 ### 남은 것
@@ -2411,7 +2423,7 @@ CI(`.github/workflows/ci.yml`)는 PR 과 `main` 푸시에서 typecheck → lint 
 - **테스트 확대.** 6장의 "테스트가 없는 곳"
 - **남은 큰 서비스 파일.** `workout-record.service.ts` 약 600줄, `journal-editor.service.ts`
   약 485줄 정도가 가장 크다. 지금은 나눌 필요가 크지 않다
-- **CI 첫 실행 확인.** 6장 참고
+- **`trunk` 푸시에서도 CI 돌리기.** 지금은 `main` 에 머지된 뒤에야 돈다. 6장 참고
 - **트레이너 페이지 권한 확인 점검.** 7-5 참고
 
 ### 정리 필요
