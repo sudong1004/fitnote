@@ -3,6 +3,37 @@ import { expect, test } from "@playwright/test";
 import { PASSWORD, agreeAll, connectPair, newPage, signup, uniqueEmail } from "./helpers";
 
 test.describe("출시 필수 기능", () => {
+  test("없는 주소는 한국어 안내를 보여주고, 응답에 보안 헤더가 붙으며, 글꼴을 외부에서 받지 않는다", async ({ browser }) => {
+    const { context, page } = await newPage(browser);
+    await signup(page, "MEMBER", "길잃은회원", uniqueEmail("lost"));
+
+    const external: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("jsdelivr")) external.push(request.url());
+    });
+
+    const response = await page.goto("/no-such-screen");
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole("heading", { name: "찾는 화면이 없어요" })).toBeVisible();
+
+    const headers = response?.headers() ?? {};
+    expect(headers["x-frame-options"]).toBe("DENY");
+    expect(headers["x-content-type-options"]).toBe("nosniff");
+    expect(headers["content-security-policy"]).toContain("frame-ancestors 'none'");
+    expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+
+    // 없는 기록은 회원 화면 안에서 안내하므로 하단 탭이 그대로 있다.
+    await page.goto("/diet/no-such-record");
+    await expect(page.getByRole("heading", { name: "찾는 화면이 없어요" })).toBeVisible();
+    await expect(page.getByRole("navigation")).toBeVisible();
+
+    await page.getByRole("link", { name: "홈으로" }).click();
+    await expect(page).toHaveURL(/\/home$/);
+    await expect(page.locator("body")).toHaveCSS("font-family", /Pretendard Variable/);
+    expect(external).toEqual([]);
+    await context.close();
+  });
+
   test("필수 동의 없이는 가입되지 않고, 약관·방침 화면은 로그인 없이 열린다", async ({ browser }) => {
     const { context, page } = await newPage(browser);
     await page.goto("/signup");
