@@ -2401,6 +2401,8 @@ GitHub 에서 `main` 푸시마다 돌고 있다. `trunk` 푸시에서는 돌지 
 - `shadcn`(CLI)과 `@types/nodemailer` 를 `devDependencies` 로 옮겼다. 앱이 쓰는 것은 `globals.css` 의 `shadcn/tailwind.css` 뿐이다
 - `npm audit fix` 로 나머지를 정리했다. 34건 → 16건, 운영 의존성 기준 4건. 남은 운영 쪽은 `firebase` 가 끌고 오는
   `@grpc/grpc-js`(Firestore 용, 앱은 메시징만 쓴다)이고 `npm audit fix --force`(호환이 깨지는 변경)로만 풀려서 그대로 뒀다
+- 의존성을 바꾼 뒤에는 `npx npm@10 install --package-lock-only` 로 락파일을 다시 맞춘다. 맥의 npm 11 이 만든 락파일은
+  `@emnapi/core`·`@emnapi/runtime` 항목이 빠져서 CI(리눅스)의 `npm ci` 가 실패한다 (10-25 와 같은 문제가 이번에도 났다)
 
 ## 8. 다음 작업
 
