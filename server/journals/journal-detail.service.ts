@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
+import { cleanText } from "@/lib/text";
 import { createSignedReadUrls, toDownloadUrl } from "@/lib/storage";
 import { JournalStatus, NotificationType } from "@/generated/prisma/enums";
 import { getCurrentMembership } from "@/server/centers/center.service";
@@ -177,7 +178,7 @@ export async function addJournalComment(
   journalId: string,
   content: string,
 ) {
-  const trimmed = content.trim();
+  const trimmed = cleanText(content).trim();
 
   if (trimmed.length === 0) {
     throw new JournalError("EMPTY", "내용을 입력해주세요.");

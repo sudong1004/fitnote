@@ -30,7 +30,10 @@ function pickEnum<T extends Record<string, string>>(
 
 function toPage(value: string | string[] | undefined) {
   const parsed = Number(typeof value === "string" ? value : "1");
-  return Number.isFinite(parsed) && parsed >= 1 ? Math.floor(parsed) : 1;
+  // 상한이 없으면 건너뛸 줄 수가 DB 정수 범위를 넘어 쿼리가 실패한다.
+  return Number.isFinite(parsed) && parsed >= 1
+    ? Math.min(Math.floor(parsed), 1000)
+    : 1;
 }
 
 export default async function ExercisesPage({

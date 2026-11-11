@@ -1,8 +1,14 @@
 import "server-only";
 
 import { GoalStatus, GoalType } from "@/generated/prisma/enums";
-import { kstStartOfDay, toKstDateKey } from "@/lib/date";
+import {
+  isDateKey,
+  isPastOrTodayKey,
+  kstDateToUtc,
+  toKstDateKey,
+} from "@/lib/date";
 import { prisma } from "@/lib/prisma";
+import { cleanText } from "@/lib/text";
 
 /**
  * 회원이 재는 몸.
@@ -17,13 +23,17 @@ import { prisma } from "@/lib/prisma";
 
 export class BodyError extends Error {
   constructor(
-    readonly code: "NOT_FOUND" | "INVALID" | "EMPTY",
+    readonly code: "NOT_FOUND" | "INVALID" | "INVALID_DATE" | "EMPTY",
     message: string,
+    /** 범위를 벗어난 칸. 화면이 어느 칸인지 짚어 말할 때 쓴다. */
+    readonly field?: BodyField,
   ) {
     super(message);
     this.name = "BodyError";
   }
 }
+
+export type BodyField = "weight" | "body_fat" | "muscle" | "waist";
 
 /** 우리가 다루는 목표. Goal 표에는 여섯 종류가 있지만 나머지는 아직 출처가 없다. */
 export const BODY_GOAL_TYPES = [
@@ -43,6 +53,7 @@ export const METRIC: Record<
     label: string;
     unit: string;
     field: MetricField;
+    key: BodyField;
     min: number;
     max: number;
   }
@@ -51,6 +62,7 @@ export const METRIC: Record<
     label: "체중",
     unit: "kg",
     field: "weightKg",
+    key: "weight",
     min: 20,
     max: 300,
   },
@@ -58,6 +70,7 @@ export const METRIC: Record<
     label: "체지방률",
     unit: "%",
     field: "bodyFatPercent",
+    key: "body_fat",
     min: 1,
     max: 70,
   },
@@ -65,12 +78,19 @@ export const METRIC: Record<
     label: "골격근량",
     unit: "kg",
     field: "skeletalMuscleKg",
+    key: "muscle",
     min: 5,
     max: 100,
   },
 };
 
-const WAIST = { label: "허리둘레", unit: "cm", min: 30, max: 200 };
+const WAIST = {
+  label: "허리둘레",
+  unit: "cm",
+  key: "waist",
+  min: 30,
+  max: 200,
+} as const;
 
 const MAX_MEMO = 300;
 
@@ -89,17 +109,25 @@ export function parseGoalType(value: unknown): BodyGoalType | null {
  */
 function readNumber(
   raw: unknown,
-  range: { label: string; unit: string; min: number; max: number },
+  range: {
+    label: string;
+    unit: string;
+    key: BodyField;
+    min: number;
+    max: number;
+  },
 ) {
   const text = String(raw ?? "").trim();
   if (text === "") return null;
 
-  const value = Number(text);
+  // 숫자와 소수점만 받는다. Number() 는 "1e2" 나 "0x50" 도 숫자로 읽는다.
+  const value = /^\d+(\.\d+)?$/.test(text) ? Number(text) : Number.NaN;
 
   if (!Number.isFinite(value) || value < range.min || value > range.max) {
     throw new BodyError(
       "INVALID",
       `${range.label}은(는) ${range.min}${range.unit}부터 ${range.max}${range.unit} 사이로 넣어주세요.`,
+      range.key,
     );
   }
 
@@ -173,19 +201,16 @@ export async function saveBodyRecord(
     memo?: unknown;
   },
 ) {
-  const parsed = new Date(`${input.dateKey}T00:00:00+09:00`);
+  const recordedAt = isDateKey(input.dateKey)
+    ? kstDateToUtc(input.dateKey)
+    : null;
 
-  if (
-    !/^\d{4}-\d{2}-\d{2}$/.test(input.dateKey) ||
-    Number.isNaN(parsed.getTime())
-  ) {
-    throw new BodyError("INVALID", "날짜를 확인해주세요.");
+  if (!recordedAt) {
+    throw new BodyError("INVALID_DATE", "날짜를 확인해주세요.");
   }
 
-  const recordedAt = kstStartOfDay(parsed);
-
-  if (recordedAt.getTime() > kstStartOfDay().getTime()) {
-    throw new BodyError("INVALID", "아직 오지 않은 날은 적을 수 없어요.");
+  if (!isPastOrTodayKey(input.dateKey)) {
+    throw new BodyError("INVALID_DATE", "아직 오지 않은 날은 적을 수 없어요.");
   }
 
   const weightKg = readNumber(input.weightKg, METRIC.WEIGHT);
@@ -206,7 +231,7 @@ export async function saveBodyRecord(
   }
 
   const memo =
-    String(input.memo ?? "")
+    cleanText(String(input.memo ?? ""))
       .trim()
       .slice(0, MAX_MEMO) || null;
 
@@ -444,9 +469,17 @@ export async function setGoal(
 
   let targetDate: Date | null = null;
   if (input.targetDate) {
-    targetDate = new Date(`${input.targetDate}T00:00:00+09:00`);
-    if (Number.isNaN(targetDate.getTime())) {
-      throw new BodyError("INVALID", "목표 날짜를 확인해주세요.");
+    // 형식을 먼저 본다. 엔진은 "zzzzT00:00" 같은 값도 날짜로 읽어 준다.
+    targetDate = isDateKey(input.targetDate)
+      ? kstDateToUtc(input.targetDate)
+      : null;
+
+    if (!targetDate) {
+      throw new BodyError("INVALID_DATE", "목표 날짜를 확인해주세요.");
+    }
+    // 이미 지난 날을 목표일로 두면 세우자마자 "기한 지남" 이 된다.
+    if (input.targetDate < toKstDateKey(new Date())) {
+      throw new BodyError("INVALID_DATE", "목표 날짜는 오늘부터 고를 수 있어요.");
     }
   }
 

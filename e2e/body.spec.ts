@@ -39,7 +39,7 @@ test.describe("체성분", () => {
 
     await saveBody(page, { weight: "5" });
     await expect(
-      page.getByText("넣은 값을 확인해주세요. 날짜와 숫자 범위를 봐주세요."),
+      page.getByText("체중은 20~300kg 사이 숫자로 넣어주세요."),
     ).toBeVisible();
 
     await page.goto("/body");
@@ -119,7 +119,7 @@ test.describe("체성분", () => {
     await page.fill("input[name=targetValue]", "5");
     await page.getByRole("button", { name: "목표 세우기" }).click();
     await expect(
-      page.getByText("넣은 값을 확인해주세요. 날짜와 숫자 범위를 봐주세요."),
+      page.getByText("체중은 20~300kg 사이 숫자로 넣어주세요."),
     ).toBeVisible();
 
     await page.fill("input[name=targetValue]", "70");

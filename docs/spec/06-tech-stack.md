@@ -87,6 +87,6 @@ docs/               PROGRESS.md, spec/
 
 ## 7. 알려진 기술 부채
 
-- 이메일 인증 없음, 회원 쪽 입력 검사 전수 점검 남음
+- 이메일 인증 없음
 - 수동 백업 정책, 접근 로그(`DataAccessLog`) 없음
 - 아이폰 Safari 실기기 검증은 사람이 함 (`05-test-scenarios.md` §7)

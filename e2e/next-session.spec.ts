@@ -33,6 +33,20 @@ test.describe("다음 수업 잡기", () => {
     await expect(page.getByText(/다음 수업을 .+에 잡았어요\./)).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveCount(0);
 
+    // 주소로 넘어온 문장은 화면에 그대로 띄우지 않는다. 아는 코드만 문구로 바꾼다.
+    const sessionUrl = page.url().split("?")[0];
+    await page.goto(`${sessionUrl}?error=${encodeURIComponent("계정이 정지됐어요")}`);
+    await expect(page.getByText("계정이 정지됐어요")).toHaveCount(0);
+    await expect(page.getByText("처리하지 못했어요. 잠시 후 다시 시도해주세요.")).toBeVisible();
+    await page.goto(`${sessionUrl}?error=session_closed`);
+    await expect(page.getByText("이미 처리한 수업이에요. 되돌린 뒤에 다시 해주세요.")).toBeVisible();
+
+    // 일정 화면도 없는 날짜를 오늘로 돌린다.
+    await page.goto("/trainer/schedule?date=9999-99-99&view=month");
+    await expect(page.getByText("화면을 불러오지 못했어요")).toHaveCount(0);
+    await page.goto("/trainer/schedule?date=0001-01-01");
+    await expect(page.getByText("화면을 불러오지 못했어요")).toHaveCount(0);
+
     await trainer.context.close();
     await member.context.close();
   });

@@ -1,6 +1,7 @@
 import "server-only";
 
 import {
+  ConnectionStatus,
   PTContractStatus,
   PTSessionActor,
   PTSessionStatus,
@@ -249,6 +250,15 @@ export async function listSchedulableContracts(userId: string) {
       trainerProfileId: trainer.id,
       status: PTContractStatus.ACTIVE,
       OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }],
+      // 연결이 끝난 회원은 뺀다. scheduleSession 이 어차피 막는다.
+      memberUser: {
+        trainerConnections: {
+          some: {
+            trainerProfileId: trainer.id,
+            status: ConnectionStatus.ACTIVE,
+          },
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
     select: {

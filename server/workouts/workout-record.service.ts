@@ -1,7 +1,10 @@
 import "server-only";
 
 import { Prisma } from "@/generated/prisma/client";
-import { WorkoutSessionStatus } from "@/generated/prisma/enums";
+import {
+  ConnectionStatus,
+  WorkoutSessionStatus,
+} from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import {
   WorkoutError,
@@ -99,7 +102,12 @@ export async function getLastRecord(
   userId: string,
   exerciseId: string,
   excludeSessionId?: string,
-  options: { ptOnly?: boolean; trainerProfileId?: string } = {},
+  options: {
+    ptOnly?: boolean;
+    trainerProfileId?: string;
+    /** 개인 운동은 이 시각 이후 것만 본다. 트레이너가 볼 때 관계가 시작된 날이다. */
+    personalSince?: Date;
+  } = {},
 ) {
   const record = await prisma.workoutRecord.findFirst({
     where: {
@@ -130,7 +138,12 @@ export async function getLastRecord(
               session: {
                 status: { not: WorkoutSessionStatus.CANCELLED },
                 OR: [
-                  { ptSessionId: null },
+                  {
+                    ptSessionId: null,
+                    ...(options.personalSince
+                      ? { startedAt: { gte: options.personalSince } }
+                      : {}),
+                  },
                   {
                     ptSession: {
                       is: { trainerProfileId: options.trainerProfileId },
@@ -171,6 +184,45 @@ export async function getLastRecord(
     totalVolume: toNumber(record.totalVolume),
     maxWeight: weights.length > 0 ? Math.max(...weights) : null,
     sets,
+  };
+}
+
+/**
+ * 트레이너가 수업에서 참고해도 되는 회원의 지난 기록 범위.
+ *
+ * - PT 기록은 이 트레이너가 진행한 수업 것만 본다. 회원이 예전에 다른 트레이너와
+ *   한 수업은 이 트레이너와 나눈 기록이 아니다.
+ * - 개인 운동은 회원이 공유를 켰고 연결이 살아 있을 때만, 그것도 관계가 시작된
+ *   날 이후 것만 본다. 다른 화면(`assertTrainerCanView` 의 since)과 같은 기준이다.
+ *
+ * 화면이 넘긴 값으로 정하지 않고 여기서 DB 를 보고 정한다. 힌트와 "지난 기록 담기"
+ * 가 같은 범위를 써야 화면에 보인 값과 담기는 값이 어긋나지 않는다.
+ */
+export async function getTrainerReferenceScope(
+  memberUserId: string,
+  trainerProfileId: string,
+) {
+  const [connection, sharing] = await Promise.all([
+    prisma.trainerMemberConnection.findUnique({
+      where: {
+        trainerProfileId_memberUserId: { trainerProfileId, memberUserId },
+      },
+      select: { status: true, startedAt: true },
+    }),
+    prisma.trainerSharingSetting.findUnique({
+      where: { userId: memberUserId },
+      select: { sharePersonalWorkout: true },
+    }),
+  ]);
+
+  const personal =
+    connection?.status === ConnectionStatus.ACTIVE &&
+    sharing?.sharePersonalWorkout === true;
+
+  return {
+    trainerProfileId,
+    ptOnly: !personal,
+    personalSince: personal ? connection.startedAt : undefined,
   };
 }
 
@@ -480,24 +532,24 @@ export async function copyPreviousSets(
     그 값을 믿으면 공유를 끈 회원의 개인 운동 무게와 횟수가 수업 기록으로 복사된다.
     넘어온 옵션은 범위를 좁히는 데만 쓸 수 있다.
   */
-  let ptOnly = options.ptOnly;
+  let scope: Parameters<typeof getLastRecord>[3] = options;
 
-  if (owner.ptSessionId) {
-    const sharing = await prisma.trainerSharingSetting.findUnique({
-      where: { userId: owner.ownerUserId },
-      select: { sharePersonalWorkout: true },
-    });
+  if (owner.ptSessionId && owner.trainerProfileId) {
+    const allowed = await getTrainerReferenceScope(
+      owner.ownerUserId,
+      owner.trainerProfileId,
+    );
 
-    ptOnly = sharing?.sharePersonalWorkout ? (options.ptOnly ?? true) : true;
+    scope = { ...allowed, ptOnly: allowed.ptOnly || options.ptOnly === true };
+  } else if (owner.ptSessionId) {
+    scope = { ptOnly: true };
   }
 
   const previous = await getLastRecord(
     owner.ownerUserId,
     record.exerciseId,
     record.sessionId,
-    owner.ptSessionId
-      ? { trainerProfileId: owner.trainerProfileId ?? undefined, ptOnly }
-      : options,
+    scope,
   );
 
   if (!previous || previous.sets.length === 0) return null;

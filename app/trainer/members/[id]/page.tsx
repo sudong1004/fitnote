@@ -120,7 +120,7 @@ export default async function TrainerMemberPage({
 
     sharing.shareBody ? getMemberBody(user.id, id, 30) : null,
 
-    getMemberStats(user.id, id, sharing.sharePersonalWorkout),
+    getMemberStats(user.id, id),
   ]);
 
   /*

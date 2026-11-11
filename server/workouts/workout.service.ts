@@ -19,6 +19,7 @@ export {
 export type { StartSessionMode } from "./workout-session.service";
 export {
   getLastRecord,
+  getTrainerReferenceScope,
   addRecord,
   addRecords,
   deleteRecord,

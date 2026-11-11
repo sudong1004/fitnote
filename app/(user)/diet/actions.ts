@@ -22,18 +22,24 @@ import { StorageError } from "@/lib/storage";
  * 그래서 폼을 다시 그리면서 주소에 실패 이유를 싣는다. 값은 정해진 몇 개뿐이라
  * 그대로 화면 문구로 바꾼다 — 서버 메시지를 주소로 나르면 아무 문구나 띄울 수 있다.
  */
-export type DietFormError = "empty" | "storage" | "unknown";
+export type DietFormError = "empty" | "date" | "storage" | "unknown";
 
 export async function createDietRecord(formData: FormData) {
   const user = await requireUser();
 
-  const dateKey = parseDateKey(formData.get("date"));
+  const rawDate = formData.get("date");
+  const dateKey = parseDateKey(rawDate);
   const mealType = parseMealType(formData.get("mealType"));
 
   const back = (error: DietFormError) =>
     `/diet/new?date=${dateKey}&meal=${mealType ?? ""}&error=${error}`;
 
   if (!mealType) redirect(back("unknown"));
+
+  // 받을 수 없는 날짜를 조용히 오늘로 바꿔 저장하면 엉뚱한 날에 기록이 생긴다.
+  if (typeof rawDate === "string" && rawDate !== "" && rawDate !== dateKey) {
+    redirect(back("date"));
+  }
 
   let created;
 
@@ -50,8 +56,13 @@ export async function createDietRecord(formData: FormData) {
     if (error instanceof DietError && error.code === "EMPTY") {
       redirect(back("empty"));
     }
+    if (error instanceof DietError && error.code === "INVALID_DATE") {
+      redirect(back("date"));
+    }
     if (error instanceof StorageError) redirect(back("storage"));
-    throw error;
+
+    console.error("diet create error:", error);
+    redirect(back("unknown"));
   }
 
   revalidatePath("/diet");
@@ -65,7 +76,15 @@ export async function deleteDietRecord(formData: FormData) {
   const user = await requireUser();
   const id = String(formData.get("id") ?? "");
 
-  const { dateKey } = await deleteDiet(user.id, id);
+  let dateKey: string;
+
+  try {
+    ({ dateKey } = await deleteDiet(user.id, id));
+  } catch (error) {
+    // 두 번 누르거나 다른 탭에서 이미 지운 경우다. 지우려던 것이 없으니 목록으로 보낸다.
+    if (error instanceof DietError) redirect("/diet");
+    throw error;
+  }
 
   revalidatePath("/diet");
   revalidatePath("/home");

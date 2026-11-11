@@ -11,6 +11,8 @@ import {
   buildMonthGrid,
   formatDuration,
   formatKstDateLabel,
+  isDateKey,
+  isMonthKey,
   shiftMonthKey,
   toKstDateKey,
 } from "@/lib/date";
@@ -29,9 +31,7 @@ const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 /** URL 로 들어오는 값이라 형식을 확인하고, 아니면 오늘로 되돌린다. */
 function pickDateKey(value: string | string[] | undefined, fallback: string) {
-  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
-    ? value
-    : fallback;
+  return isDateKey(value) ? value : fallback;
 }
 
 export default async function CalendarPage({
@@ -45,10 +45,7 @@ export default async function CalendarPage({
   const selected = pickDateKey(params.date, today);
   // 선택한 날짜가 속한 달을 보여준다. 9월 30일을 고른 채 10월로 넘기면
   // 선택이 화면 밖으로 사라지므로 month 를 따로 받는다.
-  const month =
-    typeof params.month === "string" && /^\d{4}-\d{2}$/.test(params.month)
-      ? params.month
-      : selected.slice(0, 7);
+  const month = isMonthKey(params.month) ? params.month : selected.slice(0, 7);
 
   const [summary, sessions, diet] = await Promise.all([
     getMonthSummary(user.id, month),

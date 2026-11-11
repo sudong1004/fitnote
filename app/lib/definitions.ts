@@ -1,5 +1,7 @@
 import * as z from "zod";
 
+import { cleanText } from "@/lib/text";
+
 /**
  * 정규화한 뒤에 형식을 검사한다.
  *
@@ -32,14 +34,21 @@ export const PasswordSchema = z
 
 const SAME_PASSWORD_ERROR = "비밀번호가 서로 달라요.";
 
-export const SignupFormSchema = z
-  .object({
-    // 공백을 먼저 자른 뒤 길이를 센다. 반대로 하면 " a" 가 2자로 통과한다.
-    name: z
+// 공백을 먼저 자른 뒤 길이를 센다. 반대로 하면 " a" 가 2자로 통과한다.
+const NameSchema = z
+  .string()
+  .transform(cleanText)
+  .pipe(
+    z
       .string()
       .trim()
       .min(2, { error: "이름은 2자 이상 입력해주세요." })
       .max(20, { error: "이름은 20자 이하로 입력해주세요." }),
+  );
+
+export const SignupFormSchema = z
+  .object({
+    name: NameSchema,
     email: EmailSchema,
     password: PasswordSchema,
     confirmPassword: z.string(),
@@ -94,8 +103,13 @@ export type AuthFormState =
 const optionalText = (max: number, label: string) =>
   z
     .string()
-    .trim()
-    .max(max, { error: `${label}은(는) ${max}자 이하로 입력해주세요.` })
+    .transform(cleanText)
+    .pipe(
+      z
+        .string()
+        .trim()
+        .max(max, { error: `${label}은(는) ${max}자 이하로 입력해주세요.` }),
+    )
     .transform((value) => (value === "" ? null : value));
 
 /**
@@ -105,11 +119,7 @@ const optionalText = (max: number, label: string) =>
  * 정말 본인 것인지 확인하는 단계가 먼저 있어야 한다.
  */
 export const ProfileFormSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, { error: "이름은 2자 이상 입력해주세요." })
-    .max(20, { error: "이름은 20자 이하로 입력해주세요." }),
+  name: NameSchema,
   phone: z
     .string()
     .trim()

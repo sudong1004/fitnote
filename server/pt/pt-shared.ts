@@ -1,6 +1,10 @@
 import "server-only";
 
-import { PTContractStatus, PTSessionStatus } from "@/generated/prisma/enums";
+import {
+  ConnectionStatus,
+  PTContractStatus,
+  PTSessionStatus,
+} from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
 export class PTError extends Error {
@@ -10,7 +14,8 @@ export class PTError extends Error {
       | "INVALID"
       | "CONTRACT_CLOSED"
       | "SESSION_CLOSED"
-      | "NO_SESSIONS_LEFT",
+      | "NO_SESSIONS_LEFT"
+      | "MEMBER_ENDED",
     message: string,
   ) {
     super(message);
@@ -123,6 +128,7 @@ export async function requireMySession(
       contractId: true,
       scheduledAt: true,
       deducted: true,
+      memberUserId: true,
     },
   });
 
@@ -131,6 +137,32 @@ export async function requireMySession(
   }
 
   return session;
+}
+
+/**
+ * 지금도 내 담당 회원인가.
+ *
+ * 연결이 끝나도 계약과 지난 수업은 남고, 남은 예정 수업을 완료·노쇼·취소로
+ * 정리하는 것도 된다. 하지만 새 수업을 잡거나 시간을 옮기는 것은 관계를 이어
+ * 가는 일이다. 연결을 끊은 회원에게 수업이 잡히고 알림이 가면 안 된다.
+ */
+export async function requireActiveMember(
+  trainerProfileId: string,
+  memberUserId: string,
+) {
+  const connection = await prisma.trainerMemberConnection.findUnique({
+    where: {
+      trainerProfileId_memberUserId: { trainerProfileId, memberUserId },
+    },
+    select: { status: true },
+  });
+
+  if (connection?.status !== ConnectionStatus.ACTIVE) {
+    throw new PTError(
+      "MEMBER_ENDED",
+      "연결이 끝난 회원이에요. 다시 연결한 뒤에 수업을 잡을 수 있어요.",
+    );
+  }
 }
 
 /**

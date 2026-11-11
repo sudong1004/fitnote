@@ -20,6 +20,7 @@ export const metadata = { title: "식단 남기기 | FitNote" };
 
 const ERROR_TEXT: Record<string, string> = {
   empty: "사진을 올리거나 무엇을 먹었는지 적어주세요.",
+  date: "날짜를 확인해주세요. 오늘까지만 남길 수 있어요.",
   storage: "사진 저장소에 문제가 있어요. 사진 없이 먼저 남겨보세요.",
   unknown: "남기지 못했어요. 잠시 후 다시 시도해주세요.",
 };

@@ -14,7 +14,12 @@ import {
 } from "@/server/body/body.service";
 
 function fail(error: unknown) {
-  if (error instanceof BodyError) return error.code.toLowerCase();
+  if (error instanceof BodyError) {
+    // 어느 칸이 문제인지까지 코드로 싣는다. 문구는 화면이 고른다.
+    return error.field
+      ? `invalid_${error.field}`
+      : error.code.toLowerCase();
+  }
 
   console.error("body action error:", error);
   return "unknown";

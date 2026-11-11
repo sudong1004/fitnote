@@ -13,6 +13,7 @@ import { requireTrainerProfile } from "@/server/trainers/trainer.service";
 import {
   PTError,
   syncUsedSessions,
+  requireActiveMember,
   requireMyContract,
   requireMySession,
   requireOpenSession,
@@ -37,6 +38,8 @@ export async function scheduleSession(
 ) {
   const trainer = await requireTrainerProfile(userId);
   const contract = await requireMyContract(trainer.id, input.contractId);
+
+  await requireActiveMember(trainer.id, contract.memberUserId);
 
   if (contract.status !== PTContractStatus.ACTIVE) {
     throw new PTError("CONTRACT_CLOSED", "진행 중인 계약이 아니에요.");
@@ -139,6 +142,8 @@ export async function rescheduleSession(
 ) {
   const trainer = await requireTrainerProfile(userId);
   const session = await requireMySession(trainer.id, input.sessionId);
+
+  await requireActiveMember(trainer.id, session.memberUserId);
 
   if (session.status !== PTSessionStatus.SCHEDULED) {
     throw new PTError("SESSION_CLOSED", "이미 끝난 수업이에요.");
