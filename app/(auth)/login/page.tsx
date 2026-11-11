@@ -12,13 +12,15 @@ import { AuthField } from "@/components/auth/auth-field";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { SubmitButton } from "@/components/auth/submit-button";
 
-/** 비밀번호를 바꾸거나 탈퇴한 뒤 돌아왔을 때 한 줄 안내. 주소의 쿼리를 읽으므로 Suspense 안에 둔다. */
+/** 비밀번호를 바꾸거나 이메일을 인증하거나 탈퇴한 뒤 돌아왔을 때 한 줄 안내. 주소의 쿼리를 읽으므로 Suspense 안에 둔다. */
 function LoginNotice() {
   const params = useSearchParams();
   const notice =
     params.get("reset") === "1"
       ? "비밀번호를 바꿨어요. 새 비밀번호로 로그인해 주세요."
-      : params.get("deleted") === "1"
+      : params.get("verified") === "1"
+        ? "이메일 인증이 끝났어요. 로그인해 주세요."
+        : params.get("deleted") === "1"
         ? "탈퇴했어요. 그동안 FitNote를 써 주셔서 고마워요."
         : null;
   if (!notice) return null;

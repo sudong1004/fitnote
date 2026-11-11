@@ -15,7 +15,7 @@
 | 인증 | 자체 구현: `jose`(JWT) + `bcryptjs` + `AuthSession` 테이블 | 쿠키 7일, 폐기 즉시 무효 |
 | 사진 저장 | Supabase Storage (비공개 버킷) | 서버에서 service role 로 올리고 서명 주소로 노출 |
 | 푸시 | Firebase Cloud Messaging (HTTP v1) + 웹 푸시 서비스 워커 | 홈 화면에 추가한 PWA 에서만 수신 |
-| 이메일 | `nodemailer` + SMTP (비밀번호 재설정) | 지금은 Gmail SMTP, 발송 한도 있음 |
+| 이메일 | `nodemailer` + SMTP (가입 이메일 인증, 비밀번호 재설정) | 지금은 Gmail SMTP, 발송 한도 있음 |
 | 배포 | Vercel (리전 `hnd1`, 도쿄) | 현재 Hobby 플랜. 유료화 전 Pro 로 |
 | 정기 작업 | Vercel Cron `0 0 * * *` (UTC, 한국 09:00) | `/api/cron/reminders`, `CRON_SECRET` Bearer |
 | 보안 헤더 | `next.config.ts` 의 `headers()` | `X-Frame-Options`·`frame-ancestors`, `nosniff`, `Referrer-Policy`. HSTS 는 Vercel |
@@ -63,8 +63,9 @@ docs/               PROGRESS.md, spec/
 | `SUPABASE_URL` `SUPABASE_SERVICE_ROLE_KEY` `SUPABASE_PHOTO_BUCKET` | 사진 저장소. 서버 전용 | 선택(없으면 사진 비활성) |
 | `FCM_PROJECT_ID` `FCM_CLIENT_EMAIL` `FCM_PRIVATE_KEY` | 푸시 발송 | 선택 |
 | `NEXT_PUBLIC_FIREBASE_*` | 브라우저 푸시 설정 (공개 값) | 선택 |
-| `APP_URL` | 푸시·메일 링크의 앞부분. 없으면 재설정 링크는 운영에서 Vercel 운영 주소, 그 밖에서는 요청 주소로 만든다 | 운영 필수 |
-| `SMTP_USER` `SMTP_PASS` `SMTP_HOST` `SMTP_PORT` 또는 `RESEND_API_KEY`, `MAIL_FROM` | 비밀번호 재설정 메일. 둘 중 한 방식 | 운영 필수 |
+| `APP_URL` | 푸시·메일 링크의 앞부분. 없으면 메일의 링크는 운영에서 Vercel 운영 주소, 그 밖에서는 요청 주소로 만든다 | 운영 필수 |
+| `SMTP_USER` `SMTP_PASS` `SMTP_HOST` `SMTP_PORT` 또는 `RESEND_API_KEY`, `MAIL_FROM` | 가입 이메일 인증·비밀번호 재설정 메일. 둘 중 한 방식. 없으면 새로 가입할 수 없다 | 운영 필수 |
+| `MAIL_OUTBOX_URL` | 자동 테스트 전용. 메일을 보내는 대신 이 주소(`http://localhost:…` 만 받음)로 넘긴다. `e2e/server.mjs` 가 넣는다 | 쓰지 않음 |
 | `CRON_SECRET` | cron 호출 보호. 없으면 항상 401 | 필수(알림용) |
 
 ## 5. 외부 서비스
@@ -74,7 +75,7 @@ docs/               PROGRESS.md, spec/
 | Supabase | DB, 사진 저장소 | 무료 플랜은 비활성 시 일시정지 가능, 수동 백업 정책 필요 |
 | Vercel | 호스팅, Cron | Hobby 는 상업적 사용 금지 → 과금 전 Pro |
 | Firebase | 푸시 | |
-| Gmail SMTP | 재설정 메일 | 일일 한도, 정식 서비스 전 전용 발송 서비스로 교체 검토 |
+| Gmail SMTP | 가입 인증·재설정 메일 | 가입할 때마다 메일이 나가므로 일일 한도(하루 약 500통)가 곧 하루 가입자 수 한도다. 정식 서비스 전 전용 발송 서비스로 교체 검토 |
 | GitHub | 저장소, CI | |
 
 ## 6. 개발 규칙
@@ -87,6 +88,6 @@ docs/               PROGRESS.md, spec/
 
 ## 7. 알려진 기술 부채
 
-- 이메일 인증 없음
+- 가입이 메일 발송에 달려 있다. Gmail SMTP 가 막히거나 한도를 넘으면 새 가입이 멈춘다(도메인 메일로 옮기기 전까지)
 - 수동 백업 정책, 접근 로그(`DataAccessLog`) 없음
 - 아이폰 Safari 실기기 검증은 사람이 함 (`05-test-scenarios.md` §7)

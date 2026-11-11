@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-import { agreeAll, newPage, signup, uniqueEmail } from "./helpers";
+import { agreeAll, confirmEmail, newPage, signup, uniqueEmail } from "./helpers";
 
 /**
  * 트레이너와 회원이 만나는 한 바퀴.
@@ -124,11 +124,18 @@ test.describe("트레이너와 회원의 한 바퀴", () => {
     await member.page.goto(link);
     await expect(member.page.getByText("이어받을회원님, 반가워요")).toBeVisible();
 
-    await member.page.fill("#email", uniqueEmail("claimed"));
-    await member.page.fill("#password", "Passw0rd123");
-    await member.page.fill("#confirmPassword", "Passw0rd123");
-    await agreeAll(member.page);
-    await member.page.getByRole("button", { name: "시작하기" }).click();
+    // 주소를 잘못 적어도, 인증하기 전에는 같은 링크로 다시 적을 수 있다.
+    const claimedEmail = uniqueEmail("claimed");
+    for (const address of [uniqueEmail("typo"), claimedEmail]) {
+      await member.page.goto(link);
+      await member.page.fill("#email", address);
+      await member.page.fill("#password", "Passw0rd123");
+      await member.page.fill("#confirmPassword", "Passw0rd123");
+      await agreeAll(member.page);
+      await member.page.getByRole("button", { name: "시작하기" }).click();
+      await member.page.waitForURL("**/verify-email");
+    }
+    await confirmEmail(member.page, claimedEmail);
     await member.page.waitForURL("**/home");
 
     await member.page.goto("/profile");

@@ -59,6 +59,7 @@ erDiagram
 | `status` | UserStatus | O | 기본 ACTIVE |
 | `termsVersion` | String? |  |  |
 | `termsAgreedAt` | DateTime? |  |  |
+| `emailVerifiedAt` | DateTime? |  | 이메일을 인증한 시각. 비어 있으면 로그인 불가 |
 | `deletedAt` | DateTime? |  |  |
 | `lastLoginAt` | DateTime? |  |  |
 
@@ -84,6 +85,16 @@ erDiagram
 | `userId` | String | O |  |
 | `tokenHash` | String | O | unique |
 | `expiresAt` | DateTime | O |  |
+| `usedAt` | DateTime? |  |  |
+
+#### `EmailVerificationToken`
+
+| 필드 | 타입 | 필수 | 비고 |
+| --- | --- | --- | --- |
+| `userId` | String | O |  |
+| `email` | String | O | 링크를 보낸 주소. 계정의 이메일이 바뀌면 못 쓴다 |
+| `tokenHash` | String | O | unique |
+| `expiresAt` | DateTime | O | 24시간 |
 | `usedAt` | DateTime? |  |  |
 
 #### `DeviceToken`
@@ -527,6 +538,8 @@ R 읽기 · C 만들기 · U 수정 · D 삭제. "담당" = ACTIVE 연결이 있
 | 가입 제한 | IP 1시간 10회 |
 | 이어받기 제한 | IP 15분 10회 (실패만) |
 | 재설정 제한 | IP 1시간 10회 · 계정 1시간 3회 |
+| 이메일 인증 | 인증 전에는 세션을 만들지 않고, 세션을 읽을 때도 `emailVerifiedAt` 을 다시 본다. 링크 24시간, 해시만 저장 |
+| 가입 메일 제한 | 한 주소로 1시간 5통(인증·이미 가입됨 안내 합쳐서) · 다시 보내기 IP 1시간 10회 |
 | 비밀번호 | bcrypt, 72바이트 이하 |
 | 사진 | 비공개 저장소, 서명 주소로만 노출. 경로는 형식을 검증한다 |
 
@@ -544,5 +557,7 @@ R 읽기 · C 만들기 · U 수정 · D 삭제. "담당" = ACTIVE 연결이 있
 ## 5. 알려진 한계
 
 - 누가 언제 무엇을 봤는지 남기는 `DataAccessLog` 가 없다. 지금은 공유가 꺼져 있으면 조회 자체를 하지 않는 것으로 대신한다
-- 이메일 소유 확인(인증)이 없어 가입한 주소가 본인 것인지 알 수 없다
+- 이메일 인증을 넣기 전(2026-11-12 이전)에 가입한 계정은 주소를 확인하지 않은 채 인증된 것으로 뒀다
+- 인증하지 않고 버려 둔 가입 계정을 따로 치우는 작업은 없다. 같은 주소로 다시 가입할 때 지워진다
+- 이메일을 바꾸는 기능이 없다(바꾸려면 새 주소 인증이 필요하다)
 - 한 회원 한 트레이너는 서비스 코드로만 막는다. 이 정책 이전에 이미 두 트레이너와 연결된 회원이 있다면 그대로 남는다(운영 DB 확인 필요). 정책을 풀려면 공유 설정을 트레이너별로 나누고 공유 설정 화면이 모든 담당 트레이너를 보여주도록 먼저 고쳐야 한다

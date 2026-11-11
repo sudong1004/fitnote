@@ -56,6 +56,9 @@ export async function isResetTokenUsable(token: string) {
  *
  * 토큰은 한 번만 쓸 수 있고, 바꾸면 모든 기기의 로그인을 끊는다. 비밀번호를 잊은 사람이
  * 아니라 계정을 뺏긴 사람이 쓰는 경우도 있어서다.
+ *
+ * 메일로 받은 링크를 썼다는 것은 그 주소가 본인 것이라는 뜻이라, 이메일 인증을 아직
+ * 안 한 계정이면 같이 인증된 것으로 둔다.
  */
 export async function resetPasswordWithToken(token: string, newPassword: string): Promise<"ok" | "invalid"> {
   const now = new Date();
@@ -77,6 +80,7 @@ export async function resetPasswordWithToken(token: string, newPassword: string)
 
   await prisma.$transaction([
     prisma.user.update({ where: { id: row.userId }, data: { passwordHash } }),
+    prisma.user.updateMany({ where: { id: row.userId, emailVerifiedAt: null }, data: { emailVerifiedAt: now } }),
     prisma.passwordResetToken.updateMany({ where: { userId: row.userId, usedAt: null }, data: { usedAt: now } }),
     prisma.authSession.updateMany({ where: { userId: row.userId, revokedAt: null }, data: { revokedAt: now } }),
   ]);

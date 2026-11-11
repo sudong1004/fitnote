@@ -16,6 +16,11 @@ type Mail = { to: string; subject: string; text: string; html: string };
  * 어느 경우든 화면에는 같은 안내를 보여 줘서, 가입된 메일인지 드러나지 않게 한다.
  */
 export async function sendMail(input: Mail) {
+  // 자동 테스트용: 메일을 보내는 대신 이 컴퓨터의 테스트 서버에 넘긴다(e2e/server.mjs).
+  // 다른 곳으로 메일이 새지 않게 localhost 주소만 받는다.
+  const outbox = process.env.MAIL_OUTBOX_URL;
+  if (outbox && /^http:\/\/localhost:\d+\//.test(outbox)) return sendToOutbox(input, outbox);
+
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
   if (smtpUser && smtpPass) return sendWithSmtp(input, smtpUser, smtpPass);
@@ -67,4 +72,14 @@ async function sendWithResend(input: Mail, apiKey: string, from: string) {
   }
 
   return true;
+}
+
+async function sendToOutbox(input: Mail, url: string) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  }).catch(() => null);
+
+  return Boolean(response?.ok);
 }

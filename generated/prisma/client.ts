@@ -317,3 +317,8 @@ export type TrainerSharingSetting = Prisma.TrainerSharingSettingModel
  * * 한 번 쓰면 usedAt 이 찍히고, 30분 뒤에는 쓸 수 없다.
  */
 export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
+ * Model EmailVerificationToken
+ * 가입 이메일 인증 링크. 토큰은 해시로만 둔다.
+ */
+export type EmailVerificationToken = Prisma.EmailVerificationTokenModel

@@ -18,7 +18,43 @@ export const randomIpHeaders = () => ({
 export const uniqueEmail = (prefix: string) =>
   `${prefix}-${randomUUID().slice(0, 8)}@e2e.test`;
 
-/** 가입 화면에서 역할을 고르고 가입한다. 가입 뒤 첫 화면까지 기다린다. */
+/** 가짜 메일함(e2e/server.mjs)에서 그 주소가 받은 메일들. 오래된 것부터. */
+export async function mailsTo(email: string) {
+  const res = await fetch(
+    `http://localhost:${process.env.E2E_STORAGE_PORT ?? "3201"}/__mail?to=${encodeURIComponent(email)}`,
+  );
+  return (await res.json()) as { to: string; subject: string; text: string }[];
+}
+
+/** 가장 최근에 받은 인증 메일의 링크. */
+export async function verificationLink(email: string) {
+  let link: string | undefined;
+  await expect
+    .poll(async () => {
+      const mail = (await mailsTo(email)).filter((m) => m.subject.includes("이메일 인증")).at(-1);
+      link = mail?.text.match(/https?:\/\/\S+\/verify-email\?token=\S+/)?.[0];
+      return Boolean(link);
+    })
+    .toBe(true);
+  return link as string;
+}
+
+/**
+ * 가입(또는 이어받기) 직후의 "메일을 확인해 주세요" 화면에서 이어서:
+ * 인증 메일의 링크를 열어 인증을 끝내고 로그인한다.
+ */
+export async function confirmEmail(page: Page, email: string, password = PASSWORD) {
+  await page.waitForURL("**/verify-email");
+  await page.goto(await verificationLink(email));
+  await page.getByRole("button", { name: "이메일 인증 끝내기" }).click();
+  await page.waitForURL(/\/login\?verified=1$/);
+  await page.fill("#email", email);
+  await page.fill("#password", password);
+  await page.getByRole("button", { name: "로그인" }).click();
+  await page.waitForURL((url) => !url.pathname.startsWith("/login"));
+}
+
+/** 가입 화면에서 역할을 고르고 가입한 뒤 이메일을 인증하고 로그인한다. 첫 화면까지 기다린다. */
 export async function signup(
   page: Page,
   role: "MEMBER" | "TRAINER",
@@ -33,6 +69,7 @@ export async function signup(
   await page.fill("#confirmPassword", PASSWORD);
   await agreeAll(page);
   await page.getByRole("button", { name: "가입하기" }).click();
+  await confirmEmail(page, email);
   await page.waitForURL(role === "TRAINER" ? "**/trainer" : "**/home");
 }
 
