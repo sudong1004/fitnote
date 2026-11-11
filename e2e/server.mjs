@@ -28,6 +28,12 @@ const BUCKET = "fitnote-photos";
  */
 const objects = new Map();
 
+/**
+ * 가짜 메일함. 앱은 MAIL_OUTBOX_URL 이 있으면 메일을 보내는 대신 여기로 넘긴다(lib/mail.ts).
+ * 테스트는 GET /__mail?to= 로 그 주소가 받은 메일을 읽어 인증 링크를 꺼낸다.
+ */
+const mails = [];
+
 function readBody(req) {
   return new Promise((resolve) => {
     const chunks = [];
@@ -57,6 +63,15 @@ const storage = createHttpServer(async (req, res) => {
   const prefix = `/storage/v1`;
 
   if (path === "/__objects") return json(200, [...objects.keys()].sort());
+
+  if (path === "/__mail" && req.method === "POST") {
+    mails.push(JSON.parse((await readBody(req)).toString() || "{}"));
+    return json(200, { ok: true });
+  }
+  if (path === "/__mail") {
+    const to = url.searchParams.get("to");
+    return json(200, mails.filter((mail) => !to || mail.to === to));
+  }
 
   if (path === `${prefix}/bucket/${BUCKET}`) return json(200, { id: BUCKET });
 
@@ -147,6 +162,12 @@ const env = {
   FCM_CLIENT_EMAIL: "",
   FCM_PRIVATE_KEY: "",
   CRON_SECRET: "",
+  // 진짜 메일이 나가지 않게 발송 설정을 비우고, 가짜 메일함으로 돌린다.
+  SMTP_USER: "",
+  SMTP_PASS: "",
+  RESEND_API_KEY: "",
+  APP_URL: `http://localhost:${APP_PORT}`,
+  MAIL_OUTBOX_URL: `http://localhost:${STORAGE_PORT}/__mail`,
   SUPABASE_URL: `http://localhost:${STORAGE_PORT}`,
   SUPABASE_SERVICE_ROLE_KEY: "e2e-service-key",
   SUPABASE_PHOTO_BUCKET: BUCKET,

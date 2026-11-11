@@ -101,7 +101,7 @@ async function main() {
   }
 
   const trainerUser = await prisma.user.create({
-    data: { email: EMAILS.trainer, name: "박준호", passwordHash },
+    data: { email: EMAILS.trainer, name: "박준호", passwordHash, emailVerifiedAt: new Date() },
   });
   const trainer = await prisma.trainerProfile.create({
     data: {
@@ -115,7 +115,7 @@ async function main() {
 
   // ── 회원 1: 오래 다닌 사람. 재등록했고 체중이 많이 빠졌다. ──────
   const m1 = await prisma.user.create({
-    data: { email: EMAILS.m1, name: "김수정", passwordHash },
+    data: { email: EMAILS.m1, name: "김수정", passwordHash, emailVerifiedAt: new Date() },
   });
   const c1 = await prisma.trainerMemberConnection.create({
     data: {
@@ -370,7 +370,7 @@ async function main() {
 
   // ── 회원 2: 이제 막 시작. 공유를 꺼 둬서 게이트가 보인다. ──────
   const m2 = await prisma.user.create({
-    data: { email: EMAILS.m2, name: "이도현", passwordHash },
+    data: { email: EMAILS.m2, name: "이도현", passwordHash, emailVerifiedAt: new Date() },
   });
   const c2 = await prisma.trainerMemberConnection.create({
     data: {
@@ -428,7 +428,7 @@ async function main() {
 
   // ── 회원 3: 계약이 없는 사람. 빈 상태를 보려고 둔다. ──────────
   const m3 = await prisma.user.create({
-    data: { email: EMAILS.m3, name: "최민서", passwordHash },
+    data: { email: EMAILS.m3, name: "최민서", passwordHash, emailVerifiedAt: new Date() },
   });
   const c3 = await prisma.trainerMemberConnection.create({
     data: {

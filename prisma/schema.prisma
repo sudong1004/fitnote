@@ -25,6 +25,10 @@ model User {
   termsVersion            String?
   termsAgreedAt           DateTime?
   /// *
+  ///    * 이메일이 본인 것임을 확인한 시각. 비어 있으면 로그인되지 않는다.
+  ///    * 인증을 넣기 전에 가입한 계정은 마이그레이션에서 가입 시각으로 채웠다.
+  emailVerifiedAt         DateTime?
+  /// *
   ///    * 탈퇴한 시각. 탈퇴하면 이름·연락처를 지우고 상태를 DELETED 로 둔다.
   ///    * 행 자체는 남긴다: 트레이너의 계약·수업·알림장 기록이 이 행을 가리킨다.
   deletedAt               DateTime?
@@ -34,6 +38,7 @@ model User {
   aiAnalyses              AiAnalysis[]
   authSessions            AuthSession[]
   passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
   bodyRecords             BodyRecord[]
   centerMemberships       CenterMembership[]
   deviceTokens            DeviceToken[]
@@ -1153,6 +1158,21 @@ enum AiAnalysisStatus {
 model PasswordResetToken {
   id        String    @id @default(uuid())
   userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// 가입 이메일 인증 링크. 토큰은 해시로만 둔다.
+model EmailVerificationToken {
+  id        String    @id @default(uuid())
+  userId    String
+  /// * 이 링크를 보낸 주소. 그 뒤에 계정의 이메일이 바뀌면 링크를 쓸 수 없다.
+  email     String
   tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?

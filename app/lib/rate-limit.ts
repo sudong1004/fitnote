@@ -26,6 +26,13 @@ export const AUTH_LIMITS = {
   /** 비밀번호 재설정 메일: 남의 메일함을 메일로 채우는 걸 막는다 */
   resetIp: { limit: 10, windowMs: 60 * 60 * 1000 },
   resetAccount: { limit: 3, windowMs: 60 * 60 * 1000 },
+  /** 인증 메일 다시 보내기 버튼 */
+  verifyIp: { limit: 10, windowMs: 60 * 60 * 1000 },
+  /**
+   * 한 주소로 나가는 가입 관련 메일(인증, 이미 가입됨 안내). IP 와 상관없이 주소로만 센다.
+   * 남의 주소를 가입 칸에 계속 넣어 메일함을 채우는 걸 막는다.
+   */
+  signupMailAddress: { limit: 5, windowMs: 60 * 60 * 1000 },
 } as const;
 
 export const RATE_LIMIT_MESSAGE =

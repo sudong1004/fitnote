@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import { prisma } from "@/lib/prisma";
 import {
-  ConnectionError,
+  createEmailVerificationToken,
+  getVerificationTokenState,
+  verifyEmailWithToken,
+} from "@/server/account/email-verification.service";
+import {
   claimMemberAccount,
   createMemberClaimCode,
   createTrainerInvitation,
@@ -30,72 +34,103 @@ async function setup() {
   return { trainer, member, code };
 }
 
+/** 이어받기를 끝까지: 이메일·비밀번호를 적고 인증 링크까지 누른 상태. */
+async function claimAndVerify(code: string, credentials = creds()) {
+  const claimed = await claimMemberAccount(code, credentials);
+  if (claimed.status !== "claimed") throw new Error("이어받지 못했다");
+
+  const issued = await createEmailVerificationToken(claimed.id);
+  expect(await verifyEmailWithToken(issued!.token)).toBe("ok");
+
+  return claimed;
+}
+
 describe("claimMemberAccount", () => {
-  it("미가입 계정을 이어받으면 활성화되고 코드가 닫힌다", async () => {
+  it("이어받으면 이메일과 비밀번호가 적히고, 인증을 끝내야 활성화되고 코드가 닫힌다", async () => {
     const { member, code } = await setup();
     const credentials = creds();
 
-    const user = await claimMemberAccount(code, credentials);
+    const claimed = await claimMemberAccount(code, credentials);
 
-    expect(user.id).toBe(member.memberUserId);
+    expect(claimed).toMatchObject({ status: "claimed", id: member.memberUserId });
 
-    const row = await prisma.user.findUniqueOrThrow({
-      where: { id: user.id },
-      select: { status: true, email: true, passwordHash: true },
+    const select = { status: true, email: true, passwordHash: true, emailVerifiedAt: true };
+    const before = await prisma.user.findUniqueOrThrow({
+      where: { id: member.memberUserId },
+      select,
     });
 
-    expect(row).toEqual({
-      status: "ACTIVE",
+    // 인증 전: 아직 미가입 상태이고 코드도 열려 있다.
+    expect(before).toEqual({
+      status: "PENDING",
       email: credentials.email,
       passwordHash: "hash",
+      emailVerifiedAt: null,
     });
+    expect(
+      (await prisma.memberClaimCode.findUniqueOrThrow({ where: { code } })).claimedAt,
+    ).toBeNull();
 
-    const claim = await prisma.memberClaimCode.findUniqueOrThrow({
-      where: { code },
-      select: { claimedAt: true },
+    const issued = await createEmailVerificationToken(member.memberUserId);
+    expect(await verifyEmailWithToken(issued!.token)).toBe("ok");
+
+    const after = await prisma.user.findUniqueOrThrow({
+      where: { id: member.memberUserId },
+      select,
     });
-
-    expect(claim.claimedAt).not.toBeNull();
+    expect(after.status).toBe("ACTIVE");
+    expect(after.emailVerifiedAt).not.toBeNull();
+    expect(
+      (await prisma.memberClaimCode.findUniqueOrThrow({ where: { code } })).claimedAt,
+    ).not.toBeNull();
   });
 
-  it("같은 코드로 두 번째는 거절한다", async () => {
+  it("인증을 끝낸 뒤에는 같은 코드로 다시 이어받을 수 없다", async () => {
     const { code } = await setup();
 
-    await claimMemberAccount(code, creds());
+    await claimAndVerify(code);
 
     await expect(claimMemberAccount(code, creds())).rejects.toMatchObject({
       code: "INVALID_CODE",
     });
   });
 
-  it("동시에 두 사람이 눌러도 한쪽만 계정을 가져가고 비밀번호가 덮이지 않는다", async () => {
+  it("인증 전에는 같은 코드로 주소를 다시 적을 수 있고, 예전 주소로 간 링크는 못 쓴다", async () => {
+    const { member, code } = await setup();
+    const typo = creds();
+    const right = creds();
+
+    await claimMemberAccount(code, typo);
+    const stale = await createEmailVerificationToken(member.memberUserId);
+
+    await claimMemberAccount(code, { ...right, passwordHash: "hash-2" });
+    expect(await getVerificationTokenState(stale!.token)).toBe("invalid");
+    expect(await verifyEmailWithToken(stale!.token)).toBe("invalid");
+
+    const fresh = await createEmailVerificationToken(member.memberUserId);
+    expect(fresh!.email).toBe(right.email);
+    expect(await verifyEmailWithToken(fresh!.token)).toBe("ok");
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: member.memberUserId },
+      select: { email: true, passwordHash: true, status: true },
+    });
+    expect(user).toEqual({ email: right.email, passwordHash: "hash-2", status: "ACTIVE" });
+  });
+
+  it("동시에 두 사람이 눌러도 이메일과 비밀번호는 같은 사람 것끼리 짝이 맞는다", async () => {
     const { member, code } = await setup();
     const a = { email: `a-${uniq()}@test.com`, passwordHash: "hash-a" };
     const b = { email: `b-${uniq()}@test.com`, passwordHash: "hash-b" };
 
-    const results = await Promise.allSettled([
-      claimMemberAccount(code, a),
-      claimMemberAccount(code, b),
-    ]);
-
-    const won = results.filter((r) => r.status === "fulfilled");
-    const lost = results.filter((r) => r.status === "rejected");
-
-    expect(won).toHaveLength(1);
-    expect(lost).toHaveLength(1);
-    expect((lost[0] as PromiseRejectedResult).reason).toBeInstanceOf(
-      ConnectionError,
-    );
+    await Promise.all([claimMemberAccount(code, a), claimMemberAccount(code, b)]);
 
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: member.memberUserId },
       select: { email: true, passwordHash: true },
     });
 
-    const winner = won[0].status === "fulfilled" && won[0].value.id;
-    expect(winner).toBe(member.memberUserId);
     expect([a.email, b.email]).toContain(user.email);
-    // 이메일과 비밀번호가 같은 사람 것이어야 한다.
     expect(user.passwordHash).toBe(user.email === a.email ? "hash-a" : "hash-b");
   });
 
@@ -119,23 +154,27 @@ describe("claimMemberAccount", () => {
     ).rejects.toMatchObject({ code: "INVALID_CODE" });
   });
 
-  it("이미 쓰는 이메일이면 코드를 쓰지 않고 거절한다", async () => {
-    const { code } = await setup();
+  it("인증된 계정이 쓰는 이메일이면 아무것도 바꾸지 않고 taken 을 돌려준다", async () => {
+    const { member, code } = await setup();
     const taken = await prisma.user.create({
-      data: { name: "기존", email: `taken-${uniq()}@test.com`, passwordHash: "x" },
+      data: {
+        name: "기존",
+        email: `taken-${uniq()}@test.com`,
+        passwordHash: "x",
+        emailVerifiedAt: new Date(),
+      },
       select: { email: true },
     });
 
-    await expect(
-      claimMemberAccount(code, { email: taken.email!, passwordHash: "h" }),
-    ).rejects.toMatchObject({ code: "ALREADY_CONNECTED" });
+    expect(
+      await claimMemberAccount(code, { email: taken.email!, passwordHash: "h" }),
+    ).toEqual({ status: "taken" });
 
-    // 실패했으니 코드는 아직 살아 있어야 한다.
-    const claim = await prisma.memberClaimCode.findUniqueOrThrow({
-      where: { code },
-      select: { claimedAt: true },
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: member.memberUserId },
+      select: { email: true, passwordHash: true, status: true },
     });
-    expect(claim.claimedAt).toBeNull();
+    expect(user).toEqual({ email: null, passwordHash: null, status: "PENDING" });
   });
 
   it("새 코드를 발급하면 이전 코드는 못 쓴다", async () => {
@@ -151,7 +190,7 @@ describe("claimMemberAccount", () => {
   it("이미 가입한 회원에게는 코드를 발급하지 않는다", async () => {
     const { trainer, member, code } = await setup();
 
-    await claimMemberAccount(code, creds());
+    await claimAndVerify(code);
 
     await expect(
       createMemberClaimCode(trainer.userId, member.connectionId),

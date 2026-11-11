@@ -2,6 +2,7 @@ import "server-only";
 
 import { ConnectionStatus } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
+import { releaseUnverifiedEmail } from "@/server/account/email-verification.service";
 import { generateCode, normalizeCode } from "@/server/centers/center.service";
 import {
   ConnectionError,
@@ -247,17 +248,22 @@ export async function previewMemberClaimCode(input: string) {
  * 회원이 계정을 이어받는다.
  *
  * 새 User 를 만들지 않는다. 트레이너가 만들어 둔 그 계정에 이메일과 비밀번호를
- * 채우고 상태만 ACTIVE 로 바꾼다. 기록을 옮기는 방식이었다면 계약·수업·차감·
- * 알림장·운동 기록을 전부 새 사람에게 다시 걸어야 하고, 그중 하나라도 놓치면
- * 회원은 "PT 3회를 어디로 갔냐" 고 묻게 된다. 옮기지 않으면 샐 데가 없다.
+ * 채운다. 기록을 옮기는 방식이었다면 계약·수업·차감·알림장·운동 기록을 전부 새
+ * 사람에게 다시 걸어야 하고, 그중 하나라도 놓치면 회원은 "PT 3회를 어디로 갔냐" 고
+ * 묻게 된다. 옮기지 않으면 샐 데가 없다.
  *
- * 한 번에 다 하거나 아무것도 하지 않는다. 이메일만 채워지고 코드가 안 닫히면
- * 그 코드로 비밀번호를 다시 정할 수 있게 된다.
+ * 여기서는 이메일과 비밀번호만 적어 두고, 계정은 아직 PENDING 이며 코드도 열려 있다.
+ * 메일의 인증 링크를 눌러야 ACTIVE 가 되고 코드가 닫힌다
+ * (email-verification.service 의 verifyEmailWithToken). 그 전에는 같은 코드로 다시
+ * 적을 수 있어서, 주소를 잘못 적어도 계정이 묶이지 않는다. 이메일과 비밀번호는 한
+ * 번의 갱신으로 같이 바뀌므로 둘이 동시에 눌러도 한 사람의 값끼리만 짝이 맞는다.
+ *
+ * 인증된 다른 계정이 그 주소를 쓰고 있으면 아무것도 바꾸지 않고 "taken" 을 돌려준다.
  */
 export async function claimMemberAccount(
   input: string,
   credentials: { email: string; passwordHash: string },
-) {
+): Promise<{ status: "claimed"; id: string; name: string } | { status: "taken" }> {
   const code = normalizeCode(input);
 
   const invalid = () =>
@@ -290,38 +296,49 @@ export async function claimMemberAccount(
     throw invalid();
   }
 
-  const taken = await prisma.user.findUnique({
-    where: { email: credentials.email },
-    select: { id: true },
-  });
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const released = await releaseUnverifiedEmail(
+        tx,
+        credentials.email,
+        row.memberUserId,
+      );
 
-  if (taken) {
-    throw new ConnectionError("ALREADY_CONNECTED", "이미 가입된 이메일이에요.");
+      if (released === "taken") return { status: "taken" as const };
+
+      // 그 사이에 인증이 끝났거나(상태가 바뀜) 코드가 닫혔으면 건드리지 않는다.
+      const open = await tx.memberClaimCode.count({
+        where: { id: row.id, claimedAt: null, revokedAt: null },
+      });
+
+      const updated = open
+        ? await tx.user.updateMany({
+            where: { id: row.memberUserId, status: "PENDING" },
+            data: {
+              email: credentials.email,
+              passwordHash: credentials.passwordHash,
+              emailVerifiedAt: null,
+            },
+          })
+        : { count: 0 };
+
+      if (updated.count !== 1) throw invalid();
+
+      // 다른 주소로 보낸 예전 인증 링크는 버린다.
+      await tx.emailVerificationToken.deleteMany({
+        where: { userId: row.memberUserId, email: { not: credentials.email } },
+      });
+
+      const user = await tx.user.findUniqueOrThrow({
+        where: { id: row.memberUserId },
+        select: { id: true, name: true },
+      });
+
+      return { status: "claimed" as const, ...user };
+    });
+  } catch (error) {
+    // 미가입 회원 둘이 같은 주소를 동시에 적은 경우.
+    if ((error as { code?: string })?.code === "P2002") return { status: "taken" };
+    throw error;
   }
-
-  return prisma.$transaction(async (tx) => {
-    /*
-      코드를 먼저 닫는다. claimedAt 이 null 인 줄만 골라 갱신하므로, 같은
-      링크로 두 번 동시에 눌러도 한쪽만 1을 받는다. 계정을 먼저 채우고 코드를
-      나중에 닫으면 그 사이에 들어온 두 번째 요청이 비밀번호를 덮어쓴다.
-    */
-    const closed = await tx.memberClaimCode.updateMany({
-      where: { id: row.id, claimedAt: null, revokedAt: null },
-      data: { claimedAt: new Date() },
-    });
-
-    if (closed.count !== 1) throw invalid();
-
-    const user = await tx.user.update({
-      where: { id: row.memberUserId, status: "PENDING" },
-      data: {
-        email: credentials.email,
-        passwordHash: credentials.passwordHash,
-        status: "ACTIVE",
-      },
-      select: { id: true, name: true },
-    });
-
-    return user;
-  });
 }

@@ -80,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 7.10.0
- * Query Engine version: 0edf323efd1d98336f3f0a68684b56f689b900d3
+ * Prisma Client JS version: 7.10.1
+ * Query Engine version: d1b3f377ca835d73fd50954a5e22128b9ebdd6b8
  */
 export const prismaVersion: PrismaVersion = {
-  client: "7.10.0",
-  engine: "0edf323efd1d98336f3f0a68684b56f689b900d3"
+  client: "7.10.1",
+  engine: "d1b3f377ca835d73fd50954a5e22128b9ebdd6b8"
 }
 
 /**
@@ -440,7 +440,8 @@ export const ModelName = {
   NotificationPreference: 'NotificationPreference',
   AiAnalysis: 'AiAnalysis',
   TrainerSharingSetting: 'TrainerSharingSetting',
-  PasswordResetToken: 'PasswordResetToken'
+  PasswordResetToken: 'PasswordResetToken',
+  EmailVerificationToken: 'EmailVerificationToken'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -456,7 +457,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "authAttempt" | "deviceToken" | "center" | "centerMembership" | "centerInvitation" | "memberProfile" | "trainerProfile" | "trainerMemberConnection" | "memberClaimCode" | "trainerInvitation" | "equipment" | "memberEquipment" | "gym" | "gymEquipment" | "exercise" | "exerciseEquipment" | "workoutAlternative" | "routine" | "routineExercise" | "workoutSession" | "workoutRecord" | "workoutSet" | "workoutFavorite" | "pTProduct" | "pTSessionReschedule" | "trainerPTPrice" | "pTContract" | "pTSession" | "dietRecord" | "dietFeedback" | "bodyRecord" | "goal" | "journal" | "journalPhoto" | "journalComment" | "notice" | "noticeRead" | "notification" | "notificationPreference" | "aiAnalysis" | "trainerSharingSetting" | "passwordResetToken"
+    modelProps: "user" | "authSession" | "authAttempt" | "deviceToken" | "center" | "centerMembership" | "centerInvitation" | "memberProfile" | "trainerProfile" | "trainerMemberConnection" | "memberClaimCode" | "trainerInvitation" | "equipment" | "memberEquipment" | "gym" | "gymEquipment" | "exercise" | "exerciseEquipment" | "workoutAlternative" | "routine" | "routineExercise" | "workoutSession" | "workoutRecord" | "workoutSet" | "workoutFavorite" | "pTProduct" | "pTSessionReschedule" | "trainerPTPrice" | "pTContract" | "pTSession" | "dietRecord" | "dietFeedback" | "bodyRecord" | "goal" | "journal" | "journalPhoto" | "journalComment" | "notice" | "noticeRead" | "notification" | "notificationPreference" | "aiAnalysis" | "trainerSharingSetting" | "passwordResetToken" | "emailVerificationToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -3716,6 +3717,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    EmailVerificationToken: {
+      payload: Prisma.$EmailVerificationTokenPayload<ExtArgs>
+      fields: Prisma.EmailVerificationTokenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmailVerificationTokenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmailVerificationTokenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload>
+        }
+        findFirst: {
+          args: Prisma.EmailVerificationTokenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmailVerificationTokenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload>
+        }
+        findMany: {
+          args: Prisma.EmailVerificationTokenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload>[]
+        }
+        create: {
+          args: Prisma.EmailVerificationTokenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload>
+        }
+        createMany: {
+          args: Prisma.EmailVerificationTokenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.EmailVerificationTokenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload>[]
+        }
+        delete: {
+          args: Prisma.EmailVerificationTokenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload>
+        }
+        update: {
+          args: Prisma.EmailVerificationTokenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmailVerificationTokenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmailVerificationTokenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.EmailVerificationTokenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload>[]
+        }
+        upsert: {
+          args: Prisma.EmailVerificationTokenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailVerificationTokenPayload>
+        }
+        aggregate: {
+          args: Prisma.EmailVerificationTokenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmailVerificationToken>
+        }
+        groupBy: {
+          args: Prisma.EmailVerificationTokenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailVerificationTokenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmailVerificationTokenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailVerificationTokenCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3765,6 +3840,7 @@ export const UserScalarFieldEnum = {
   status: 'status',
   termsVersion: 'termsVersion',
   termsAgreedAt: 'termsAgreedAt',
+  emailVerifiedAt: 'emailVerifiedAt',
   deletedAt: 'deletedAt',
   lastLoginAt: 'lastLoginAt',
   createdAt: 'createdAt',
@@ -4412,6 +4488,19 @@ export const PasswordResetTokenScalarFieldEnum = {
 } as const
 
 export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
+export const EmailVerificationTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailVerificationTokenScalarFieldEnum = (typeof EmailVerificationTokenScalarFieldEnum)[keyof typeof EmailVerificationTokenScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -5096,6 +5185,7 @@ export type GlobalOmitConfig = {
   aiAnalysis?: Prisma.AiAnalysisOmit
   trainerSharingSetting?: Prisma.TrainerSharingSettingOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit
+  emailVerificationToken?: Prisma.EmailVerificationTokenOmit
 }
 
 /* Types for Logging */

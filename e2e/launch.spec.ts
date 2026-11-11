@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { PASSWORD, agreeAll, connectPair, newPage, signup, uniqueEmail } from "./helpers";
+import { PASSWORD, agreeAll, confirmEmail, connectPair, newPage, signup, uniqueEmail } from "./helpers";
 
 test.describe("출시 필수 기능", () => {
   test("없는 주소는 한국어 안내를 보여주고, 응답에 보안 헤더가 붙으며, 글꼴을 외부에서 받지 않는다", async ({ browser }) => {
@@ -51,11 +51,13 @@ test.describe("출시 필수 기능", () => {
 
     await page.goto("/signup");
     await page.fill("#name", "동의회원");
-    await page.fill("#email", uniqueEmail("consent2"));
+    const agreed = uniqueEmail("consent2");
+    await page.fill("#email", agreed);
     await page.fill("#password", PASSWORD);
     await page.fill("#confirmPassword", PASSWORD);
     await agreeAll(page);
     await page.getByRole("button", { name: "가입하기" }).click();
+    await confirmEmail(page, agreed);
     await page.waitForURL(/\/(home|trainer)/);
     await context.close();
   });
@@ -166,6 +168,7 @@ test.describe("출시 필수 기능", () => {
     await page.fill("#password", PASSWORD);
     await page.fill("#confirmPassword", PASSWORD);
     await page.getByRole("button", { name: "가입하기" }).click();
+    await confirmEmail(page, email);
     await page.waitForURL("**/trainer");
     await context.close();
   });
@@ -235,6 +238,7 @@ test.describe("출시 필수 기능", () => {
     await page.fill("#confirmPassword", password);
     await agreeAll(page);
     await page.getByRole("button", { name: "가입하기" }).click();
+    await confirmEmail(page, email, password);
     await page.waitForURL("**/home");
 
     await page.context().clearCookies();

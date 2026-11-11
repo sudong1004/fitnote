@@ -51,6 +51,7 @@ export const getCurrentUser = cache(async () => {
           name: true,
           profileImageUrl: true,
           status: true,
+          emailVerifiedAt: true,
 
           trainerProfile: {
             select: {
@@ -69,7 +70,12 @@ export const getCurrentUser = cache(async () => {
     },
   });
 
-  if (!authSession || authSession.user.status !== "ACTIVE") {
+  // 이메일 인증 전에는 로그인(세션)을 만들지 않지만, 여기서도 한 번 더 본다.
+  if (
+    !authSession ||
+    authSession.user.status !== "ACTIVE" ||
+    !authSession.user.emailVerifiedAt
+  ) {
     return null;
   }
 
