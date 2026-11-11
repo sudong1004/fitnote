@@ -129,7 +129,43 @@ export function kstDateToUtc(dateKey: string) {
   if (!DATE_KEY.test(dateKey)) return null;
 
   const date = new Date(`${dateKey}T00:00:00+09:00`);
-  return Number.isNaN(date.getTime()) ? null : date;
+  if (Number.isNaN(date.getTime())) return null;
+
+  // 2월 31일 같은 없는 날은 엔진이 3월 3일로 넘겨 읽는다. 적은 날과 다르면 받지 않는다.
+  return toKstDateKey(date) === dateKey ? date : null;
+}
+
+/**
+ * 우리가 다루는 날짜의 범위.
+ *
+ * 주소나 폼으로 0001년, 9999년 같은 값이 들어오면 달력과 그래프가 깨지거나 DB 가
+ * 거절한다. 실제로 쓸 일이 없는 범위는 처음부터 받지 않는다.
+ */
+export const MIN_DATE_KEY = "2000-01-01";
+export const MAX_DATE_KEY = "2100-12-31";
+
+/** 실제로 있는 날이고 2000~2100년 안인가. */
+export function isDateKey(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    kstDateToUtc(value) !== null &&
+    value >= MIN_DATE_KEY &&
+    value <= MAX_DATE_KEY
+  );
+}
+
+/** 오늘(KST)까지의 날인가. 지난 일을 적는 폼이 쓴다. */
+export function isPastOrTodayKey(value: unknown): value is string {
+  return isDateKey(value) && value <= toKstDateKey(new Date());
+}
+
+/** YYYY-MM 이 실제로 있는 달이고 2000~2100년 안인가. */
+export function isMonthKey(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^\d{4}-(0[1-9]|1[0-2])$/.test(value) &&
+    isDateKey(`${value}-01`)
+  );
 }
 
 /** 폼에서 온 "2026-09-08" + "19:00" 을 KST 시각으로 읽는다. */

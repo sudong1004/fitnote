@@ -8,7 +8,12 @@ import {
 } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import { requireTrainerProfile } from "@/server/trainers/trainer.service";
-import { addRecords, getSessionById } from "@/server/workouts/workout.service";
+import {
+  addRecords,
+  getLastRecord,
+  getSessionById,
+  getTrainerReferenceScope,
+} from "@/server/workouts/workout.service";
 
 import { lockPTSession } from "./pt-session-lock";
 import { PTError } from "./pt.service";
@@ -228,6 +233,35 @@ export async function getSessionWorkout(userId: string, ptSessionId: string) {
   if (!session.workoutSession) return null;
 
   return getSessionById(userId, session.workoutSession.id);
+}
+
+/**
+ * 수업 기록 화면에서 운동마다 보여 줄 "지난번" 값.
+ *
+ * 무엇까지 참고해도 되는지는 화면이 아니라 여기서 정한다(`getTrainerReferenceScope`).
+ * `ptOnly` 는 화면이 "PT 기록만 참고한다" 고 안내할 때 쓴다.
+ */
+export async function getSessionHints(
+  userId: string,
+  ptSessionId: string,
+  exerciseIds: string[],
+) {
+  const { trainer, session } = await requireMySession(userId, ptSessionId);
+
+  const scope = await getTrainerReferenceScope(session.memberUserId, trainer.id);
+
+  const records = await Promise.all(
+    exerciseIds.map((exerciseId) =>
+      getLastRecord(
+        session.memberUserId,
+        exerciseId,
+        session.workoutSession?.id,
+        scope,
+      ),
+    ),
+  );
+
+  return { ptOnly: scope.ptOnly, records };
 }
 
 /**

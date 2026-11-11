@@ -5,6 +5,8 @@ import type { WorkoutBodyPart } from "@/generated/prisma/enums";
 import { kstDaysAgo, kstMonthRange, toKstDateKey } from "@/lib/date";
 import { prisma } from "@/lib/prisma";
 
+import { getTrainerReferenceScope } from "@/server/workouts/workout.service";
+
 import { requireMyMember, requireTrainerProfile } from "./trainer-shared";
 
 export interface MemberStats {
@@ -23,20 +25,27 @@ export interface MemberStats {
  *
  * DB 에 새로 쌓는 값이 아니라 이미 있는 수업·운동 기록에서 그때그때 센다.
  *
- * 개인 운동은 회원이 공유를 켰을 때만 센다. 끈 회원의 개인 운동까지 부위 그림에
- * 섞으면 공유하지 않은 기록이 숫자로 새어 나간다. PT 수업 기록은 트레이너가 직접
- * 적은 것이라 늘 센다.
+ * 개인 운동은 회원이 공유를 켰을 때만, 관계가 시작된 날 이후 것만 센다. 끈 회원의
+ * 개인 운동까지 부위 그림에 섞으면 공유하지 않은 기록이 숫자로 새어 나간다. 공유
+ * 여부는 부르는 쪽이 넘기지 않고 여기서 읽는다. PT 수업 기록은 이 트레이너가 직접
+ * 적은 것만 센다. 회원이 다른 트레이너와 한 수업은 이 화면의 숫자가 아니다.
  */
 export async function getMemberStats(
   userId: string,
   connectionId: string,
-  includePersonal: boolean,
 ): Promise<MemberStats> {
   const trainer = await requireTrainerProfile(userId);
   const connection = await requireMyMember(trainer.id, connectionId);
   const memberUserId = connection.memberUserId;
 
+  const scope = await getTrainerReferenceScope(memberUserId, trainer.id);
+  const includePersonal = !scope.ptOnly;
+  const since = connection.startedAt;
+
   const { start: monthStart } = kstMonthRange(toKstDateKey(new Date()).slice(0, 7));
+  const fourWeeksAgo = kstDaysAgo(27);
+  const later = (a: Date, b: Date) => (a.getTime() > b.getTime() ? a : b);
+  const mine = { ptSession: { is: { trainerProfileId: trainer.id } } };
 
   const [statusCounts, sets, personalThisMonth] = await Promise.all([
     prisma.pTSession.groupBy({
@@ -54,8 +63,17 @@ export async function getMemberStats(
           session: {
             userId: memberUserId,
             status: { not: WorkoutSessionStatus.CANCELLED },
-            startedAt: { gte: kstDaysAgo(27) },
-            ...(includePersonal ? {} : { ptSessionId: { not: null } }),
+            ...(includePersonal
+              ? {
+                  OR: [
+                    { ...mine, startedAt: { gte: fourWeeksAgo } },
+                    {
+                      ptSessionId: null,
+                      startedAt: { gte: later(fourWeeksAgo, since) },
+                    },
+                  ],
+                }
+              : { ...mine, startedAt: { gte: fourWeeksAgo } }),
           },
         },
       },
@@ -67,7 +85,7 @@ export async function getMemberStats(
             userId: memberUserId,
             ptSessionId: null,
             status: { not: WorkoutSessionStatus.CANCELLED },
-            startedAt: { gte: monthStart },
+            startedAt: { gte: later(monthStart, since) },
           },
         })
       : Promise.resolve(null),

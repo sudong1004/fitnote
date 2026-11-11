@@ -5,9 +5,12 @@ import {
   cancelSession,
   completeSession,
   createContract,
+  listSchedulableContracts,
   reopenSession,
+  rescheduleSession,
   scheduleSession,
 } from "@/server/pt/pt.service";
+import { endConnection } from "@/server/trainers/connection.service";
 import { getNextSessionPlan } from "@/server/pt/next-session.service";
 
 import { makeContract } from "./helpers";
@@ -137,6 +140,48 @@ describe("수업 잡기", () => {
     ).map((s) => s.sessionNumber);
 
     expect(numbers).toEqual([1, 2, 3, 4, 5]);
+  });
+});
+
+describe("연결이 끝난 회원", () => {
+  it("새 수업을 잡거나 시간을 옮길 수 없고, 남은 수업을 정리하는 것은 된다", async () => {
+    const { trainer, member, contractId } = await makeContract(5, createContract);
+
+    const first = await book(trainer.userId, contractId, 1);
+    const second = await book(trainer.userId, contractId, 2);
+
+    expect(
+      (await listSchedulableContracts(trainer.userId)).map((row) => row.id),
+    ).toContain(contractId);
+
+    await endConnection(member.memberUserId, member.connectionId);
+
+    await expect(book(trainer.userId, contractId, 3)).rejects.toMatchObject({
+      code: "MEMBER_ENDED",
+    });
+    await expect(
+      rescheduleSession(trainer.userId, {
+        sessionId: first.id,
+        scheduledAt: when(5),
+        movedBy: "TRAINER",
+      }),
+    ).rejects.toMatchObject({ code: "MEMBER_ENDED" });
+
+    // 수업을 잡는 서랍의 목록에서도 빠진다.
+    expect(
+      (await listSchedulableContracts(trainer.userId)).map((row) => row.id),
+    ).not.toContain(contractId);
+
+    // 이미 잡혀 있던 수업은 완료·취소로 닫을 수 있다.
+    await completeSession(trainer.userId, first.id);
+    await cancelSession(trainer.userId, second.id, { cancelledBy: "TRAINER" });
+
+    expect((await contractOf(contractId)).usedSessions).toBe(1);
+    expect(
+      await prisma.pTSession.count({
+        where: { contractId, status: "SCHEDULED" },
+      }),
+    ).toBe(0);
   });
 });
 

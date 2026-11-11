@@ -12,6 +12,7 @@ export type PTFail =
   | "contract_closed"
   | "session_closed"
   | "no_sessions_left"
+  | "member_ended"
   | "unknown";
 
 export const PT_ERROR_MESSAGE: Record<PTFail, string> = {
@@ -20,6 +21,7 @@ export const PT_ERROR_MESSAGE: Record<PTFail, string> = {
   contract_closed: "진행 중인 계약이 아니에요.",
   session_closed: "이미 처리한 수업이에요. 되돌린 뒤에 다시 해주세요.",
   no_sessions_left: "남은 횟수가 없어요.",
+  member_ended: "연결이 끝난 회원이에요. 다시 연결한 뒤에 수업을 잡을 수 있어요.",
   unknown: "처리하지 못했어요. 잠시 후 다시 시도해주세요.",
 };
 

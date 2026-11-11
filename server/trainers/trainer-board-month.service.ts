@@ -1,7 +1,7 @@
 import "server-only";
 
 import { PTSessionStatus } from "@/generated/prisma/enums";
-import { toKstDateKey } from "@/lib/date";
+import { isDateKey, toKstDateKey } from "@/lib/date";
 import { prisma } from "@/lib/prisma";
 import { requireTrainerProfile } from "./trainer.service";
 import { shiftDateKey, kstRange } from "./trainer-board-shared";
@@ -29,8 +29,8 @@ export async function getTrainerMonth(
   const trainer = await requireTrainerProfile(userId);
   const todayDateKey = toKstDateKey(new Date());
 
-  const selected =
-    dateKey && /^\d{4}-\d{2}-\d{2}$/.test(dateKey) ? dateKey : todayDateKey;
+  // 주소로 들어오는 값이다. 없는 날이나 범위 밖의 해는 오늘로 돌린다.
+  const selected = isDateKey(dateKey) ? dateKey : todayDateKey;
 
   const [year, month] = selected.split("-").map(Number);
   const monthStartDateKey = `${year}-${String(month).padStart(2, "0")}-01`;

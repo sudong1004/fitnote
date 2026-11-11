@@ -21,4 +21,17 @@ describe("SetInputSchema", () => {
   ])("%s 는 거절한다", (_label, input) => {
     expect(SetInputSchema.safeParse(input).success).toBe(false);
   });
+
+  it("숫자 자리에 글자가 오면 한국어로 알려 준다", () => {
+    const parsed = SetInputSchema.safeParse({ weight: "abc" });
+
+    expect(parsed.success).toBe(false);
+    expect(parsed.error?.issues[0]?.message).toBe("숫자로 입력해주세요.");
+  });
+
+  it("저장할 수 없는 글자(NUL)는 메모에서 뺀다", () => {
+    const parsed = SetInputSchema.safeParse({ note: "무릎\u0000 조심" });
+
+    expect(parsed.success && parsed.data.note).toBe("무릎 조심");
+  });
 });

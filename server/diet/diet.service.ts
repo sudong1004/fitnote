@@ -3,13 +3,14 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 
 import { DietMealType } from "@/generated/prisma/enums";
-import { kstStartOfDay, toKstDateKey } from "@/lib/date";
+import { isPastOrTodayKey, kstStartOfDay, toKstDateKey } from "@/lib/date";
 import { prisma } from "@/lib/prisma";
 import {
   createSignedReadUrls,
   createSignedUpload,
   removeObjects,
 } from "@/lib/storage";
+import { cleanText } from "@/lib/text";
 
 /**
  * 회원이 올리는 식단.
@@ -44,7 +45,7 @@ const ALLOWED_MIME = ["image/webp", "image/jpeg", "image/png"];
 
 export class DietError extends Error {
   constructor(
-    readonly code: "NOT_FOUND" | "INVALID" | "EMPTY",
+    readonly code: "NOT_FOUND" | "INVALID" | "INVALID_DATE" | "EMPTY",
     message: string,
   ) {
     super(message);
@@ -58,13 +59,13 @@ export function parseMealType(value: unknown): DietMealType | null {
     : null;
 }
 
-/** YYYY-MM-DD 인지 보고, 아니면 오늘. 주소로 아무 값이나 들어올 수 있다. */
+/**
+ * 오늘까지의 날짜인지 보고, 아니면 오늘. 주소로 아무 값이나 들어올 수 있다.
+ *
+ * 식단은 먹은 것을 남기는 기록이라 아직 오지 않은 날은 열지 않는다.
+ */
 export function parseDateKey(value: unknown): string {
-  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    const parsed = new Date(`${value}T00:00:00+09:00`);
-    if (!Number.isNaN(parsed.getTime())) return toKstDateKey(parsed);
-  }
-  return toKstDateKey(new Date());
+  return isPastOrTodayKey(value) ? value : toKstDateKey(new Date());
 }
 
 /**
@@ -331,7 +332,7 @@ export async function getDietDetailForTrainer(
 
 function trim(value: unknown, max: number) {
   if (typeof value !== "string") return null;
-  const text = value.trim().slice(0, max);
+  const text = cleanText(value).trim().slice(0, max);
   return text.length > 0 ? text : null;
 }
 
@@ -359,6 +360,11 @@ export interface CreateDietInput {
  * 함께 받는다.
  */
 export async function createDiet(userId: string, input: CreateDietInput) {
+  // 화면은 오늘까지만 열지만 폼은 직접 만들어 보낼 수 있다.
+  if (!isPastOrTodayKey(input.dateKey)) {
+    throw new DietError("INVALID_DATE", "오늘까지의 날짜만 남길 수 있어요.");
+  }
+
   const foodName = trim(input.foodName, MAX_FOOD_NAME);
   const memo = trim(input.memo, MAX_MEMO);
   const imagePath = photoPathOf(userId, input.imagePath);

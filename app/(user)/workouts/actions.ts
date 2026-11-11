@@ -181,13 +181,27 @@ export async function addExerciseToSession(
   );
 }
 
+const MAX_EXERCISES_AT_ONCE = 30;
+
 /** 고른 운동을 한 번에 담는다. */
 export async function addExercisesToSession(
   sessionId: string,
   exerciseIds: string[],
 ) {
+  // 서버 액션 인자는 화면을 거치지 않고도 보낼 수 있다.
+  if (
+    !Array.isArray(exerciseIds) ||
+    exerciseIds.some((id) => typeof id !== "string")
+  ) {
+    return { error: "잘못된 요청입니다." };
+  }
   if (exerciseIds.length === 0) {
     return { error: "운동을 선택해 주세요." };
+  }
+  if (exerciseIds.length > MAX_EXERCISES_AT_ONCE) {
+    return {
+      error: `한 번에 ${MAX_EXERCISES_AT_ONCE}개까지 담을 수 있어요.`,
+    };
   }
 
   return run(sessionId, (userId) => addRecords(userId, sessionId, exerciseIds));

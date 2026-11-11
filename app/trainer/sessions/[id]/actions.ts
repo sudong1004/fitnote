@@ -23,6 +23,15 @@ import {
 } from "@/server/pt/session-record.service";
 import { TrainerError } from "@/server/trainers/trainer.service";
 
+/** 주소에 싣는 실패 코드. 문구는 화면(`messages.ts`)이 고른다. */
+function codeOf(error: unknown) {
+  if (error instanceof PTError || error instanceof TrainerError) {
+    return error.code.toLowerCase();
+  }
+  console.error("session record error:", error);
+  return "unknown";
+}
+
 function messageOf(error: unknown) {
   if (error instanceof PTError || error instanceof TrainerError) {
     return error.message;
@@ -115,9 +124,7 @@ export async function writeJournalAction(
 
   if (!ptSessionId || !connectionId) {
     redirect(
-      `/trainer/sessions/${ptSessionId}?error=${encodeURIComponent(
-        "알림장을 시작할 수 없어요.",
-      )}`,
+      `/trainer/sessions/${ptSessionId}?error=journal`,
     );
   }
 
@@ -131,9 +138,7 @@ export async function writeJournalAction(
     );
   } catch (error) {
     redirect(
-      `/trainer/sessions/${ptSessionId}?error=${encodeURIComponent(
-        messageOf(error),
-      )}`,
+      `/trainer/sessions/${ptSessionId}?error=${codeOf(error)}`,
     );
   }
 
@@ -191,12 +196,12 @@ export async function finishSessionAction(formData: FormData) {
       await reopenSession(user.id, ptSessionId);
     } else {
       redirect(
-        `/trainer/sessions/${ptSessionId}?error=${encodeURIComponent("무엇을 할지 골라 주세요.")}`,
+        `/trainer/sessions/${ptSessionId}?error=pick`,
       );
     }
   } catch (error) {
     redirect(
-      `/trainer/sessions/${ptSessionId}?error=${encodeURIComponent(messageOf(error))}`,
+      `/trainer/sessions/${ptSessionId}?error=${codeOf(error)}`,
     );
   }
 
@@ -226,10 +231,10 @@ export async function scheduleNextSessionAction(formData: FormData) {
   const scheduledAt = kstDateTimeToUtc(date, time);
 
   if (!scheduledAt) {
-    redirect(`${back}?done=complete&nextError=${encodeURIComponent("날짜와 시각을 확인해주세요.")}`);
+    redirect(`${back}?done=complete&nextError=when`);
   }
   if (scheduledAt.getTime() <= Date.now()) {
-    redirect(`${back}?done=complete&nextError=${encodeURIComponent("지난 시각에는 잡을 수 없어요.")}`);
+    redirect(`${back}?done=complete&nextError=past`);
   }
 
   let nextId: string;
@@ -241,7 +246,7 @@ export async function scheduleNextSessionAction(formData: FormData) {
     });
     nextId = next.id;
   } catch (error) {
-    redirect(`${back}?done=complete&nextError=${encodeURIComponent(messageOf(error))}`);
+    redirect(`${back}?done=complete&nextError=${codeOf(error)}`);
   }
 
   revalidatePath("/trainer");

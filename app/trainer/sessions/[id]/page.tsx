@@ -15,19 +15,19 @@ import { getBodyPartCounts } from "@/server/exercises/exercise.service";
 import { PTError, SESSION_STATUS_LABEL } from "@/server/pt/pt.service";
 import {
   getSessionBriefing,
+  getSessionHints,
   getSessionRecord,
   getSessionWorkout,
 } from "@/server/pt/session-record.service";
 import { getNextSessionPlan } from "@/server/pt/next-session.service";
-import { getSharingForTrainer } from "@/server/sharing/sharing.service";
 import { TrainerError } from "@/server/trainers/trainer.service";
 import { getFavoriteExerciseIds } from "@/server/workouts/favorite.service";
-import { getLastRecord } from "@/server/workouts/workout.service";
 
 import { AddExerciseDrawer } from "@/app/(user)/workouts/[id]/add-exercise-drawer";
 import { RecordList } from "@/app/(user)/workouts/[id]/record-list";
 
 import { Briefing } from "./briefing";
+import { sessionErrorMessage } from "./messages";
 import { ClearWorkoutButton } from "./clear-workout-button";
 import {
   FinishSessionPanel,
@@ -91,25 +91,15 @@ export default async function SessionRecordPage({
    */
   const briefing = cancelled ? null : await getSessionBriefing(user.id, id);
 
-  /*
-   * 회원의 개인 운동 공유 설정.
-   *
-   * 개인 운동 공유가 꺼져 있으면
-   * 이전 기록에서도 PT 기록만 사용한다.
-   */
-  const sharing = session.connectionId
-    ? await getSharingForTrainer(user.id, session.connectionId)
-    : {
-        sharePersonalWorkout: false,
-      };
-
-  const [previousRecords, bodyPartCounts, favoriteIds] = await Promise.all([
-    Promise.all(
-      (workout?.records ?? []).map((record) =>
-        getLastRecord(session.memberUserId, record.exercise.id, workout!.id, {
-          ptOnly: !sharing.sharePersonalWorkout,
-        }),
-      ),
+  const [hints, bodyPartCounts, favoriteIds] = await Promise.all([
+    /*
+     * 운동마다 붙일 지난 기록. 회원의 공유 설정과 관계가 시작된 날을 보고
+     * 무엇까지 참고할지는 서비스가 정한다.
+     */
+    getSessionHints(
+      user.id,
+      id,
+      (workout?.records ?? []).map((record) => record.exercise.id),
     ),
 
     workout ? getBodyPartCounts() : Promise.resolve({}),
@@ -123,6 +113,7 @@ export default async function SessionRecordPage({
   ]);
 
   const remaining = Math.max(session.totalSessions - session.usedSessions, 0);
+  const errorMessage = sessionErrorMessage(query.error);
 
   /*
    * 방금 완료로 마쳤거나(다음 수업 시트) 방금 다음 수업을 잡았을 때(확인 문구)만
@@ -303,11 +294,11 @@ export default async function SessionRecordPage({
         </p>
       ) : null}
 
-      {query.error ? (
+      {errorMessage ? (
         <p className="mt-3 flex items-center gap-1.5 rounded-[0.875rem] bg-status-urgent-bg px-3.5 py-2.5 text-sm font-medium text-status-urgent">
           <AlertCircle className="size-4 shrink-0" aria-hidden />
 
-          {query.error}
+          {errorMessage}
         </p>
       ) : null}
 
@@ -377,7 +368,7 @@ export default async function SessionRecordPage({
                   sessionId={workout.id}
                   records={workout.records}
                   previousRecords={workout.records.map((_, index) => {
-                    const previous = previousRecords[index];
+                    const previous = hints.records[index];
 
                     return previous
                       ? {
@@ -388,7 +379,7 @@ export default async function SessionRecordPage({
                   })}
                   alwaysEditable
                   showCompleteToggle={false}
-                  ptOnly={!sharing.sharePersonalWorkout}
+                  ptOnly={hints.ptOnly}
                 />
               )}
 
@@ -535,7 +526,7 @@ export default async function SessionRecordPage({
           firstDateKey={nextPlan.firstDateKey}
           defaultTime={nextPlan.defaultTime}
           defaultDuration={nextPlan.defaultDuration}
-          error={typeof query.nextError === "string" ? query.nextError : undefined}
+          error={sessionErrorMessage(query.nextError) ?? undefined}
         />
       ) : null}
     </main>

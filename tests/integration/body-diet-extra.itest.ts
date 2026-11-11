@@ -118,6 +118,92 @@ describe("체성분 흐름", () => {
   });
 });
 
+describe("회원 입력 검사", () => {
+  it("체성분: 없는 날·아주 옛날·내일은 거절하고, 어느 칸이 범위 밖인지 알려 준다", async () => {
+    const userId = await makeMember();
+
+    for (const key of ["0001-01-01", "2026-02-31", "zzzz", dateKey(1)]) {
+      await expect(
+        saveBodyRecord(userId, { dateKey: key, weightKg: 70 }),
+      ).rejects.toMatchObject({ code: "INVALID_DATE" });
+    }
+
+    await expect(
+      saveBodyRecord(userId, { dateKey: dateKey(0), bodyFatPercent: 99 }),
+    ).rejects.toMatchObject({ code: "INVALID", field: "body_fat" });
+
+    // 숫자와 소수점만 숫자로 읽는다.
+    for (const weightKg of ["1e2", "0x50", "-70", "70kg"]) {
+      await expect(
+        saveBodyRecord(userId, { dateKey: dateKey(0), weightKg }),
+      ).rejects.toMatchObject({ code: "INVALID", field: "weight" });
+    }
+
+    expect(await prisma.bodyRecord.count({ where: { userId } })).toBe(0);
+  });
+
+  it("체성분: 긴 메모는 300자로 자르고 저장할 수 없는 글자는 뺀다", async () => {
+    const userId = await makeMember();
+
+    const row = await saveBodyRecord(userId, {
+      dateKey: dateKey(0),
+      weightKg: "70.5",
+      memo: `공복\u0000${"가".repeat(500)}`,
+    });
+
+    expect(row.weightKg).toBe(70.5);
+    expect(row.memo).toHaveLength(300);
+    expect(row.memo?.startsWith("공복가")).toBe(true);
+  });
+
+  it("식단: 내일이나 아주 옛날 날짜로는 남길 수 없다", async () => {
+    const userId = await makeMember();
+
+    for (const key of [dateKey(1), "0001-01-01", "2026-02-31"]) {
+      await expect(
+        createDiet(userId, { dateKey: key, mealType: "LUNCH", foodName: "밥" }),
+      ).rejects.toMatchObject({ code: "INVALID_DATE" });
+    }
+
+    expect(await prisma.dietRecord.count({ where: { userId } })).toBe(0);
+  });
+
+  it("식단: 저장할 수 없는 글자는 빼고, 긴 글은 길이 제한 안에서 자른다", async () => {
+    const userId = await makeMember();
+
+    const created = await createDiet(userId, {
+      dateKey: dateKey(0),
+      mealType: "LUNCH",
+      foodName: `현미밥\u0000${"가".repeat(200)}`,
+      memo: "나".repeat(2000),
+    });
+
+    const row = await prisma.dietRecord.findUniqueOrThrow({
+      where: { id: created.id },
+      select: { foodName: true, memo: true },
+    });
+
+    expect(row.foodName).toHaveLength(100);
+    expect(row.foodName?.startsWith("현미밥가")).toBe(true);
+    expect(row.memo).toHaveLength(500);
+  });
+
+  it("식단: 이미 지운 기록을 다시 지우면 없는 것으로 답한다", async () => {
+    const userId = await makeMember();
+
+    const created = await createDiet(userId, {
+      dateKey: dateKey(0),
+      mealType: "LUNCH",
+      foodName: "밥",
+    });
+
+    await deleteDiet(userId, created.id);
+    await expect(deleteDiet(userId, created.id)).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
+  });
+});
+
 describe("체성분 목표", () => {
   it("시작값은 그 시점의 가장 최근 값이다", async () => {
     const userId = await makeMember();
@@ -206,9 +292,23 @@ describe("체성분 목표", () => {
         targetValue: 70,
         targetDate: "not-a-date",
       }),
-    ).rejects.toMatchObject({ code: "INVALID" });
+    ).rejects.toMatchObject({ code: "INVALID_DATE" });
+
+    // 엔진이 날짜로 읽어 주는 값, 지난 날, 터무니없이 먼 날도 받지 않는다.
+    for (const targetDate of ["zzzz", dateKey(-1), "9999-12-31", "0000-01-01"]) {
+      await expect(
+        setGoal(userId, { type: "WEIGHT", targetValue: 70, targetDate }),
+      ).rejects.toMatchObject({ code: "INVALID_DATE" });
+    }
 
     expect(await prisma.goal.count({ where: { userId } })).toBe(0);
+
+    await setGoal(userId, {
+      type: "WEIGHT",
+      targetValue: 70,
+      targetDate: dateKey(0),
+    });
+    expect(await prisma.goal.count({ where: { userId } })).toBe(1);
   });
 
   it("남의 목표는 취소하지 못한다", async () => {

@@ -5,7 +5,13 @@ import {
   WorkoutEntryMode,
   WorkoutSessionStatus,
 } from "@/generated/prisma/enums";
-import { kstDaysAgo, kstMonthRange, toKstDateKey } from "@/lib/date";
+import {
+  isDateKey,
+  kstDateToUtc,
+  kstDaysAgo,
+  kstMonthRange,
+  toKstDateKey,
+} from "@/lib/date";
 import { prisma } from "@/lib/prisma";
 import {
   WorkoutError,
@@ -543,13 +549,10 @@ export async function openManualSession(
   dateKey: string,
   options: { recordedByUserId?: string } = {},
 ) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) {
-    throw new WorkoutError("INVALID_DATE", "날짜 형식이 올바르지 않습니다.");
-  }
+  // 없는 날(2월 31일)이나 0001년 같은 값은 받지 않는다.
+  const startedAt = isDateKey(dateKey) ? kstDateToUtc(dateKey) : null;
 
-  const startedAt = new Date(`${dateKey}T00:00:00+09:00`);
-
-  if (Number.isNaN(startedAt.getTime())) {
+  if (!startedAt) {
     throw new WorkoutError("INVALID_DATE", "날짜 형식이 올바르지 않습니다.");
   }
 
