@@ -38,7 +38,7 @@ http://localhost:3000 에서 확인한다. 패키지 매니저는 **npm** 이다
 | `FCM_PROJECT_ID` · `FCM_CLIENT_EMAIL` · `FCM_PRIVATE_KEY` | 푸시 알림 (선택) | 세 값이 모두 있어야 켜진다. 서버 전용 |
 | `APP_URL`                   | 푸시·메일(인증, 재설정) 링크의 앞부분 (운영 필수) | `https://도메인` 처럼 끝에 `/` 없이               |
 | `SMTP_USER` · `SMTP_PASS`   | 가입 인증·비밀번호 재설정 메일 (운영 필수, 없으면 가입 불가) | Gmail 앱 비밀번호. 또는 `RESEND_API_KEY` + `MAIL_FROM` |
-| `NEXT_PUBLIC_SENTRY_DSN`    | 오류 수집(Sentry). 없으면 보내지 않는다 (선택) | Vercel 의 Sentry 연결이 `SENTRY_ORG`·`SENTRY_PROJECT`·`SENTRY_AUTH_TOKEN` 과 함께 넣어 준다 |
+| `NEXT_PUBLIC_SENTRY_DSN`    | 오류 수집(Sentry). 없으면 보내지 않는다 (선택) | DSN 만 있으면 된다. `SENTRY_ORG`·`SENTRY_PROJECT`·`SENTRY_AUTH_TOKEN` 은 소스맵을 올릴 때만 넣는다 |
 
 `DATABASE_URL` 과 `SESSION_SECRET` 이 없으면 빌드가 실패한다 (모듈 로드 시점에 검사).
 사진 버킷은 새 환경에서 한 번만 만든다: `npx tsx --conditions=react-server scripts/setup-storage.mts`

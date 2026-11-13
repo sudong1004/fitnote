@@ -2495,7 +2495,7 @@ E2E 44개(+3 `input-checks.spec.ts`, `next-session.spec.ts` 에 주소 문구·�
 
 #### 오류 수집 (Sentry, 2026-11-13)
 
-운영에서 난 오류를 Vercel 로그에서 찾지 않고 한곳에서 보게 했다. Vercel Marketplace 의 Sentry 를 쓴다.
+운영에서 난 오류를 Vercel 로그에서 찾지 않고 한곳에서 보게 했다. Sentry 를 쓴다. Vercel Marketplace 연동은 약관 동의 단계에서 "Missing billingPlanId" 오류가 반복돼(CLI·대시보드 모두) sentry.io 에 직접 가입해 DSN 만 Vercel 환경변수 `NEXT_PUBLIC_SENTRY_DSN`(운영·프리뷰, 공개 값)에 넣었다. 소스맵 올리기(`SENTRY_AUTH_TOKEN` 등)는 아직 연결하지 않았다. 2026-11-13 운영에 반영.
 
 - 모으는 것: 브라우저 오류(`instrumentation-client.ts`, 오류 화면 `error-screen.tsx`·`global-error.tsx`),
   잡히지 않은 서버 오류(`instrumentation.ts` 의 `onRequestError`), 서버가 `console.error` 로 남긴 것.

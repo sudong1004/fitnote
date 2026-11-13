@@ -16,7 +16,7 @@
 | 사진 저장 | Supabase Storage (비공개 버킷) | 서버에서 service role 로 올리고 서명 주소로 노출 |
 | 푸시 | Firebase Cloud Messaging (HTTP v1) + 웹 푸시 서비스 워커 | 홈 화면에 추가한 PWA 에서만 수신 |
 | 이메일 | `nodemailer` + SMTP (가입 이메일 인증, 비밀번호 재설정) | 지금은 Gmail SMTP, 발송 한도 있음 |
-| 오류 수집 | Sentry (`@sentry/nextjs` 11, Vercel Marketplace 로 연결) | 오류만 모은다. 성능 추적·화면 녹화는 쓰지 않는다. 설정은 `lib/sentry.ts` |
+| 오류 수집 | Sentry (`@sentry/nextjs` 11, sentry.io 에 직접 가입한 무료 Developer 플랜) | 오류만 모은다. 성능 추적·화면 녹화는 쓰지 않는다. 설정은 `lib/sentry.ts` |
 | 배포 | Vercel (리전 `hnd1`, 도쿄) | 현재 Hobby 플랜. 유료화 전 Pro 로 |
 | 정기 작업 | Vercel Cron `0 0 * * *` (UTC, 한국 09:00) | `/api/cron/reminders`, `CRON_SECRET` Bearer |
 | 보안 헤더 | `next.config.ts` 의 `headers()` | `X-Frame-Options`·`frame-ancestors`, `nosniff`, `Referrer-Policy`. HSTS 는 Vercel |
@@ -70,7 +70,7 @@ docs/               PROGRESS.md, spec/
 | `MAIL_OUTBOX_URL` | 자동 테스트 전용. 메일을 보내는 대신 이 주소(`http://localhost:…` 만 받음)로 넘긴다. `e2e/server.mjs` 가 넣는다 | 쓰지 않음 |
 | `CRON_SECRET` | cron 호출 보호. 없으면 항상 401 | 필수(알림용) |
 | `NEXT_PUBLIC_SENTRY_DSN` | 오류를 보낼 Sentry 주소(공개 값). 없으면 아무것도 보내지 않는다 | 선택(운영 권장) |
-| `SENTRY_ORG` `SENTRY_PROJECT` `SENTRY_AUTH_TOKEN` | 빌드할 때 소스맵을 Sentry 에 올린다. 없으면 올리지 않고 넘어간다. Vercel 의 Sentry 연결이 넣어 준다 | 선택 |
+| `SENTRY_ORG` `SENTRY_PROJECT` `SENTRY_AUTH_TOKEN` | 빌드할 때 소스맵을 Sentry 에 올린다. 없으면 올리지 않고 넘어간다. 소스맵을 올릴 때만 넣는다(지금은 넣지 않음) | 선택 |
 
 ## 5. 외부 서비스
 
