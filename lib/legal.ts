@@ -6,8 +6,8 @@
  *
  * 출시 전에 아래 [ ] 칸을 실제 값으로 채워야 한다.
  */
-export const TERMS_VERSION = "2026-11-03";
-export const TERMS_EFFECTIVE_LABEL = "2026년 11월 3일";
+export const TERMS_VERSION = "2026-11-13";
+export const TERMS_EFFECTIVE_LABEL = "2026년 11월 13일";
 
 export const OPERATOR = {
   /** 개인이면 이름, 사업자면 상호 */

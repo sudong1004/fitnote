@@ -4,7 +4,7 @@
 
 | 층 | 위치 | 실행 | 비고 |
 | --- | --- | --- | --- |
-| 단위 | `tests/*.test.ts` (vitest) | `npm test` | 스키마·계산 |
+| 단위 | `tests/*.test.ts` (vitest) | `npm test` | 스키마·계산, 오류 수집으로 보내기 전에 지우는 값(`sentry-scrub`) |
 | 통합 | `tests/integration/*.itest.ts` | `npm run test:integration` | 임시 Postgres 를 띄움. 운영 DB 는 건드리지 않음 |
 | E2E | `e2e/*.spec.ts` (Playwright, Chromium) | `npm run test:e2e` | 실제 화면. 아이폰 Safari 는 포함되지 않음 |
 
