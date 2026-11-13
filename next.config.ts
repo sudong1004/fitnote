@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 
 /**
@@ -22,4 +23,18 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+/**
+ * 오류 수집(Sentry). 빌드할 때 소스맵을 올려서, 오류가 난 위치를 원래 코드의 줄로 보여 준다.
+ * SENTRY_AUTH_TOKEN 이 없으면(로컬, CI) 올리지 않고 넘어간다. 올린 소스맵은 배포물에서 지운다.
+ */
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: true,
+  telemetry: false,
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+    deleteSourcemapsAfterUpload: true,
+  },
+});

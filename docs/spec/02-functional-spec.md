@@ -247,5 +247,5 @@ SCHEDULED ──미루기──▶ SCHEDULED  (시각만 변경, 이력 `PTSessi
 
 ## 9. 법적·운영
 
-- `/terms`, `/privacy`: 로그인 없이 열리고, 로그인한 채로도 머무를 수 있다. 판 번호(`TERMS_VERSION`)를 고치면 이후 가입자에게 새 판이 기록된다
+- `/terms`, `/privacy`: 로그인 없이 열리고, 로그인한 채로도 머무를 수 있다. 판 번호(`TERMS_VERSION`)를 고치면 이후 가입자에게 새 판이 기록된다. 지금 판은 2026-11-13(맡기는 곳에 오류 수집 Sentry 추가, 메일 발송처를 실제와 같게 Google 로 고침)
 - 운영자·문의처는 `lib/legal.ts` 의 `OPERATOR` — 지금은 개인 명의다

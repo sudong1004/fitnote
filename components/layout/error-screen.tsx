@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 
+import * as Sentry from "@sentry/nextjs";
 import { TriangleAlert } from "lucide-react";
 
 import {
@@ -28,6 +29,7 @@ export function ErrorScreen({
 }) {
   useEffect(() => {
     console.error(error);
+    Sentry.captureException(error);
   }, [error]);
 
   const digest =

@@ -69,8 +69,8 @@ export default function PrivacyPage() {
           <tbody>
             <tr><td>Vercel Inc.(미국, 서버는 일본 도쿄)</td><td>서비스 서버 운영</td><td>서비스 이용 중 오가는 모든 정보</td></tr>
             <tr><td>Supabase Inc.(미국, 저장은 일본 도쿄)</td><td>데이터베이스·사진 저장</td><td>1번의 모든 정보</td></tr>
-            <tr><td>Google LLC(미국)</td><td>푸시 알림 발송(Firebase Cloud Messaging)</td><td>기기 토큰, 알림 문구</td></tr>
-            <tr><td>Resend Inc.(미국)</td><td>비밀번호 재설정 메일 발송</td><td>이메일 주소</td></tr>
+            <tr><td>Google LLC(미국)</td><td>푸시 알림 발송(Firebase Cloud Messaging), 가입 인증·비밀번호 재설정 메일 발송(Gmail)</td><td>기기 토큰, 알림 문구, 이메일 주소</td></tr>
+            <tr><td>Functional Software, Inc.(Sentry, 미국)</td><td>오류 기록 수집</td><td>오류 내용, 오류가 난 화면의 경로, 브라우저·기기 종류. 적은 내용이나 이름·이메일은 보내지 않습니다</td></tr>
           </tbody>
         </table>
         <p>

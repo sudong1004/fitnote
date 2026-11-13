@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import * as Sentry from "@sentry/nextjs";
+
 /**
  * 루트 레이아웃 자체가 실패했을 때의 마지막 화면.
  *
@@ -17,6 +19,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error(error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (
