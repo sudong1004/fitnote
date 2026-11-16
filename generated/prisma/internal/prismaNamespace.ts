@@ -4076,6 +4076,7 @@ export const ExerciseScalarFieldEnum = {
   thumbnailUrl: 'thumbnailUrl',
   isSystem: 'isSystem',
   isActive: 'isActive',
+  createdByUserId: 'createdByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

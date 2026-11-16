@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
+import { usableBy } from "@/server/exercises/exercise-access";
 
 /**
  * 자주 하는 운동 즐겨찾기.
@@ -31,7 +32,7 @@ export async function toggleFavorite(userId: string, exerciseId: string) {
 
   // 없는 운동을 즐겨찾기에 넣지 않는다.
   const exercise = await prisma.exercise.findFirst({
-    where: { id: exerciseId, isActive: true },
+    where: { id: exerciseId, ...usableBy(userId) },
     select: { id: true },
   });
 
@@ -70,7 +71,7 @@ export async function setFavorite(
 
   // 없는 운동을 즐겨찾기에 넣지 않는다.
   const exercise = await prisma.exercise.findFirst({
-    where: { id: exerciseId, isActive: true },
+    where: { id: exerciseId, ...usableBy(userId) },
     select: { id: true },
   });
 

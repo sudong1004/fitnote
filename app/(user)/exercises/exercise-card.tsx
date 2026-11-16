@@ -18,6 +18,8 @@ export interface ExerciseCardData {
   targetMuscle: string | null;
   movementType: keyof typeof MOVEMENT_TYPE_LABEL;
   difficulty: keyof typeof DIFFICULTY_LABEL;
+  /** 직접 만든 운동. 난이도·동작 유형은 자리표시 값이라 보여 주지 않는다. */
+  isCustom?: boolean;
   equipment: { id: string; name: string; isPrimary: boolean }[];
 }
 
@@ -49,19 +51,25 @@ export function ExerciseCard({
       <span className="min-w-0 flex-1">
         <span className="flex min-w-0 items-center gap-1.5">
           <span className="min-w-0 truncate text-sm font-bold">{exercise.name}</span>
-          <span
-            className={cn(
-              "shrink-0 rounded-full px-1.5 text-[0.6875rem] leading-[1.125rem] font-bold",
-              DIFFICULTY_BADGE[exercise.difficulty],
-            )}
-          >
-            {DIFFICULTY_LABEL[exercise.difficulty]}
-          </span>
+          {exercise.isCustom ? (
+            <span className="shrink-0 rounded-full border border-brand px-1.5 text-[0.6875rem] leading-4 font-bold text-primary">
+              내 운동
+            </span>
+          ) : (
+            <span
+              className={cn(
+                "shrink-0 rounded-full px-1.5 text-[0.6875rem] leading-[1.125rem] font-bold",
+                DIFFICULTY_BADGE[exercise.difficulty],
+              )}
+            >
+              {DIFFICULTY_LABEL[exercise.difficulty]}
+            </span>
+          )}
         </span>
         <span className="mt-0.5 block truncate text-xs text-muted-foreground">
           {[
             exercise.targetMuscle ?? BODY_PART_LABEL[exercise.bodyPart],
-            MOVEMENT_TYPE_LABEL[exercise.movementType],
+            exercise.isCustom ? null : MOVEMENT_TYPE_LABEL[exercise.movementType],
             primary?.name,
           ]
             .filter(Boolean)

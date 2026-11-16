@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/app/lib/dal";
+import type { WorkoutBodyPart } from "@/generated/prisma/enums";
+import {
+  createCustomExercise,
+  deleteCustomExercise,
+  updateCustomExercise,
+} from "@/server/exercises/custom-exercise.service";
 import { setFavorite } from "@/server/workouts/favorite.service";
 import {
   addRecord,
@@ -63,4 +69,72 @@ export async function toggleFavorite(formData: FormData) {
 
   revalidatePath(`/exercises/${exerciseId}`);
   revalidatePath("/exercises");
+}
+
+// ---------------------------------------------------------------------------
+// 직접 만드는 운동
+// ---------------------------------------------------------------------------
+
+export type ExerciseFormState = { message?: string } | undefined;
+
+const field = (formData: FormData, key: string) => String(formData.get(key) ?? "");
+
+/**
+ * 운동 선택창에서 바로 만든다.
+ *
+ * 찾는 운동이 없을 때 지금 하던 기록을 떠나지 않고 만들 수 있어야 해서, 화면을 옮기지 않고 결과만
+ * 돌려준다. 이름과 부위만 받는다(나머지는 나중에 수정 화면에서).
+ */
+export async function createExerciseInline(input: {
+  name: string;
+  bodyPart: WorkoutBodyPart;
+}): Promise<
+  | { error: string; exercise?: undefined }
+  | { error: null; exercise: { id: string; name: string; bodyPart: WorkoutBodyPart } }
+> {
+  const user = await requireUser();
+  const result = await createCustomExercise(user.id, {
+    name: String(input?.name ?? ""),
+    bodyPart: input?.bodyPart,
+  });
+
+  if (!result.ok) return { error: result.message };
+
+  revalidatePath("/exercises");
+  return { error: null, exercise: result.exercise };
+}
+
+/** 운동 만들기·수정 화면의 저장. `id` 가 있으면 수정, 없으면 새로 만든다. */
+export async function saveExercise(
+  _state: ExerciseFormState,
+  formData: FormData,
+): Promise<ExerciseFormState> {
+  const user = await requireUser();
+  const id = field(formData, "id");
+
+  const input = {
+    name: field(formData, "name"),
+    bodyPart: field(formData, "bodyPart"),
+    targetMuscle: field(formData, "targetMuscle"),
+    description: field(formData, "description"),
+  };
+
+  const result = id
+    ? await updateCustomExercise(user.id, id, input)
+    : await createCustomExercise(user.id, input);
+
+  if (!result.ok) return { message: result.message };
+
+  revalidatePath("/exercises");
+  revalidatePath(`/exercises/${result.exercise.id}`);
+  redirect(`/exercises/${result.exercise.id}`);
+}
+
+export async function removeExercise(formData: FormData) {
+  const user = await requireUser();
+
+  await deleteCustomExercise(user.id, field(formData, "exerciseId"));
+
+  revalidatePath("/exercises");
+  redirect("/exercises?custom=1");
 }

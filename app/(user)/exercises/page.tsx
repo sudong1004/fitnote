@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { Plus } from "lucide-react";
+
 import { requireUser } from "@/app/lib/dal";
 import {
   BODY_PART_LABEL,
@@ -48,9 +50,12 @@ export default async function ExercisesPage({
   const difficulty = pickEnum(DIFFICULTY_LABEL, params.difficulty);
   const movementType = pickEnum(MOVEMENT_TYPE_LABEL, params.movementType);
   const favoriteOnly = params.favorite === "1";
+  const customOnly = !favoriteOnly && params.custom === "1";
   const page = toPage(params.page);
 
   const [{ data, pagination }, favoriteIds] = await Promise.all([getExercises({
+    viewerId: user.id,
+    customOnly,
     search,
     bodyPart,
     difficulty,
@@ -69,21 +74,23 @@ export default async function ExercisesPage({
     if (difficulty) next.set("difficulty", difficulty);
     if (movementType) next.set("movementType", movementType);
     if (favoriteOnly) next.set("favorite", "1");
+    if (customOnly) next.set("custom", "1");
     if (target > 1) next.set("page", String(target));
 
     const query = next.toString();
     return query ? `/exercises?${query}` : "/exercises";
   }
 
-  /** 즐겨찾기 탭을 오갈 때 검색·부위 조건은 그대로 두고 페이지만 1로 돌린다. */
-  function scopeHref(target: boolean) {
+  /** 탭을 오갈 때 검색·부위 조건은 그대로 두고 페이지만 1로 돌린다. */
+  function scopeHref(target: "all" | "favorite" | "custom") {
     const next = new URLSearchParams();
 
     if (search) next.set("search", search);
     if (bodyPart) next.set("bodyPart", bodyPart);
     if (difficulty) next.set("difficulty", difficulty);
     if (movementType) next.set("movementType", movementType);
-    if (target) next.set("favorite", "1");
+    if (target === "favorite") next.set("favorite", "1");
+    if (target === "custom") next.set("custom", "1");
 
     const query = next.toString();
     return query ? `/exercises?${query}` : "/exercises";
@@ -91,22 +98,32 @@ export default async function ExercisesPage({
 
   return (
     <main className="flex flex-col pt-4">
-      <header className="px-5">
-        <h1 className="text-2xl font-extrabold tracking-tight">운동</h1>
-        <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
-          부위·기구별로 찾고, 하트로 모아 둬요
-        </p>
+      <header className="flex items-start justify-between gap-3 px-5">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight">운동</h1>
+          <p className="mt-0.5 text-[0.8125rem] text-muted-foreground">
+            부위·기구별로 찾고, 하트로 모아 둬요
+          </p>
+        </div>
+        <Link
+          href="/exercises/new"
+          className="mt-1 flex h-9.5 shrink-0 items-center gap-1 rounded-full border border-border px-3.5 text-[0.8125rem] font-bold"
+        >
+          <Plus className="size-3.5" aria-hidden />새 운동
+        </Link>
       </header>
 
-      {/* 밑줄 탭: 전체 / 즐겨찾기 */}
+      {/* 밑줄 탭: 전체 / 즐겨찾기 / 내 운동 */}
       <nav aria-label="목록 범위" className="mt-2 flex gap-5 border-b border-line px-5">
         {(
           [
-            { label: "전체", value: false },
-            { label: "즐겨찾기", value: true },
+            { label: "전체", value: "all" },
+            { label: "즐겨찾기", value: "favorite" },
+            { label: "내 운동", value: "custom" },
           ] as const
         ).map((tab) => {
-          const active = favoriteOnly === tab.value;
+          const current = favoriteOnly ? "favorite" : customOnly ? "custom" : "all";
+          const active = current === tab.value;
           return (
             <Link
               key={tab.label}
@@ -132,7 +149,9 @@ export default async function ExercisesPage({
           <p className="rounded-[1.375rem] bg-[#f7f8f7] px-6 py-14 text-center text-sm text-muted-foreground">
             {favoriteOnly
               ? "즐겨찾기한 운동이 없어요. 운동 상세에서 하트를 눌러 두면 여기 모여요."
-              : "조건에 맞는 운동이 없어요."}
+              : customOnly
+                ? "직접 만든 운동이 없어요. 오른쪽 위 '새 운동'으로 라이브러리에 없는 운동을 적어 두세요."
+                : "조건에 맞는 운동이 없어요."}
           </p>
         ) : (
           <ul className="flex flex-col">

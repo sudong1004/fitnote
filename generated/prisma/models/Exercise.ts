@@ -39,6 +39,7 @@ export type ExerciseMinAggregateOutputType = {
   thumbnailUrl: string | null
   isSystem: boolean | null
   isActive: boolean | null
+  createdByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +59,7 @@ export type ExerciseMaxAggregateOutputType = {
   thumbnailUrl: string | null
   isSystem: boolean | null
   isActive: boolean | null
+  createdByUserId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -77,6 +79,7 @@ export type ExerciseCountAggregateOutputType = {
   thumbnailUrl: number
   isSystem: number
   isActive: number
+  createdByUserId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -98,6 +101,7 @@ export type ExerciseMinAggregateInputType = {
   thumbnailUrl?: true
   isSystem?: true
   isActive?: true
+  createdByUserId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -117,6 +121,7 @@ export type ExerciseMaxAggregateInputType = {
   thumbnailUrl?: true
   isSystem?: true
   isActive?: true
+  createdByUserId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -136,6 +141,7 @@ export type ExerciseCountAggregateInputType = {
   thumbnailUrl?: true
   isSystem?: true
   isActive?: true
+  createdByUserId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -228,6 +234,7 @@ export type ExerciseGroupByOutputType = {
   thumbnailUrl: string | null
   isSystem: boolean
   isActive: boolean
+  createdByUserId: string | null
   createdAt: Date
   updatedAt: Date
   _count: ExerciseCountAggregateOutputType | null
@@ -268,8 +275,10 @@ export type ExerciseWhereInput = {
   thumbnailUrl?: Prisma.StringNullableFilter<"Exercise"> | string | null
   isSystem?: Prisma.BoolFilter<"Exercise"> | boolean
   isActive?: Prisma.BoolFilter<"Exercise"> | boolean
+  createdByUserId?: Prisma.StringNullableFilter<"Exercise"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Exercise"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Exercise"> | Date | string
+  createdBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   equipment?: Prisma.ExerciseEquipmentListRelationFilter
   routineExercises?: Prisma.RoutineExerciseListRelationFilter
   alternativesTo?: Prisma.WorkoutAlternativeListRelationFilter
@@ -293,8 +302,10 @@ export type ExerciseOrderByWithRelationInput = {
   thumbnailUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isSystem?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  createdBy?: Prisma.UserOrderByWithRelationInput
   equipment?: Prisma.ExerciseEquipmentOrderByRelationAggregateInput
   routineExercises?: Prisma.RoutineExerciseOrderByRelationAggregateInput
   alternativesTo?: Prisma.WorkoutAlternativeOrderByRelationAggregateInput
@@ -305,10 +316,11 @@ export type ExerciseOrderByWithRelationInput = {
 
 export type ExerciseWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  name?: string
+  createdByUserId_name?: Prisma.ExerciseCreatedByUserIdNameCompoundUniqueInput
   AND?: Prisma.ExerciseWhereInput | Prisma.ExerciseWhereInput[]
   OR?: Prisma.ExerciseWhereInput[]
   NOT?: Prisma.ExerciseWhereInput | Prisma.ExerciseWhereInput[]
+  name?: Prisma.StringFilter<"Exercise"> | string
   bodyPart?: Prisma.EnumWorkoutBodyPartFilter<"Exercise"> | $Enums.WorkoutBodyPart
   targetMuscle?: Prisma.StringNullableFilter<"Exercise"> | string | null
   movementType?: Prisma.EnumExerciseMovementTypeFilter<"Exercise"> | $Enums.ExerciseMovementType
@@ -321,15 +333,17 @@ export type ExerciseWhereUniqueInput = Prisma.AtLeast<{
   thumbnailUrl?: Prisma.StringNullableFilter<"Exercise"> | string | null
   isSystem?: Prisma.BoolFilter<"Exercise"> | boolean
   isActive?: Prisma.BoolFilter<"Exercise"> | boolean
+  createdByUserId?: Prisma.StringNullableFilter<"Exercise"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Exercise"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Exercise"> | Date | string
+  createdBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   equipment?: Prisma.ExerciseEquipmentListRelationFilter
   routineExercises?: Prisma.RoutineExerciseListRelationFilter
   alternativesTo?: Prisma.WorkoutAlternativeListRelationFilter
   alternativesFrom?: Prisma.WorkoutAlternativeListRelationFilter
   favorites?: Prisma.WorkoutFavoriteListRelationFilter
   workoutRecords?: Prisma.WorkoutRecordListRelationFilter
-}, "id" | "name">
+}, "id" | "createdByUserId_name">
 
 export type ExerciseOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -346,6 +360,7 @@ export type ExerciseOrderByWithAggregationInput = {
   thumbnailUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   isSystem?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdByUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ExerciseCountOrderByAggregateInput
@@ -371,6 +386,7 @@ export type ExerciseScalarWhereWithAggregatesInput = {
   thumbnailUrl?: Prisma.StringNullableWithAggregatesFilter<"Exercise"> | string | null
   isSystem?: Prisma.BoolWithAggregatesFilter<"Exercise"> | boolean
   isActive?: Prisma.BoolWithAggregatesFilter<"Exercise"> | boolean
+  createdByUserId?: Prisma.StringNullableWithAggregatesFilter<"Exercise"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Exercise"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Exercise"> | Date | string
 }
@@ -392,6 +408,7 @@ export type ExerciseCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedExercisesInput
   equipment?: Prisma.ExerciseEquipmentCreateNestedManyWithoutExerciseInput
   routineExercises?: Prisma.RoutineExerciseCreateNestedManyWithoutExerciseInput
   alternativesTo?: Prisma.WorkoutAlternativeCreateNestedManyWithoutAlternativeExerciseInput
@@ -415,6 +432,7 @@ export type ExerciseUncheckedCreateInput = {
   thumbnailUrl?: string | null
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedCreateNestedManyWithoutExerciseInput
@@ -442,6 +460,7 @@ export type ExerciseUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedExercisesNestedInput
   equipment?: Prisma.ExerciseEquipmentUpdateManyWithoutExerciseNestedInput
   routineExercises?: Prisma.RoutineExerciseUpdateManyWithoutExerciseNestedInput
   alternativesTo?: Prisma.WorkoutAlternativeUpdateManyWithoutAlternativeExerciseNestedInput
@@ -465,6 +484,7 @@ export type ExerciseUncheckedUpdateInput = {
   thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedUpdateManyWithoutExerciseNestedInput
@@ -490,6 +510,7 @@ export type ExerciseCreateManyInput = {
   thumbnailUrl?: string | null
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -528,8 +549,24 @@ export type ExerciseUncheckedUpdateManyInput = {
   thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ExerciseListRelationFilter = {
+  every?: Prisma.ExerciseWhereInput
+  some?: Prisma.ExerciseWhereInput
+  none?: Prisma.ExerciseWhereInput
+}
+
+export type ExerciseOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
+export type ExerciseCreatedByUserIdNameCompoundUniqueInput = {
+  createdByUserId: string
+  name: string
 }
 
 export type ExerciseCountOrderByAggregateInput = {
@@ -547,6 +584,7 @@ export type ExerciseCountOrderByAggregateInput = {
   thumbnailUrl?: Prisma.SortOrder
   isSystem?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -566,6 +604,7 @@ export type ExerciseMaxOrderByAggregateInput = {
   thumbnailUrl?: Prisma.SortOrder
   isSystem?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -585,6 +624,7 @@ export type ExerciseMinOrderByAggregateInput = {
   thumbnailUrl?: Prisma.SortOrder
   isSystem?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  createdByUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -592,6 +632,48 @@ export type ExerciseMinOrderByAggregateInput = {
 export type ExerciseScalarRelationFilter = {
   is?: Prisma.ExerciseWhereInput
   isNot?: Prisma.ExerciseWhereInput
+}
+
+export type ExerciseCreateNestedManyWithoutCreatedByInput = {
+  create?: Prisma.XOR<Prisma.ExerciseCreateWithoutCreatedByInput, Prisma.ExerciseUncheckedCreateWithoutCreatedByInput> | Prisma.ExerciseCreateWithoutCreatedByInput[] | Prisma.ExerciseUncheckedCreateWithoutCreatedByInput[]
+  connectOrCreate?: Prisma.ExerciseCreateOrConnectWithoutCreatedByInput | Prisma.ExerciseCreateOrConnectWithoutCreatedByInput[]
+  createMany?: Prisma.ExerciseCreateManyCreatedByInputEnvelope
+  connect?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+}
+
+export type ExerciseUncheckedCreateNestedManyWithoutCreatedByInput = {
+  create?: Prisma.XOR<Prisma.ExerciseCreateWithoutCreatedByInput, Prisma.ExerciseUncheckedCreateWithoutCreatedByInput> | Prisma.ExerciseCreateWithoutCreatedByInput[] | Prisma.ExerciseUncheckedCreateWithoutCreatedByInput[]
+  connectOrCreate?: Prisma.ExerciseCreateOrConnectWithoutCreatedByInput | Prisma.ExerciseCreateOrConnectWithoutCreatedByInput[]
+  createMany?: Prisma.ExerciseCreateManyCreatedByInputEnvelope
+  connect?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+}
+
+export type ExerciseUpdateManyWithoutCreatedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ExerciseCreateWithoutCreatedByInput, Prisma.ExerciseUncheckedCreateWithoutCreatedByInput> | Prisma.ExerciseCreateWithoutCreatedByInput[] | Prisma.ExerciseUncheckedCreateWithoutCreatedByInput[]
+  connectOrCreate?: Prisma.ExerciseCreateOrConnectWithoutCreatedByInput | Prisma.ExerciseCreateOrConnectWithoutCreatedByInput[]
+  upsert?: Prisma.ExerciseUpsertWithWhereUniqueWithoutCreatedByInput | Prisma.ExerciseUpsertWithWhereUniqueWithoutCreatedByInput[]
+  createMany?: Prisma.ExerciseCreateManyCreatedByInputEnvelope
+  set?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+  disconnect?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+  delete?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+  connect?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+  update?: Prisma.ExerciseUpdateWithWhereUniqueWithoutCreatedByInput | Prisma.ExerciseUpdateWithWhereUniqueWithoutCreatedByInput[]
+  updateMany?: Prisma.ExerciseUpdateManyWithWhereWithoutCreatedByInput | Prisma.ExerciseUpdateManyWithWhereWithoutCreatedByInput[]
+  deleteMany?: Prisma.ExerciseScalarWhereInput | Prisma.ExerciseScalarWhereInput[]
+}
+
+export type ExerciseUncheckedUpdateManyWithoutCreatedByNestedInput = {
+  create?: Prisma.XOR<Prisma.ExerciseCreateWithoutCreatedByInput, Prisma.ExerciseUncheckedCreateWithoutCreatedByInput> | Prisma.ExerciseCreateWithoutCreatedByInput[] | Prisma.ExerciseUncheckedCreateWithoutCreatedByInput[]
+  connectOrCreate?: Prisma.ExerciseCreateOrConnectWithoutCreatedByInput | Prisma.ExerciseCreateOrConnectWithoutCreatedByInput[]
+  upsert?: Prisma.ExerciseUpsertWithWhereUniqueWithoutCreatedByInput | Prisma.ExerciseUpsertWithWhereUniqueWithoutCreatedByInput[]
+  createMany?: Prisma.ExerciseCreateManyCreatedByInputEnvelope
+  set?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+  disconnect?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+  delete?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+  connect?: Prisma.ExerciseWhereUniqueInput | Prisma.ExerciseWhereUniqueInput[]
+  update?: Prisma.ExerciseUpdateWithWhereUniqueWithoutCreatedByInput | Prisma.ExerciseUpdateWithWhereUniqueWithoutCreatedByInput[]
+  updateMany?: Prisma.ExerciseUpdateManyWithWhereWithoutCreatedByInput | Prisma.ExerciseUpdateManyWithWhereWithoutCreatedByInput[]
+  deleteMany?: Prisma.ExerciseScalarWhereInput | Prisma.ExerciseScalarWhereInput[]
 }
 
 export type EnumWorkoutBodyPartFieldUpdateOperationsInput = {
@@ -690,6 +772,105 @@ export type ExerciseUpdateOneRequiredWithoutFavoritesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ExerciseUpdateToOneWithWhereWithoutFavoritesInput, Prisma.ExerciseUpdateWithoutFavoritesInput>, Prisma.ExerciseUncheckedUpdateWithoutFavoritesInput>
 }
 
+export type ExerciseCreateWithoutCreatedByInput = {
+  id?: string
+  name: string
+  bodyPart: $Enums.WorkoutBodyPart
+  targetMuscle?: string | null
+  movementType: $Enums.ExerciseMovementType
+  difficulty: $Enums.Difficulty
+  description?: string | null
+  instruction?: string | null
+  breathing?: string | null
+  caution?: string | null
+  videoUrl?: string | null
+  thumbnailUrl?: string | null
+  isSystem?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  equipment?: Prisma.ExerciseEquipmentCreateNestedManyWithoutExerciseInput
+  routineExercises?: Prisma.RoutineExerciseCreateNestedManyWithoutExerciseInput
+  alternativesTo?: Prisma.WorkoutAlternativeCreateNestedManyWithoutAlternativeExerciseInput
+  alternativesFrom?: Prisma.WorkoutAlternativeCreateNestedManyWithoutExerciseInput
+  favorites?: Prisma.WorkoutFavoriteCreateNestedManyWithoutExerciseInput
+  workoutRecords?: Prisma.WorkoutRecordCreateNestedManyWithoutExerciseInput
+}
+
+export type ExerciseUncheckedCreateWithoutCreatedByInput = {
+  id?: string
+  name: string
+  bodyPart: $Enums.WorkoutBodyPart
+  targetMuscle?: string | null
+  movementType: $Enums.ExerciseMovementType
+  difficulty: $Enums.Difficulty
+  description?: string | null
+  instruction?: string | null
+  breathing?: string | null
+  caution?: string | null
+  videoUrl?: string | null
+  thumbnailUrl?: string | null
+  isSystem?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  equipment?: Prisma.ExerciseEquipmentUncheckedCreateNestedManyWithoutExerciseInput
+  routineExercises?: Prisma.RoutineExerciseUncheckedCreateNestedManyWithoutExerciseInput
+  alternativesTo?: Prisma.WorkoutAlternativeUncheckedCreateNestedManyWithoutAlternativeExerciseInput
+  alternativesFrom?: Prisma.WorkoutAlternativeUncheckedCreateNestedManyWithoutExerciseInput
+  favorites?: Prisma.WorkoutFavoriteUncheckedCreateNestedManyWithoutExerciseInput
+  workoutRecords?: Prisma.WorkoutRecordUncheckedCreateNestedManyWithoutExerciseInput
+}
+
+export type ExerciseCreateOrConnectWithoutCreatedByInput = {
+  where: Prisma.ExerciseWhereUniqueInput
+  create: Prisma.XOR<Prisma.ExerciseCreateWithoutCreatedByInput, Prisma.ExerciseUncheckedCreateWithoutCreatedByInput>
+}
+
+export type ExerciseCreateManyCreatedByInputEnvelope = {
+  data: Prisma.ExerciseCreateManyCreatedByInput | Prisma.ExerciseCreateManyCreatedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type ExerciseUpsertWithWhereUniqueWithoutCreatedByInput = {
+  where: Prisma.ExerciseWhereUniqueInput
+  update: Prisma.XOR<Prisma.ExerciseUpdateWithoutCreatedByInput, Prisma.ExerciseUncheckedUpdateWithoutCreatedByInput>
+  create: Prisma.XOR<Prisma.ExerciseCreateWithoutCreatedByInput, Prisma.ExerciseUncheckedCreateWithoutCreatedByInput>
+}
+
+export type ExerciseUpdateWithWhereUniqueWithoutCreatedByInput = {
+  where: Prisma.ExerciseWhereUniqueInput
+  data: Prisma.XOR<Prisma.ExerciseUpdateWithoutCreatedByInput, Prisma.ExerciseUncheckedUpdateWithoutCreatedByInput>
+}
+
+export type ExerciseUpdateManyWithWhereWithoutCreatedByInput = {
+  where: Prisma.ExerciseScalarWhereInput
+  data: Prisma.XOR<Prisma.ExerciseUpdateManyMutationInput, Prisma.ExerciseUncheckedUpdateManyWithoutCreatedByInput>
+}
+
+export type ExerciseScalarWhereInput = {
+  AND?: Prisma.ExerciseScalarWhereInput | Prisma.ExerciseScalarWhereInput[]
+  OR?: Prisma.ExerciseScalarWhereInput[]
+  NOT?: Prisma.ExerciseScalarWhereInput | Prisma.ExerciseScalarWhereInput[]
+  id?: Prisma.StringFilter<"Exercise"> | string
+  name?: Prisma.StringFilter<"Exercise"> | string
+  bodyPart?: Prisma.EnumWorkoutBodyPartFilter<"Exercise"> | $Enums.WorkoutBodyPart
+  targetMuscle?: Prisma.StringNullableFilter<"Exercise"> | string | null
+  movementType?: Prisma.EnumExerciseMovementTypeFilter<"Exercise"> | $Enums.ExerciseMovementType
+  difficulty?: Prisma.EnumDifficultyFilter<"Exercise"> | $Enums.Difficulty
+  description?: Prisma.StringNullableFilter<"Exercise"> | string | null
+  instruction?: Prisma.StringNullableFilter<"Exercise"> | string | null
+  breathing?: Prisma.StringNullableFilter<"Exercise"> | string | null
+  caution?: Prisma.StringNullableFilter<"Exercise"> | string | null
+  videoUrl?: Prisma.StringNullableFilter<"Exercise"> | string | null
+  thumbnailUrl?: Prisma.StringNullableFilter<"Exercise"> | string | null
+  isSystem?: Prisma.BoolFilter<"Exercise"> | boolean
+  isActive?: Prisma.BoolFilter<"Exercise"> | boolean
+  createdByUserId?: Prisma.StringNullableFilter<"Exercise"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Exercise"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Exercise"> | Date | string
+}
+
 export type ExerciseCreateWithoutEquipmentInput = {
   id?: string
   name: string
@@ -707,6 +888,7 @@ export type ExerciseCreateWithoutEquipmentInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedExercisesInput
   routineExercises?: Prisma.RoutineExerciseCreateNestedManyWithoutExerciseInput
   alternativesTo?: Prisma.WorkoutAlternativeCreateNestedManyWithoutAlternativeExerciseInput
   alternativesFrom?: Prisma.WorkoutAlternativeCreateNestedManyWithoutExerciseInput
@@ -729,6 +911,7 @@ export type ExerciseUncheckedCreateWithoutEquipmentInput = {
   thumbnailUrl?: string | null
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   routineExercises?: Prisma.RoutineExerciseUncheckedCreateNestedManyWithoutExerciseInput
@@ -771,6 +954,7 @@ export type ExerciseUpdateWithoutEquipmentInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedExercisesNestedInput
   routineExercises?: Prisma.RoutineExerciseUpdateManyWithoutExerciseNestedInput
   alternativesTo?: Prisma.WorkoutAlternativeUpdateManyWithoutAlternativeExerciseNestedInput
   alternativesFrom?: Prisma.WorkoutAlternativeUpdateManyWithoutExerciseNestedInput
@@ -793,6 +977,7 @@ export type ExerciseUncheckedUpdateWithoutEquipmentInput = {
   thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   routineExercises?: Prisma.RoutineExerciseUncheckedUpdateManyWithoutExerciseNestedInput
@@ -819,6 +1004,7 @@ export type ExerciseCreateWithoutAlternativesToInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedExercisesInput
   equipment?: Prisma.ExerciseEquipmentCreateNestedManyWithoutExerciseInput
   routineExercises?: Prisma.RoutineExerciseCreateNestedManyWithoutExerciseInput
   alternativesFrom?: Prisma.WorkoutAlternativeCreateNestedManyWithoutExerciseInput
@@ -841,6 +1027,7 @@ export type ExerciseUncheckedCreateWithoutAlternativesToInput = {
   thumbnailUrl?: string | null
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedCreateNestedManyWithoutExerciseInput
@@ -872,6 +1059,7 @@ export type ExerciseCreateWithoutAlternativesFromInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedExercisesInput
   equipment?: Prisma.ExerciseEquipmentCreateNestedManyWithoutExerciseInput
   routineExercises?: Prisma.RoutineExerciseCreateNestedManyWithoutExerciseInput
   alternativesTo?: Prisma.WorkoutAlternativeCreateNestedManyWithoutAlternativeExerciseInput
@@ -894,6 +1082,7 @@ export type ExerciseUncheckedCreateWithoutAlternativesFromInput = {
   thumbnailUrl?: string | null
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedCreateNestedManyWithoutExerciseInput
@@ -936,6 +1125,7 @@ export type ExerciseUpdateWithoutAlternativesToInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedExercisesNestedInput
   equipment?: Prisma.ExerciseEquipmentUpdateManyWithoutExerciseNestedInput
   routineExercises?: Prisma.RoutineExerciseUpdateManyWithoutExerciseNestedInput
   alternativesFrom?: Prisma.WorkoutAlternativeUpdateManyWithoutExerciseNestedInput
@@ -958,6 +1148,7 @@ export type ExerciseUncheckedUpdateWithoutAlternativesToInput = {
   thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedUpdateManyWithoutExerciseNestedInput
@@ -995,6 +1186,7 @@ export type ExerciseUpdateWithoutAlternativesFromInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedExercisesNestedInput
   equipment?: Prisma.ExerciseEquipmentUpdateManyWithoutExerciseNestedInput
   routineExercises?: Prisma.RoutineExerciseUpdateManyWithoutExerciseNestedInput
   alternativesTo?: Prisma.WorkoutAlternativeUpdateManyWithoutAlternativeExerciseNestedInput
@@ -1017,6 +1209,7 @@ export type ExerciseUncheckedUpdateWithoutAlternativesFromInput = {
   thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedUpdateManyWithoutExerciseNestedInput
@@ -1043,6 +1236,7 @@ export type ExerciseCreateWithoutRoutineExercisesInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedExercisesInput
   equipment?: Prisma.ExerciseEquipmentCreateNestedManyWithoutExerciseInput
   alternativesTo?: Prisma.WorkoutAlternativeCreateNestedManyWithoutAlternativeExerciseInput
   alternativesFrom?: Prisma.WorkoutAlternativeCreateNestedManyWithoutExerciseInput
@@ -1065,6 +1259,7 @@ export type ExerciseUncheckedCreateWithoutRoutineExercisesInput = {
   thumbnailUrl?: string | null
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedCreateNestedManyWithoutExerciseInput
@@ -1107,6 +1302,7 @@ export type ExerciseUpdateWithoutRoutineExercisesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedExercisesNestedInput
   equipment?: Prisma.ExerciseEquipmentUpdateManyWithoutExerciseNestedInput
   alternativesTo?: Prisma.WorkoutAlternativeUpdateManyWithoutAlternativeExerciseNestedInput
   alternativesFrom?: Prisma.WorkoutAlternativeUpdateManyWithoutExerciseNestedInput
@@ -1129,6 +1325,7 @@ export type ExerciseUncheckedUpdateWithoutRoutineExercisesInput = {
   thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedUpdateManyWithoutExerciseNestedInput
@@ -1155,6 +1352,7 @@ export type ExerciseCreateWithoutWorkoutRecordsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedExercisesInput
   equipment?: Prisma.ExerciseEquipmentCreateNestedManyWithoutExerciseInput
   routineExercises?: Prisma.RoutineExerciseCreateNestedManyWithoutExerciseInput
   alternativesTo?: Prisma.WorkoutAlternativeCreateNestedManyWithoutAlternativeExerciseInput
@@ -1177,6 +1375,7 @@ export type ExerciseUncheckedCreateWithoutWorkoutRecordsInput = {
   thumbnailUrl?: string | null
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedCreateNestedManyWithoutExerciseInput
@@ -1219,6 +1418,7 @@ export type ExerciseUpdateWithoutWorkoutRecordsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedExercisesNestedInput
   equipment?: Prisma.ExerciseEquipmentUpdateManyWithoutExerciseNestedInput
   routineExercises?: Prisma.RoutineExerciseUpdateManyWithoutExerciseNestedInput
   alternativesTo?: Prisma.WorkoutAlternativeUpdateManyWithoutAlternativeExerciseNestedInput
@@ -1241,6 +1441,7 @@ export type ExerciseUncheckedUpdateWithoutWorkoutRecordsInput = {
   thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedUpdateManyWithoutExerciseNestedInput
@@ -1267,6 +1468,7 @@ export type ExerciseCreateWithoutFavoritesInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedExercisesInput
   equipment?: Prisma.ExerciseEquipmentCreateNestedManyWithoutExerciseInput
   routineExercises?: Prisma.RoutineExerciseCreateNestedManyWithoutExerciseInput
   alternativesTo?: Prisma.WorkoutAlternativeCreateNestedManyWithoutAlternativeExerciseInput
@@ -1289,6 +1491,7 @@ export type ExerciseUncheckedCreateWithoutFavoritesInput = {
   thumbnailUrl?: string | null
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedCreateNestedManyWithoutExerciseInput
@@ -1331,6 +1534,7 @@ export type ExerciseUpdateWithoutFavoritesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedExercisesNestedInput
   equipment?: Prisma.ExerciseEquipmentUpdateManyWithoutExerciseNestedInput
   routineExercises?: Prisma.RoutineExerciseUpdateManyWithoutExerciseNestedInput
   alternativesTo?: Prisma.WorkoutAlternativeUpdateManyWithoutAlternativeExerciseNestedInput
@@ -1353,6 +1557,7 @@ export type ExerciseUncheckedUpdateWithoutFavoritesInput = {
   thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdByUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   equipment?: Prisma.ExerciseEquipmentUncheckedUpdateManyWithoutExerciseNestedInput
@@ -1360,6 +1565,94 @@ export type ExerciseUncheckedUpdateWithoutFavoritesInput = {
   alternativesTo?: Prisma.WorkoutAlternativeUncheckedUpdateManyWithoutAlternativeExerciseNestedInput
   alternativesFrom?: Prisma.WorkoutAlternativeUncheckedUpdateManyWithoutExerciseNestedInput
   workoutRecords?: Prisma.WorkoutRecordUncheckedUpdateManyWithoutExerciseNestedInput
+}
+
+export type ExerciseCreateManyCreatedByInput = {
+  id?: string
+  name: string
+  bodyPart: $Enums.WorkoutBodyPart
+  targetMuscle?: string | null
+  movementType: $Enums.ExerciseMovementType
+  difficulty: $Enums.Difficulty
+  description?: string | null
+  instruction?: string | null
+  breathing?: string | null
+  caution?: string | null
+  videoUrl?: string | null
+  thumbnailUrl?: string | null
+  isSystem?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ExerciseUpdateWithoutCreatedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  bodyPart?: Prisma.EnumWorkoutBodyPartFieldUpdateOperationsInput | $Enums.WorkoutBodyPart
+  targetMuscle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  movementType?: Prisma.EnumExerciseMovementTypeFieldUpdateOperationsInput | $Enums.ExerciseMovementType
+  difficulty?: Prisma.EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instruction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  breathing?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  equipment?: Prisma.ExerciseEquipmentUpdateManyWithoutExerciseNestedInput
+  routineExercises?: Prisma.RoutineExerciseUpdateManyWithoutExerciseNestedInput
+  alternativesTo?: Prisma.WorkoutAlternativeUpdateManyWithoutAlternativeExerciseNestedInput
+  alternativesFrom?: Prisma.WorkoutAlternativeUpdateManyWithoutExerciseNestedInput
+  favorites?: Prisma.WorkoutFavoriteUpdateManyWithoutExerciseNestedInput
+  workoutRecords?: Prisma.WorkoutRecordUpdateManyWithoutExerciseNestedInput
+}
+
+export type ExerciseUncheckedUpdateWithoutCreatedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  bodyPart?: Prisma.EnumWorkoutBodyPartFieldUpdateOperationsInput | $Enums.WorkoutBodyPart
+  targetMuscle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  movementType?: Prisma.EnumExerciseMovementTypeFieldUpdateOperationsInput | $Enums.ExerciseMovementType
+  difficulty?: Prisma.EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instruction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  breathing?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  equipment?: Prisma.ExerciseEquipmentUncheckedUpdateManyWithoutExerciseNestedInput
+  routineExercises?: Prisma.RoutineExerciseUncheckedUpdateManyWithoutExerciseNestedInput
+  alternativesTo?: Prisma.WorkoutAlternativeUncheckedUpdateManyWithoutAlternativeExerciseNestedInput
+  alternativesFrom?: Prisma.WorkoutAlternativeUncheckedUpdateManyWithoutExerciseNestedInput
+  favorites?: Prisma.WorkoutFavoriteUncheckedUpdateManyWithoutExerciseNestedInput
+  workoutRecords?: Prisma.WorkoutRecordUncheckedUpdateManyWithoutExerciseNestedInput
+}
+
+export type ExerciseUncheckedUpdateManyWithoutCreatedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  bodyPart?: Prisma.EnumWorkoutBodyPartFieldUpdateOperationsInput | $Enums.WorkoutBodyPart
+  targetMuscle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  movementType?: Prisma.EnumExerciseMovementTypeFieldUpdateOperationsInput | $Enums.ExerciseMovementType
+  difficulty?: Prisma.EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instruction?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  breathing?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  caution?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  videoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -1453,8 +1746,10 @@ export type ExerciseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   thumbnailUrl?: boolean
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  createdBy?: boolean | Prisma.Exercise$createdByArgs<ExtArgs>
   equipment?: boolean | Prisma.Exercise$equipmentArgs<ExtArgs>
   routineExercises?: boolean | Prisma.Exercise$routineExercisesArgs<ExtArgs>
   alternativesTo?: boolean | Prisma.Exercise$alternativesToArgs<ExtArgs>
@@ -1479,8 +1774,10 @@ export type ExerciseSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   thumbnailUrl?: boolean
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  createdBy?: boolean | Prisma.Exercise$createdByArgs<ExtArgs>
 }, ExtArgs["result"]["exercise"]>
 
 export type ExerciseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1498,8 +1795,10 @@ export type ExerciseSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   thumbnailUrl?: boolean
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  createdBy?: boolean | Prisma.Exercise$createdByArgs<ExtArgs>
 }, ExtArgs["result"]["exercise"]>
 
 export type ExerciseSelectScalar = {
@@ -1517,12 +1816,14 @@ export type ExerciseSelectScalar = {
   thumbnailUrl?: boolean
   isSystem?: boolean
   isActive?: boolean
+  createdByUserId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ExerciseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "bodyPart" | "targetMuscle" | "movementType" | "difficulty" | "description" | "instruction" | "breathing" | "caution" | "videoUrl" | "thumbnailUrl" | "isSystem" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["exercise"]>
+export type ExerciseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "bodyPart" | "targetMuscle" | "movementType" | "difficulty" | "description" | "instruction" | "breathing" | "caution" | "videoUrl" | "thumbnailUrl" | "isSystem" | "isActive" | "createdByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["exercise"]>
 export type ExerciseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  createdBy?: boolean | Prisma.Exercise$createdByArgs<ExtArgs>
   equipment?: boolean | Prisma.Exercise$equipmentArgs<ExtArgs>
   routineExercises?: boolean | Prisma.Exercise$routineExercisesArgs<ExtArgs>
   alternativesTo?: boolean | Prisma.Exercise$alternativesToArgs<ExtArgs>
@@ -1531,12 +1832,17 @@ export type ExerciseInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   workoutRecords?: boolean | Prisma.Exercise$workoutRecordsArgs<ExtArgs>
   _count?: boolean | Prisma.ExerciseCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type ExerciseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type ExerciseIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type ExerciseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  createdBy?: boolean | Prisma.Exercise$createdByArgs<ExtArgs>
+}
+export type ExerciseIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  createdBy?: boolean | Prisma.Exercise$createdByArgs<ExtArgs>
+}
 
 export type $ExercisePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Exercise"
   objects: {
+    createdBy: Prisma.$UserPayload<ExtArgs> | null
     equipment: Prisma.$ExerciseEquipmentPayload<ExtArgs>[]
     routineExercises: Prisma.$RoutineExercisePayload<ExtArgs>[]
     alternativesTo: Prisma.$WorkoutAlternativePayload<ExtArgs>[]
@@ -1546,6 +1852,9 @@ export type $ExercisePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    /**
+     * 시스템 운동끼리의 이름 중복은 시드가, 사용자가 만든 운동은 (만든 사람, 이름)으로 막는다
+     */
     name: string
     bodyPart: $Enums.WorkoutBodyPart
     targetMuscle: string | null
@@ -1559,6 +1868,10 @@ export type $ExercisePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     thumbnailUrl: string | null
     isSystem: boolean
     isActive: boolean
+    /**
+     * 직접 만든 운동의 주인. 시스템 운동은 비어 있다. 주인에게만 보인다
+     */
+    createdByUserId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["exercise"]>
@@ -1955,6 +2268,7 @@ readonly fields: ExerciseFieldRefs;
  */
 export interface Prisma__ExerciseClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  createdBy<T extends Prisma.Exercise$createdByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Exercise$createdByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   equipment<T extends Prisma.Exercise$equipmentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Exercise$equipmentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExerciseEquipmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   routineExercises<T extends Prisma.Exercise$routineExercisesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Exercise$routineExercisesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RoutineExercisePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   alternativesTo<T extends Prisma.Exercise$alternativesToArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Exercise$alternativesToArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkoutAlternativePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2004,6 +2318,7 @@ export interface ExerciseFieldRefs {
   readonly thumbnailUrl: Prisma.FieldRef<"Exercise", 'String'>
   readonly isSystem: Prisma.FieldRef<"Exercise", 'Boolean'>
   readonly isActive: Prisma.FieldRef<"Exercise", 'Boolean'>
+  readonly createdByUserId: Prisma.FieldRef<"Exercise", 'String'>
   readonly createdAt: Prisma.FieldRef<"Exercise", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Exercise", 'DateTime'>
 }
@@ -2260,6 +2575,10 @@ export type ExerciseCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    */
   data: Prisma.ExerciseCreateManyInput | Prisma.ExerciseCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExerciseIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2330,6 +2649,10 @@ export type ExerciseUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many Exercises to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExerciseIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -2396,6 +2719,25 @@ export type ExerciseDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many Exercises to delete.
    */
   limit?: number
+}
+
+/**
+ * Exercise.createdBy
+ */
+export type Exercise$createdByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { getCurrentUser } from "@/app/lib/dal";
+
 import {
   getExercises,
   type GetExercisesParams,
@@ -19,6 +21,16 @@ function isEnumValue<T extends Record<string, string>>(
 
 export async function GET(request: NextRequest) {
   try {
+    // 사람마다 보이는 운동이 다르다(직접 만든 운동). 로그인하지 않았으면 목록을 주지 않는다.
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const { searchParams } = request.nextUrl;
 
     const search = searchParams.get("search") ?? undefined;
@@ -135,6 +147,7 @@ export async function GET(request: NextRequest) {
     // ----------------------------------------------------------
 
     const params: GetExercisesParams = {
+      viewerId: user.id,
       search,
       bodyPart,
       difficulty,

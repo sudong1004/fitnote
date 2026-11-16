@@ -26,6 +26,7 @@ import {
 } from "@/lib/exercise-labels";
 import { cn } from "@/lib/utils";
 
+import { createExerciseInline } from "../../exercises/actions";
 import {
   addExercisesToSession,
   toggleExerciseFavorite,
@@ -36,6 +37,8 @@ type ExerciseItem = {
   name: string;
   bodyPart: WorkoutBodyPart;
   difficulty: keyof typeof DIFFICULTY_LABEL;
+  /** 직접 만든 운동. 난이도는 자리표시 값이라 "내 운동" 으로 대신 보여 준다. */
+  isCustom?: boolean;
 };
 
 /** "전체" 와 즐겨찾기는 부위 enum 이 아니므로 따로 표현한다. */
@@ -73,6 +76,13 @@ export function AddExerciseDrawer({
   const [loading, setLoading] = useState(false);
   const [pending, startTransition] = useTransition();
 
+  // 찾는 운동이 없을 때 이 자리에서 바로 만든다.
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newPart, setNewPart] = useState<WorkoutBodyPart | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [refresh, setRefresh] = useState(0);
+
   const keyword = search.trim();
 
   // 검색 중에는 부위 탭을 무시하고 전체에서 찾는다.
@@ -82,8 +92,8 @@ export function AddExerciseDrawer({
       : tab.value;
 
   const queryKey = keyword
-    ? `search:${keyword}`
-    : `part:${bodyPart ?? "all"}`;
+    ? `search:${keyword}:${refresh}`
+    : `part:${bodyPart ?? "all"}:${refresh}`;
 
   // 받아온 조건을 함께 들고 있다가 조건이 맞을 때만 보여준다.
   const [result, setResult] = useState<{
@@ -168,6 +178,44 @@ export function AddExerciseDrawer({
     setTab({ kind: "all" });
     setSelected([]);
     setError(null);
+    setCreating(false);
+    setNewName("");
+    setNewPart(null);
+    setCreateError(null);
+  }
+
+  function openCreate() {
+    setError(null);
+    setCreateError(null);
+    // 검색하던 말이 있으면 그대로 이름 칸에 넣어 준다.
+    setNewName(keyword);
+    setNewPart(null);
+    setCreating(true);
+  }
+
+  function createExercise() {
+    setCreateError(null);
+
+    if (newPart === null) {
+      setCreateError("부위를 골라주세요.");
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await createExerciseInline({ name: newName, bodyPart: newPart });
+
+      if (res.error !== null) {
+        setCreateError(res.error);
+        return;
+      }
+
+      // 만든 운동은 바로 선택해 두고, 이름으로 검색한 결과에서 보이게 한다.
+      setSelected((prev) => [...prev, res.exercise.id]);
+      setTab({ kind: "all" });
+      setSearch(res.exercise.name);
+      setRefresh((value) => value + 1);
+      setCreating(false);
+    });
   }
 
   function toggle(exerciseId: string) {
@@ -318,7 +366,8 @@ export function AddExerciseDrawer({
             </DrawerTitle>
           </DrawerHeader>
 
-          <div className="px-4">
+          {/* 만드는 동안에는 검색과 부위 탭을 숨긴다. 같은 부위 이름이 두 군데 보이면 헷갈린다. */}
+          <div className={cn("px-4", creating && "hidden")}>
             <div className="relative">
               <Search
                 className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
@@ -350,7 +399,12 @@ export function AddExerciseDrawer({
             </div>
           </div>
 
-          <div className="mt-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div
+            className={cn(
+              "mt-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+              creating && "hidden",
+            )}
+          >
             <button
               type="button"
               aria-label="즐겨찾기만 보기"
@@ -410,7 +464,72 @@ export function AddExerciseDrawer({
           ) : null}
 
           <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-2">
-            {loading &&
+            {creating ? (
+              <div className="flex flex-col gap-4 py-3">
+                <div>
+                  <p className="text-sm font-bold">운동 직접 만들기</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    나만 볼 수 있어요. 만들면 바로 선택돼요.
+                  </p>
+                </div>
+
+                <label className="flex flex-col gap-1.5">
+                  <span className="px-1 text-[0.8125rem] font-bold">운동 이름</span>
+                  <input
+                    value={newName}
+                    onChange={(event) => setNewName(event.target.value)}
+                    maxLength={40}
+                    placeholder="예: 케이블 힙 어브덕션"
+                    className="h-12 w-full rounded-2xl border border-border bg-card px-4 text-[0.9375rem] outline-none focus:border-primary focus:ring-2 focus:ring-ring/30"
+                  />
+                </label>
+
+                <div className="flex flex-col gap-1.5">
+                  <span className="px-1 text-[0.8125rem] font-bold">부위</span>
+                  <div className="flex flex-wrap gap-2">
+                    {BODY_PART_OPTIONS.map(([value, label]) => (
+                      <button
+                        key={value}
+                        type="button"
+                        aria-pressed={newPart === value}
+                        onClick={() => setNewPart(value)}
+                        className={cn(
+                          "h-9 rounded-full border px-3.5 text-[0.8125rem] font-bold transition-colors",
+                          newPart === value
+                            ? "border-ink bg-ink text-white"
+                            : "border-border text-foreground",
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {createError ? (
+                  <p role="alert" className="px-1 text-sm text-destructive">
+                    {createError}
+                  </p>
+                ) : null}
+
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="h-12 flex-1 rounded-full font-bold"
+                    onClick={() => setCreating(false)}
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    className="h-12 flex-1 rounded-full font-bold"
+                    disabled={pending || newName.trim() === ""}
+                    onClick={createExercise}
+                  >
+                    {pending ? <Loader2 className="size-4 animate-spin" /> : "만들기"}
+                  </Button>
+                </div>
+              </div>
+            ) : loading &&
             fetched.length === 0 ? (
               <p className="py-10 text-center text-sm text-muted-foreground">
                 불러오는 중…
@@ -427,6 +546,7 @@ export function AddExerciseDrawer({
                   setSearch("");
                   setTab({ kind: "all" });
                 }}
+                onCreate={openCreate}
               />
             ) : (
               <ul className="divide-y divide-border">
@@ -496,12 +616,12 @@ export function AddExerciseDrawer({
                               ]
                             }{" "}
                             ·{" "}
-                            {
-                              DIFFICULTY_LABEL[
-                                exercise
-                                  .difficulty
-                              ]
-                            }
+                            {exercise.isCustom
+                              ? "내 운동"
+                              : DIFFICULTY_LABEL[
+                                  exercise
+                                    .difficulty
+                                ]}
                           </span>
                         </span>
                       </button>
@@ -535,6 +655,17 @@ export function AddExerciseDrawer({
                   );
                 })}
               </ul>
+            )}
+
+            {creating || (items.length === 0 && !loading) ? null : (
+              <button
+                type="button"
+                onClick={openCreate}
+                className="my-3 flex h-11 w-full items-center justify-center gap-1.5 rounded-full border border-dashed border-border text-[0.8125rem] font-bold text-muted-foreground"
+              >
+                <Plus className="size-3.5" />
+                찾는 운동이 없나요? 직접 만들기
+              </button>
             )}
           </div>
 
@@ -577,10 +708,12 @@ function EmptyResult({
   keyword,
   favoriteTab,
   onReset,
+  onCreate,
 }: {
   keyword: string;
   favoriteTab: boolean;
   onReset: () => void;
+  onCreate: () => void;
 }) {
   return (
     <div className="flex flex-col items-center gap-3 py-12 text-center">
@@ -618,14 +751,23 @@ function EmptyResult({
         </>
       )}
 
-      <Button
-        variant="outline"
-        size="sm"
-        className="rounded-lg"
-        onClick={onReset}
-      >
-        전체 보기
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-lg"
+          onClick={onReset}
+        >
+          전체 보기
+        </Button>
+
+        {favoriteTab ? null : (
+          <Button size="sm" className="rounded-lg" onClick={onCreate}>
+            <Plus className="size-3.5" />
+            직접 만들기
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

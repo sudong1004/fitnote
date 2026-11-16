@@ -25,6 +25,7 @@ import { isFavorite } from "@/server/workouts/favorite.service";
 import { getActiveSession } from "@/server/workouts/workout.service";
 
 import { recordThisExercise, toggleFavorite } from "../actions";
+import { DeleteExerciseButton } from "./delete-exercise-button";
 import { ExerciseTrend } from "./exercise-trend";
 import { FavoriteToggleButton } from "./favorite-toggle-button";
 
@@ -32,7 +33,8 @@ export async function generateMetadata({
   params,
 }: PageProps<"/exercises/[id]">) {
   const { id } = await params;
-  const exercise = await getExerciseById(id);
+  const user = await requireUser();
+  const exercise = await getExerciseById(id, user.id);
 
   return {
     title: exercise ? `${exercise.name} | FitNote` : "운동을 찾을 수 없어요",
@@ -61,7 +63,7 @@ export default async function ExerciseDetailPage({
   const user = await requireUser();
 
   const { id } = await params;
-  const exercise = await getExerciseById(id);
+  const exercise = await getExerciseById(id, user.id);
 
   if (!exercise) {
     notFound();
@@ -86,16 +88,26 @@ export default async function ExerciseDetailPage({
         backHref="/exercises"
         backLabel="운동 목록"
         title={exercise.name}
-        subtitle={`${BODY_PART_LABEL[exercise.bodyPart]} · ${MOVEMENT_TYPE_LABEL[exercise.movementType]}`}
+        subtitle={
+          exercise.isCustom
+            ? BODY_PART_LABEL[exercise.bodyPart]
+            : `${BODY_PART_LABEL[exercise.bodyPart]} · ${MOVEMENT_TYPE_LABEL[exercise.movementType]}`
+        }
         right={
-          <span
-            className={cn(
-              "rounded-full px-2 py-0.5 text-[0.6875rem] font-bold",
-              DIFFICULTY_BADGE[exercise.difficulty],
-            )}
-          >
-            {DIFFICULTY_LABEL[exercise.difficulty]}
-          </span>
+          exercise.isCustom ? (
+            <span className="rounded-full border border-brand px-2 py-0.5 text-[0.6875rem] font-bold text-primary">
+              내 운동
+            </span>
+          ) : (
+            <span
+              className={cn(
+                "rounded-full px-2 py-0.5 text-[0.6875rem] font-bold",
+                DIFFICULTY_BADGE[exercise.difficulty],
+              )}
+            >
+              {DIFFICULTY_LABEL[exercise.difficulty]}
+            </span>
+          )
         }
       />
 
@@ -141,6 +153,11 @@ export default async function ExerciseDetailPage({
         여기서 "운동 시작 → 운동 추가 → 검색 → 이 운동 찾기" 를 다시 하게 만들면
         방금 보고 있던 운동을 처음부터 다시 찾는 셈이다.
       */}
+      {!exercise.isActive ? (
+        <p className="rounded-[1.375rem] bg-[#f7f8f7] px-5 py-4 text-center text-sm text-muted-foreground">
+          지운 운동이에요. 지난 기록에서만 볼 수 있어요.
+        </p>
+      ) : (
       <div className="flex items-center gap-2">
         <form action={recordThisExercise} className="flex-1">
           <input type="hidden" name="exerciseId" value={exercise.id} />
@@ -165,7 +182,21 @@ export default async function ExerciseDetailPage({
           <FavoriteToggleButton on={favorite} />
         </form>
       </div>
+      )}
 
+      {exercise.isCustom && exercise.isActive && exercise.createdByUserId === user.id ? (
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/exercises/${exercise.id}/edit`}
+            className="flex h-11 flex-1 items-center justify-center rounded-full border border-border text-sm font-bold"
+          >
+            수정
+          </Link>
+          <DeleteExerciseButton exerciseId={exercise.id} />
+        </div>
+      ) : null}
+
+      {exercise.isCustom ? null : (
       <Section title="필요한 기구">
         {exercise.equipment.length === 0 ? (
           <p className="text-sm text-muted-foreground">
@@ -200,6 +231,7 @@ export default async function ExerciseDetailPage({
           </ul>
         )}
       </Section>
+      )}
 
       {exercise.instruction && (
         <Section title="운동 방법">
@@ -239,6 +271,7 @@ export default async function ExerciseDetailPage({
         moreHref={`/exercises/${exercise.id}?records=all`}
       />
 
+      {exercise.isCustom ? null : (
       <Section title="이 운동 대신 할 수 있어요">
         {exercise.alternatives.length === 0 ? (
           <p className="text-sm text-muted-foreground">
@@ -279,6 +312,7 @@ export default async function ExerciseDetailPage({
           </ul>
         )}
       </Section>
+      )}
       </div>
     </main>
   );
