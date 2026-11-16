@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+import { getCurrentUser } from "@/app/lib/dal";
 import { getExerciseById } from "@/server/exercises/exercise.service";
 
 export async function GET(
@@ -8,6 +9,15 @@ export async function GET(
   context: RouteContext<"/api/exercises/[id]">,
 ) {
   try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const { id } = await context.params;
 
     if (!id) {
@@ -22,7 +32,7 @@ export async function GET(
       );
     }
 
-    const exercise = await getExerciseById(id);
+    const exercise = await getExerciseById(id, user.id);
 
     if (!exercise) {
       return NextResponse.json(

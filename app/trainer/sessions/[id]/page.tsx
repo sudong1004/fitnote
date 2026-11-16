@@ -102,7 +102,7 @@ export default async function SessionRecordPage({
       (workout?.records ?? []).map((record) => record.exercise.id),
     ),
 
-    workout ? getBodyPartCounts() : Promise.resolve({}),
+    workout ? getBodyPartCounts(user.id) : Promise.resolve({}),
 
     /*
      * 트레이너 자신의 즐겨찾기.

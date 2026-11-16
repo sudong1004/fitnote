@@ -64,6 +64,21 @@ export async function deleteMyAccount(userId: string, password: string): Promise
     await tx.workoutSession.deleteMany({ where: { userId, ptSessionId: null } });
     await tx.workoutFavorite.deleteMany({ where: { userId } });
     await tx.routine.deleteMany({ where: { userId } });
+
+    // 직접 만든 운동: 기록에 쓰이지 않은 것은 지운다. PT 수업 기록에 남은 것은 트레이너의 업무 기록이라
+    // 이름을 지우지 않고 숨기기만 한다(누구도 새로 고를 수 없다).
+    await tx.exercise.deleteMany({
+      where: {
+        createdByUserId: userId,
+        isSystem: false,
+        workoutRecords: { none: {} },
+        routineExercises: { none: {} },
+      },
+    });
+    await tx.exercise.updateMany({
+      where: { createdByUserId: userId, isSystem: false },
+      data: { isActive: false },
+    });
     await tx.aiAnalysis.deleteMany({ where: { userId } });
     await tx.trainerSharingSetting.deleteMany({ where: { userId } });
     await tx.memberProfile.deleteMany({ where: { userId } });

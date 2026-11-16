@@ -6,6 +6,7 @@ import {
   WorkoutSessionStatus,
 } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
+import { usableBy } from "@/server/exercises/exercise-access";
 import {
   WorkoutError,
   toNumber,
@@ -243,7 +244,7 @@ export async function addRecord(
   assertEditable(owner.status);
 
   const exercise = await prisma.exercise.findFirst({
-    where: { id: exerciseId, isActive: true },
+    where: { id: exerciseId, ...usableBy(userId) },
     select: { id: true },
   });
 
@@ -314,7 +315,7 @@ export async function addRecords(
   assertEditable(owner.status);
 
   const found = await prisma.exercise.findMany({
-    where: { id: { in: exerciseIds }, isActive: true },
+    where: { id: { in: exerciseIds }, ...usableBy(userId) },
     select: { id: true },
   });
 

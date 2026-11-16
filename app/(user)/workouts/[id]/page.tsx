@@ -50,7 +50,7 @@ export default async function WorkoutSessionPage({
       ),
       // 운동 추가 드로어의 "부위로 찾기" 첫 화면. 여기서 미리 넘겨 두면
       // 드로어를 열자마자 목록이 보인다.
-      getBodyPartCounts(),
+      getBodyPartCounts(user.id),
       getFavoriteExerciseIds(user.id),
       // 신기록은 끝난 운동에서만 의미가 있다. 진행 중에는 세트가 계속
       // 바뀌므로 세트를 하나 지울 때마다 배지가 붙었다 떨어진다.

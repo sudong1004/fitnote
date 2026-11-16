@@ -6,6 +6,8 @@ import {
 } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
+import { usableBy, viewableBy } from "./exercise-access";
+
 /**
  * 목록/상세가 동일한 형태를 반환하도록 공통 include 와 매퍼를 사용한다.
  * 한쪽만 필드가 바뀌어 응답이 어긋나는 것을 방지한다.
@@ -103,6 +105,11 @@ function toExerciseDto(exercise: ExerciseWithRelations) {
     id: exercise.id,
     name: exercise.name,
 
+    /** 사용자가 직접 만든 운동. 난이도·동작 유형은 채우지 않은 자리표시 값이라 화면에서 숨긴다. */
+    isCustom: !exercise.isSystem,
+    createdByUserId: exercise.createdByUserId,
+    isActive: exercise.isActive,
+
     bodyPart: exercise.bodyPart,
     targetMuscle: exercise.targetMuscle,
 
@@ -160,10 +167,10 @@ function toExerciseDto(exercise: ExerciseWithRelations) {
  * 골라 들어가는 길을 열어 두는데, 이때 운동이 하나도 없는 부위를 눌러
  * 빈 화면을 보게 만들면 안 되므로 개수를 함께 내려준다.
  */
-export async function getBodyPartCounts() {
+export async function getBodyPartCounts(viewerId: string) {
   const rows = await prisma.exercise.groupBy({
     by: ["bodyPart"],
-    where: { isActive: true },
+    where: usableBy(viewerId),
     _count: { _all: true },
   });
 
@@ -174,6 +181,12 @@ export async function getBodyPartCounts() {
 }
 
 export interface GetExercisesParams {
+  /** 누구에게 보여 줄 목록인가. 이 사람이 쓸 수 있는 운동만 나온다. */
+  viewerId: string;
+
+  /** 내가 직접 만든 운동만. */
+  customOnly?: boolean;
+
   search?: string;
   bodyPart?: WorkoutBodyPart;
   difficulty?: Difficulty;
@@ -193,6 +206,8 @@ export interface GetExercisesParams {
 }
 
 export async function getExercises({
+  viewerId,
+  customOnly,
   search,
   bodyPart,
   difficulty,
@@ -208,7 +223,9 @@ export async function getExercises({
   const skip = (normalizedPage - 1) * normalizedLimit;
 
   const where: Prisma.ExerciseWhereInput = {
-    isActive: true,
+    ...usableBy(viewerId),
+
+    ...(customOnly ? { createdByUserId: viewerId } : {}),
 
     ...(search
       ? {
@@ -294,13 +311,13 @@ export async function getExercises({
 }
 /**
  * 운동 상세 조회.
- * 존재하지 않거나 비활성화된 운동이면 null 을 반환한다.
+ * 없거나 이 사람이 열 수 없는 운동이면 null 을 반환한다(남이 만든 운동은 없는 것과 같다).
  */
-export async function getExerciseById(id: string) {
+export async function getExerciseById(id: string, viewerId: string) {
   const exercise = await prisma.exercise.findFirst({
     where: {
       id,
-      isActive: true,
+      ...viewableBy(viewerId),
     },
 
     include: exerciseInclude,

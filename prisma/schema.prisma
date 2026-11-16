@@ -53,6 +53,7 @@ model User {
   ptContracts             PTContract[]              @relation("ContractMember")
   ptSessions              PTSession[]               @relation("PTSessionMember")
   routines                Routine[]
+  createdExercises        Exercise[]                @relation("UserCreatedExercises")
   trainerConnections      TrainerMemberConnection[]
   trainerProfile          TrainerProfile?
   sharingSetting          TrainerSharingSetting?
@@ -362,7 +363,8 @@ model GymEquipment {
 
 model Exercise {
   id               String               @id @default(uuid())
-  name             String               @unique
+  /// 시스템 운동끼리의 이름 중복은 시드가, 사용자가 만든 운동은 (만든 사람, 이름)으로 막는다
+  name             String
   bodyPart         WorkoutBodyPart
   targetMuscle     String?
   movementType     ExerciseMovementType
@@ -375,6 +377,9 @@ model Exercise {
   thumbnailUrl     String?
   isSystem         Boolean              @default(true)
   isActive         Boolean              @default(true)
+  /// 직접 만든 운동의 주인. 시스템 운동은 비어 있다. 주인에게만 보인다
+  createdByUserId  String?
+  createdBy        User?                @relation("UserCreatedExercises", fields: [createdByUserId], references: [id], onDelete: SetNull)
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
   equipment        ExerciseEquipment[]
@@ -384,9 +389,11 @@ model Exercise {
   favorites        WorkoutFavorite[]
   workoutRecords   WorkoutRecord[]
 
+  @@unique([createdByUserId, name])
   @@index([bodyPart, isActive])
   @@index([difficulty])
   @@index([movementType])
+  @@index([createdByUserId, isActive])
 }
 
 model ExerciseEquipment {

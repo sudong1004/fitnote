@@ -2971,38 +2971,29 @@ async function main() {
   const exerciseMap = new Map<string, string>();
 
   for (const exercise of exercises) {
-    const result = await prisma.exercise.upsert({
-      where: {
-        name: exercise.name,
-      },
+    // 이름만으로는 하나로 정해지지 않는다(사용자가 같은 이름의 운동을 만들 수 있다).
+    // 시스템 운동은 만든 사람이 없는 행이다.
+    const data = {
+      bodyPart: exercise.bodyPart,
+      targetMuscle: exercise.targetMuscle,
+      movementType: exercise.movementType,
+      difficulty: exercise.difficulty,
+      description: exercise.description,
+      instruction: exercise.instruction,
+      breathing: exercise.breathing,
+      caution: exercise.caution,
+      isSystem: true,
+      isActive: true,
+    };
 
-      update: {
-        bodyPart: exercise.bodyPart,
-        targetMuscle: exercise.targetMuscle,
-        movementType: exercise.movementType,
-        difficulty: exercise.difficulty,
-        description: exercise.description,
-        instruction: exercise.instruction,
-        breathing: exercise.breathing,
-        caution: exercise.caution,
-        isSystem: true,
-        isActive: true,
-      },
-
-      create: {
-        name: exercise.name,
-        bodyPart: exercise.bodyPart,
-        targetMuscle: exercise.targetMuscle,
-        movementType: exercise.movementType,
-        difficulty: exercise.difficulty,
-        description: exercise.description,
-        instruction: exercise.instruction,
-        breathing: exercise.breathing,
-        caution: exercise.caution,
-        isSystem: true,
-        isActive: true,
-      },
+    const existing = await prisma.exercise.findFirst({
+      where: { name: exercise.name, createdByUserId: null },
+      select: { id: true },
     });
+
+    const result = existing
+      ? await prisma.exercise.update({ where: { id: existing.id }, data })
+      : await prisma.exercise.create({ data: { name: exercise.name, ...data } });
 
     exerciseMap.set(result.name, result.id);
 
