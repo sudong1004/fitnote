@@ -16,6 +16,7 @@ export {
 } from "./pt-shared";
 export {
   createContract,
+  addContractSessions,
   extendContract,
   cancelContract,
   listContracts,

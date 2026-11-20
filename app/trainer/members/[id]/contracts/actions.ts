@@ -10,6 +10,7 @@ import {
   cancelContract,
   cancelSession,
   completeSession,
+  addContractSessions,
   createContract,
   extendContract,
   markNoShow,
@@ -102,6 +103,29 @@ export async function extendContractAction(formData: FormData) {
 
   refresh(memberId, contractId);
   redirect(to);
+}
+
+/** 진행 중인 계약에 회차를 더한다. 기간은 그대로다. */
+export async function addSessionsAction(formData: FormData) {
+  const user = await requireUser();
+  const memberId = String(formData.get("connectionId") ?? "");
+  const contractId = String(formData.get("contractId") ?? "");
+  const to = `/trainer/members/${memberId}/contracts/${contractId}`;
+
+  try {
+    // 직접 적은 횟수가 있으면 그것을, 없으면 고른 칩의 횟수를 쓴다.
+    const typed = text(formData, "count");
+    await addContractSessions(
+      user.id,
+      contractId,
+      Number(typed ?? formData.get("countChoice")),
+    );
+  } catch (error) {
+    redirect(`${to}?error=${toFail(error)}`);
+  }
+
+  refresh(memberId, contractId);
+  redirect(`${to}?added=1`);
 }
 
 export async function cancelContractAction(formData: FormData) {

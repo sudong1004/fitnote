@@ -11,7 +11,15 @@ import {
   requireMyMember,
   requireTrainerProfile,
 } from "@/server/trainers/trainer.service";
-import { PTError, isExpired, requireMyContract } from "./pt-shared";
+import {
+  PTError,
+  isExpired,
+  requireMyContract,
+  syncUsedSessions,
+} from "./pt-shared";
+
+/** 한 계약의 총 횟수 상한. 처음 등록할 때와 중간에 더할 때 같은 값을 쓴다. */
+const MAX_TOTAL_SESSIONS = 300;
 
 /**
  * 계약을 만든다.
@@ -35,8 +43,11 @@ export async function createContract(
 
   const total = Math.trunc(input.totalSessions);
 
-  if (!Number.isFinite(total) || total < 1 || total > 300) {
-    throw new PTError("INVALID", "횟수는 1회부터 300회까지 넣을 수 있어요.");
+  if (!Number.isFinite(total) || total < 1 || total > MAX_TOTAL_SESSIONS) {
+    throw new PTError(
+      "INVALID",
+      `횟수는 1회부터 ${MAX_TOTAL_SESSIONS}회까지 넣을 수 있어요.`,
+    );
   }
 
   if (Number.isNaN(input.startedAt.getTime())) {
@@ -136,6 +147,86 @@ export async function extendContract(
           : contract.status,
     },
     select: { id: true, expiresAt: true, status: true },
+  });
+}
+
+/**
+ * 진행 중에 회차를 더한다.
+ *
+ * 20회권을 끊은 회원이 12회째에 "10회 더 할게요" 하는 일은 흔하다. 새 계약을 만들면
+ * 남은 횟수가 두 계약에 갈라져서 어느 쪽에서 깎이는지, 기간이 어디까지인지 따로
+ * 따져야 한다. 같은 계약의 총 횟수를 늘리면 지금까지의 회차 기록과 기간이 그대로
+ * 이어진다. 기간은 건드리지 않는다. 늘리려면 기간 연장을 따로 쓴다.
+ *
+ * 다 써서 닫혔던 계약(COMPLETED)은 횟수가 남으면 다시 열린다. 중단한 계약과
+ * 기간이 지난 계약은 되살리지 않는다. 앞쪽은 트레이너가 끝낸 계약이고, 뒤쪽은
+ * 기간을 먼저 연장해야 한다.
+ */
+export async function addContractSessions(
+  userId: string,
+  contractId: string,
+  count: number,
+) {
+  const trainer = await requireTrainerProfile(userId);
+  const contract = await requireMyContract(trainer.id, contractId);
+
+  const add = Math.trunc(count);
+
+  if (!Number.isFinite(add) || add < 1 || add > MAX_TOTAL_SESSIONS) {
+    throw new PTError(
+      "INVALID",
+      `더할 횟수는 1회부터 ${MAX_TOTAL_SESSIONS}회까지 넣을 수 있어요.`,
+    );
+  }
+
+  if (contract.status === PTContractStatus.CANCELLED) {
+    throw new PTError("CONTRACT_CLOSED", "중단한 계약에는 횟수를 더할 수 없어요.");
+  }
+
+  /*
+    기간이 지난 계약은 막는다. isExpired 는 진행 중(ACTIVE)인 계약만 지난 것으로 보므로, 다 써서
+    닫힌(COMPLETED) 계약의 만료일이 지난 경우를 놓친다. 그대로 더하면 다시 열리자마자 기간이
+    지나 있는 계약이 된다. 그래서 상태와 상관없이 만료일을 직접 본다.
+  */
+  const lapsed =
+    contract.status === PTContractStatus.EXPIRED ||
+    (contract.expiresAt !== null && contract.expiresAt.getTime() < Date.now());
+
+  if (lapsed) {
+    throw new PTError(
+      "CONTRACT_CLOSED",
+      "기간이 지난 계약이에요. 기간을 먼저 연장해주세요.",
+    );
+  }
+
+  return prisma.$transaction(async (tx) => {
+    /*
+      읽고 더하지 않고 조건을 걸어 한 번에 올린다. 두 화면에서 동시에 더해도 서로
+      덮어쓰지 않고, 상한도 이 문장 안에서 지켜진다.
+    */
+    const updated = await tx.pTContract.updateMany({
+      where: {
+        id: contract.id,
+        status: { not: PTContractStatus.CANCELLED },
+        totalSessions: { lte: MAX_TOTAL_SESSIONS - add },
+      },
+      data: { totalSessions: { increment: add } },
+    });
+
+    if (updated.count === 0) {
+      throw new PTError(
+        "INVALID",
+        `총 횟수는 ${MAX_TOTAL_SESSIONS}회를 넘길 수 없어요.`,
+      );
+    }
+
+    // 다 써서 닫혔던 계약은 여기서 다시 열린다.
+    await syncUsedSessions(tx, contract.id);
+
+    return tx.pTContract.findUniqueOrThrow({
+      where: { id: contract.id },
+      select: { id: true, totalSessions: true, usedSessions: true, status: true },
+    });
   });
 }
 

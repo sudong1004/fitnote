@@ -33,6 +33,7 @@ import {
 
 import { beginJournal } from "@/app/trainer/journals/actions";
 import {
+  addSessionsAction,
   cancelContractAction,
   extendContractAction,
   rescheduleSessionAction,
@@ -73,7 +74,7 @@ export default async function ContractPage({
 }: PageProps<"/trainer/members/[id]/contracts/[contractId]">) {
   const user = await requireUser();
   const { id, contractId } = await params;
-  const { error } = await searchParams;
+  const { error, added } = await searchParams;
 
   let member;
   let sessions;
@@ -272,7 +273,7 @@ export default async function ContractPage({
         </details>
       ) : contract.status === "ACTIVE" && !contract.expired ? (
         <p className="mt-3 rounded-[1.125rem] bg-[#f7f8f7] p-4 text-xs text-muted-foreground">
-          남은 횟수를 모두 잡아뒀어요. 계약을 연장하거나 새로 등록해주세요.
+          남은 횟수를 모두 잡아뒀어요. 아래에서 횟수를 더하거나 계약을 연장해주세요.
         </p>
       ) : null}
 
@@ -549,7 +550,53 @@ export default async function ContractPage({
         )}
       </section>
 
-      <section className="mt-5 rounded-[1.375rem] border border-border p-4">
+      {contract.status !== "CANCELLED" ? (
+        <section className="mt-5 rounded-[1.375rem] border border-border p-4">
+          <h2 className="text-[0.9375rem] font-bold">횟수 더하기</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            지금 {contract.totalSessions}회에서 더 늘려요. 지난 회차와 기간은 그대로 이어져요.
+          </p>
+          {added === "1" ? (
+            <p className="mt-2 rounded-[0.875rem] bg-brand-muted px-3.5 py-2.5 text-xs font-bold text-primary">
+              횟수를 더했어요. 총 {contract.totalSessions}회예요.
+            </p>
+          ) : null}
+          <form action={addSessionsAction} className="mt-2.5 flex flex-col gap-2.5">
+            {hidden}
+            <div className="flex gap-2" role="group" aria-label="더할 횟수">
+              {[5, 10, 20].map((value) => (
+                <label key={value} className="flex flex-1 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="countChoice"
+                    value={value}
+                    className="peer sr-only"
+                    defaultChecked={value === 10}
+                  />
+                  <span className="flex h-11 flex-1 items-center justify-center rounded-[0.875rem] border border-border text-sm font-semibold peer-checked:border-primary peer-checked:bg-brand-muted peer-checked:font-extrabold peer-checked:text-primary">
+                    +{value}회
+                  </span>
+                </label>
+              ))}
+            </div>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              직접 입력
+              <input
+                name="count"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={300}
+                placeholder="비우면 위에서 고른 횟수"
+                className="h-11 min-w-0 flex-1 rounded-[0.875rem] border border-border bg-background px-3 text-sm tabular-nums"
+              />
+            </label>
+            <SubmitButton variant="outline">횟수 더하기</SubmitButton>
+          </form>
+        </section>
+      ) : null}
+
+      <section className="mt-3 rounded-[1.375rem] border border-border p-4">
         <h2 className="text-[0.9375rem] font-bold">기간 연장</h2>
         <form action={extendContractAction} className="mt-2.5 flex flex-col gap-2.5">
           {hidden}
