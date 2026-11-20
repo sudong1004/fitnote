@@ -69,7 +69,7 @@
 | 회원 목록 | `/trainer/members` | 이름 검색, 회원 추가(서랍: 이름·연락처), 초대 코드 만들기 |
 | 회원 상세 | `/trainer/members/[id]` | 상단 새 알림장 쓰기, PT 계약(진행률), 수업 일정, 최근 수업, 알림장, 식단·개인 운동·몸의 변화(공유된 것만), 이어받기 링크(가입 전 회원) |
 | 계약 등록 | `/trainer/members/[id]/contracts/new` | 횟수, 기간, 이름, 센터 |
-| 계약 관리 | `/trainer/members/[id]/contracts/[contractId]` | 진행률, 수업 목록, 수업 잡기, 기간 연장, 계약 중단 |
+| 계약 관리 | `/trainer/members/[id]/contracts/[contractId]` | 진행률, 수업 목록, 수업 잡기, 횟수 더하기(+5·+10·+20 또는 직접), 기간 연장, 계약 중단 |
 | 공유 식단 | `/trainer/members/[id]/diet` | 회원이 공유한 식단 목록 |
 | 식단 상세·피드백 | `/trainer/members/[id]/diet/[dietId]` | 사진·내용, 피드백 쓰기·삭제 |
 | 회원 여정 | `/trainer/members/[id]/journey` | 함께한 기간의 변화 타임라인 |

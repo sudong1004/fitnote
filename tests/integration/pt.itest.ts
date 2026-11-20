@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { prisma } from "@/lib/prisma";
 import {
+  addContractSessions,
+  cancelContract,
   cancelSession,
   completeSession,
   createContract,
+  extendContract,
   listSchedulableContracts,
   reopenSession,
   rescheduleSession,
@@ -13,7 +16,7 @@ import {
 import { endConnection } from "@/server/trainers/connection.service";
 import { getNextSessionPlan } from "@/server/pt/next-session.service";
 
-import { makeContract } from "./helpers";
+import { makeContract, makeTrainer } from "./helpers";
 
 const when = (hoursFromNow: number) =>
   new Date(Date.now() + hoursFromNow * 3_600_000);
@@ -236,5 +239,95 @@ describe("다음 수업 잡기", () => {
 
     const plan = await getNextSessionPlan(trainer.userId, only.id);
     expect(plan.canSchedule).toBe(false);
+  });
+});
+
+describe("횟수 더하기", () => {
+  const totalOf = (id: string) =>
+    prisma.pTContract.findUniqueOrThrow({
+      where: { id },
+      select: { totalSessions: true, usedSessions: true, status: true, expiresAt: true },
+    });
+
+  it("총 횟수만 늘고, 지난 회차와 기간은 그대로다", async () => {
+    const { trainer, contractId } = await makeContract(5, createContract);
+    const first = await book(trainer.userId, contractId, 1);
+    await completeSession(trainer.userId, first.id);
+    const before = await totalOf(contractId);
+
+    const result = await addContractSessions(trainer.userId, contractId, 10);
+
+    expect(result).toMatchObject({ totalSessions: 15, usedSessions: 1, status: "ACTIVE" });
+    expect(await totalOf(contractId)).toMatchObject({
+      totalSessions: 15,
+      usedSessions: before.usedSessions,
+      expiresAt: before.expiresAt,
+    });
+  });
+
+  it("다 써서 닫힌 계약은 횟수를 더하면 다시 열리고, 새 수업을 잡을 수 있다", async () => {
+    const { trainer, contractId } = await makeContract(1, createContract);
+    const only = await book(trainer.userId, contractId, 1);
+    await completeSession(trainer.userId, only.id);
+    expect((await totalOf(contractId)).status).toBe("COMPLETED");
+
+    await addContractSessions(trainer.userId, contractId, 2);
+
+    expect(await totalOf(contractId)).toMatchObject({ totalSessions: 3, status: "ACTIVE" });
+    await expect(book(trainer.userId, contractId, 5)).resolves.toBeDefined();
+  });
+
+  it("동시에 더해도 하나도 잃지 않는다", async () => {
+    const { trainer, contractId } = await makeContract(5, createContract);
+
+    await Promise.all([
+      addContractSessions(trainer.userId, contractId, 3),
+      addContractSessions(trainer.userId, contractId, 4),
+    ]);
+
+    expect((await totalOf(contractId)).totalSessions).toBe(12);
+  });
+
+  it("1회 미만·소수·상한을 넘는 값은 받지 않는다", async () => {
+    const { trainer, contractId } = await makeContract(5, createContract);
+
+    for (const bad of [0, -3, Number.NaN, 301]) {
+      await expect(addContractSessions(trainer.userId, contractId, bad)).rejects.toMatchObject({
+        code: "INVALID",
+      });
+    }
+    // 5 + 296 = 301 이라 넘는다. 295 는 딱 300.
+    await expect(addContractSessions(trainer.userId, contractId, 296)).rejects.toMatchObject({
+      code: "INVALID",
+    });
+    await expect(addContractSessions(trainer.userId, contractId, 295)).resolves.toMatchObject({
+      totalSessions: 300,
+    });
+    expect((await totalOf(contractId)).totalSessions).toBe(300);
+  });
+
+  it("중단한 계약과 기간이 지난 계약에는 더할 수 없다", async () => {
+    const stopped = await makeContract(5, createContract);
+    await cancelContract(stopped.trainer.userId, stopped.contractId);
+    await expect(
+      addContractSessions(stopped.trainer.userId, stopped.contractId, 5),
+    ).rejects.toMatchObject({ code: "CONTRACT_CLOSED" });
+
+    const lapsed = await makeContract(5, createContract);
+    await extendContract(lapsed.trainer.userId, lapsed.contractId, new Date(Date.now() - 86_400_000));
+    await expect(
+      addContractSessions(lapsed.trainer.userId, lapsed.contractId, 5),
+    ).rejects.toMatchObject({ code: "CONTRACT_CLOSED" });
+
+    expect((await totalOf(stopped.contractId)).totalSessions).toBe(5);
+  });
+
+  it("다른 트레이너의 계약에는 더할 수 없다", async () => {
+    const { contractId } = await makeContract(5, createContract);
+    const other = await makeTrainer();
+
+    await expect(addContractSessions(other.userId, contractId, 5)).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
   });
 });
