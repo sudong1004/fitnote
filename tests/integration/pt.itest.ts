@@ -322,6 +322,19 @@ describe("횟수 더하기", () => {
     expect((await totalOf(stopped.contractId)).totalSessions).toBe(5);
   });
 
+  it("다 써서 닫혔고 만료일도 지난 계약에는 더할 수 없다", async () => {
+    const { trainer, contractId } = await makeContract(1, createContract);
+    const only = await book(trainer.userId, contractId, 1);
+    await completeSession(trainer.userId, only.id);
+    await extendContract(trainer.userId, contractId, new Date(Date.now() - 86_400_000));
+    expect((await totalOf(contractId)).status).toBe("COMPLETED");
+
+    await expect(addContractSessions(trainer.userId, contractId, 5)).rejects.toMatchObject({
+      code: "CONTRACT_CLOSED",
+    });
+    expect((await totalOf(contractId)).totalSessions).toBe(1);
+  });
+
   it("다른 트레이너의 계약에는 더할 수 없다", async () => {
     const { contractId } = await makeContract(5, createContract);
     const other = await makeTrainer();

@@ -183,7 +183,16 @@ export async function addContractSessions(
     throw new PTError("CONTRACT_CLOSED", "중단한 계약에는 횟수를 더할 수 없어요.");
   }
 
-  if (contract.status === PTContractStatus.EXPIRED || isExpired(contract)) {
+  /*
+    기간이 지난 계약은 막는다. isExpired 는 진행 중(ACTIVE)인 계약만 지난 것으로 보므로, 다 써서
+    닫힌(COMPLETED) 계약의 만료일이 지난 경우를 놓친다. 그대로 더하면 다시 열리자마자 기간이
+    지나 있는 계약이 된다. 그래서 상태와 상관없이 만료일을 직접 본다.
+  */
+  const lapsed =
+    contract.status === PTContractStatus.EXPIRED ||
+    (contract.expiresAt !== null && contract.expiresAt.getTime() < Date.now());
+
+  if (lapsed) {
     throw new PTError(
       "CONTRACT_CLOSED",
       "기간이 지난 계약이에요. 기간을 먼저 연장해주세요.",
